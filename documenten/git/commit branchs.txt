@@ -1,0 +1,5 @@
+Wanneer je naar een branch commit graag de volgende stappen volgen: 
+git switch [branch naam] 
+git add . 
+git commit -a -m "commit naam"
+git push -u origin [branch naam] 

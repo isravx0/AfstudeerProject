@@ -1,0 +1,19 @@
+Inhoud van de iteratiedocument =
+	- Inleiding.
+		. Begin met een korte samenvatting van wat er in de afgelopen sprint is 		gebeurd en de doelstellingen die werden gesteld. Dit zet de context voor de 		rest van het document.
+
+	- Feedback van de oude Sprint - Verbetering laten zien.
+		. Laat zien welke feedback uit de vorige sprint review is verwerkt en hoe de 		verbeteringen zijn doorgevoerd. Dit toont dat je werkt aan continue 			verbetering.
+
+	- Bijzonderheden/Bugs/Problemen.
+		. Bespreek de problemen of bugs die tijdens de sprint zijn opgetreden en hoe 		deze zijn aangepakt of wat er nog moet gebeuren.
+
+	- Gemaakte feature/Backlog.
+		. Geef een overzicht van de voltooide features "een lijst van" en welke items 		van de backlog nog open staan.
+
+	- Verwacht planning van de komende sprint.
+		. Beschrijf de focus en de geplande doelen voor de volgende sprint, inclusief 		welke features je verwacht af te ronden.
+
+	- Afsluiten.
+		. Sluit af met een samenvatting en eventuele actiepunten of deadlines voor de 		volgende stappen. Dit is ook een goed moment om te vragen naar eventuele extra 		feedback van het bedrijf.
+

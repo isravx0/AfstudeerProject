@@ -1,0 +1,5 @@
+De opdracht is om een webapplicatie te maken waarmee je kunt simuleren hoe een thuisbatterij werkt gedurende een dag.
+De gebruiker kan invoeren hoeveel energie ze verbruiken, hoeveel zonnepanelen ze hebben, de capaciteit van de batterij, en meer.
+De applicatie berekent per uur wat de batterij doet (opladen, ontladen, of niets) en laat in een grafiek zien wat de impact is op de energiekosten. 
+Gebruikers kunnen verschillende instellingen proberen om te ontdekken wat de beste strategie is.
+Er zijn uitbreidingsmogelijkheden zoals meerdere dagen simuleren, gebruik van actuele energieprijzen, of het opslaan van instellingen.

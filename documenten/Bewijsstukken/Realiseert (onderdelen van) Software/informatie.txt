@@ -1,0 +1,8 @@
+Realiseert (onderdelen van) Software
+
+Situatie: Geef een voorbeeld van hoe je een specifiek onderdeel van software hebt ontwikkeld. Dit kan een feature zijn of een module binnen een groter project.
+
+Bewijsstukken:
+	- Screenshot van de code of een onderdeel van de applicatie
+	- Link naar de GitHub-repository of codebase
+	- Voorbeeld van een opleverdocument met beschrijving van de gerealiseerde onderdelen

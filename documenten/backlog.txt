@@ -1,0 +1,30 @@
+Alle pagina's van het website:
+- Welkom pagina
+- Register pagina
+- Login pagina
+- Hoofdpagina (Header, content , footer)
+- Menu (informatie, gebruikers account, instelling, dashboard, log uit)
+- dashboard zonnepanelen en energie
+- dashboard voor batterij simulatie
+
+
+Features:
+welkom pagina:
+- Pagina layout
+- Pagina documentatie (logo,text)
+- register knop
+- inog knop
+- footer
+-header
+
+
+registr pagina:
+- pagina layout
+- registatie formlier
+- regitren knop
+- pop ups (fout veld in informatie)
+- succes melding (terug na inlog)
+- header (logo en naam)
+- footer (copyright)
+- (captcha)
+
