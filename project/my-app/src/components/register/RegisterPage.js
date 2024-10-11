@@ -11,6 +11,9 @@ const RegisterForm = () => {
     location: "",
   });
 
+  const [isSubmitted, setIsSubmitted] = useState(false); // State to track successful registration
+  const [loading, setLoading] = useState(false); // For showing a loading indicator
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -18,10 +21,33 @@ const RegisterForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted: ", formData);
+    setLoading(true); // Start loading state
+
+    try {
+      // Simulate an API call for registration
+      setTimeout(() => {
+        setIsSubmitted(true); // Mark form as successfully submitted
+        setLoading(false); // Stop loading
+      }, 2000); // Simulate delay
+    } catch (error) {
+      console.log("Error registering:", error);
+      setLoading(false); // Stop loading if there's an error
+    }
   };
+
+  // If form is submitted successfully, show confirmation message
+  if (isSubmitted) {
+    return (
+      <div className="confirmation-container">
+        <h1>Registration Successful!</h1>
+        <p>Welcome, {formData.name}! Your account has been successfully created.</p>
+        <p>You can now <a href="/login">log in</a> to access your dashboard and start managing your energy consumption.</p>
+        <p>Thank you for joining us!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="register-container">
@@ -97,8 +123,8 @@ const RegisterForm = () => {
               <a href="/">Privacy Policy</a>.
             </label>
           </div>
-          <button type="submit" className="register-submit-button">
-            Sign up
+          <button type="submit" className="register-submit-button" disabled={loading}>
+            {loading ? "Registering..." : "Sign up"}
           </button>
         </form>
         <p className="register-login-prompt">
