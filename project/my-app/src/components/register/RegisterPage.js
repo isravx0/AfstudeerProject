@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "./Style/RegisterForm.css";
+import axios from "axios"; // Ensure axios is imported
+import "./Style/RegisterForm.css"; // Import your styles
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const RegisterForm = () => {
 
   const [isSubmitted, setIsSubmitted] = useState(false); // State to track successful registration
   const [loading, setLoading] = useState(false); // For showing a loading indicator
+  const [error, setError] = useState(null); // State for error messages
 
   const handleChange = (e) => {
     setFormData({
@@ -24,16 +26,32 @@ const RegisterForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Start loading state
+    setError(null); // Reset error message
+
+    // Validate that the passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false); // Stop loading
+      return; // Exit the function
+    }
 
     try {
-      // Simulate an API call for registration
-      setTimeout(() => {
-        setIsSubmitted(true); // Mark form as successfully submitted
-        setLoading(false); // Stop loading
-      }, 2000); // Simulate delay
+      // Send the actual form data to the API
+      await axios.post('http://localhost:5000/api/register', {
+        email: formData.email,
+        name: formData.name,
+        password: formData.password,
+        phoneNumber: formData.phoneNumber,
+        location: formData.location,
+      });
+
+      alert('User registered successfully');
+      setIsSubmitted(true); // Mark form as successfully submitted
     } catch (error) {
       console.log("Error registering:", error);
-      setLoading(false); // Stop loading if there's an error
+      setError("Error registering user. Please try again."); // Set error message for user feedback
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -126,6 +144,9 @@ const RegisterForm = () => {
           <button type="submit" className="register-submit-button" disabled={loading}>
             {loading ? "Registering..." : "Sign up"}
           </button>
+
+          {/* Display error message if there's one */}
+          {error && <p className="error-message" style={{ color: "red" }}>{error}</p>}
         </form>
         <p className="register-login-prompt">
           Have an account? <a href="/login">Log in here!</a>
