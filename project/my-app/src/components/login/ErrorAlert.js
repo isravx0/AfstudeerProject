@@ -1,5 +1,5 @@
 import React from 'react';
-import './style/ErrorAlert.css';
+import './Style/ErrorAlert.css';
 
 const ErrorAlert = ({ id, title, message, onClose, className }) => {
   return (

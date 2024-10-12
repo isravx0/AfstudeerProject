@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom"; // To handle navigation after login
 import ErrorAlert from "./ErrorAlert"; 
 import LoginButtons from "./LoginButtons";
-import "./style/LoginPage.css";
+import "./Style/LoginPage.css";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -153,7 +153,7 @@ const LoginForm = () => {
               />
               <label htmlFor="remember">Remember me</label>
             </div>
-            <a href="/" className="forgot-password-link">Forgot password?</a>
+            <a href="/password_reset" className="forgot-password-link">Forgot password?</a>
           </div>
           
           <div className="button">
