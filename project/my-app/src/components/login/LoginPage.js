@@ -65,6 +65,11 @@ const LoginForm = () => {
     }
   };
 
+  // Handle cancel button click (navigates back to welcome page)
+  const handleCancel = () => {
+    navigate('/'); // Redirect to welcome page (or another page)
+  };
+
   // Error handling function
   const handleError = (error) => {
     if (error.response) {
@@ -88,7 +93,6 @@ const LoginForm = () => {
     }
   };
 
-  // Function to show alerts
   const showAlert = (title, message) => {
     const newAlert = {
       id: Date.now(),
@@ -157,7 +161,9 @@ const LoginForm = () => {
           </div>
           
           <div className="button">
-            <LoginButtons onClick={handleSubmit} /> 
+            <LoginButtons onClick={handleSubmit} />
+            {/* Add the cancel button here */}
+            <button type="button" className="cancel-button" onClick={handleCancel}>Back to welcome page</button>
           </div>
 
           <div className="alert-container">
@@ -181,9 +187,7 @@ const LoginForm = () => {
           <p className="login-signup-prompt">
             Don't have an account? <a href="/register" className="register-link">Register here</a>
           </p>
-          <p className="welcome-back-link">
-            <a href="/" className="back-welcome-link">Back to welcome page</a>
-          </p>
+
         </div>
 
         <div className="login-or-divider">

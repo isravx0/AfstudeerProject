@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios"; // Ensure axios is imported
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import "./Style/RegisterForm.css"; // Import your styles
 
 const RegisterForm = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -53,6 +55,11 @@ const RegisterForm = () => {
     } finally {
       setLoading(false); // Stop loading
     }
+  };
+
+  // Handle cancel button click (navigates back to welcome page)
+  const handleCancel = () => {
+    navigate('/'); // Redirect to welcome page (or another page)
   };
 
   // If form is submitted successfully, show confirmation message
@@ -144,6 +151,9 @@ const RegisterForm = () => {
           <button type="submit" className="register-submit-button" disabled={loading}>
             {loading ? "Registering..." : "Sign up"}
           </button>
+          
+          {/* Add the cancel button here */}
+          <button type="button" className="cancel-button" onClick={handleCancel}>Cancel</button>
 
           {/* Display error message if there's one */}
           {error && <p className="error-message" style={{ color: "red" }}>{error}</p>}
