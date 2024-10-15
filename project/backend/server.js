@@ -20,7 +20,7 @@ const db = mysql.createConnection({
     database: 'backend_database'
 });
 
-// Verbinden met de database
+// Connect to the database
 db.connect(err => {
     if (err) {
         console.error('Error connecting to the database:', err);
@@ -59,7 +59,7 @@ app.post('/api/register', (req, res) => {
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
 
-    // Zoek de gebruiker op basis van het e-mailadres
+    // Find user by email
     db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
         if (err || results.length === 0) {
             return res.status(401).send('User not found');
@@ -67,13 +67,13 @@ app.post('/api/login', (req, res) => {
 
         const user = results[0];
 
-        // Vergelijk het wachtwoord
+        // Compare password
         const passwordIsValid = bcrypt.compareSync(password, user.password);
         if (!passwordIsValid) {
             return res.status(401).send('Invalid password');
         }
 
-        // Genereer een token
+        // Generate a token
         const token = jwt.sign({ id: user.id }, 'your_jwt_secret', { expiresIn: 86400 }); // 24 hours
         res.status(200).send({ auth: true, token: token });
     });
@@ -83,20 +83,18 @@ app.post('/api/login', (req, res) => {
 app.post('/api/password-reset', (req, res) => {
     const { email } = req.body;
 
-    // Zoek naar de gebruiker in de database op basis van e-mailadres
+    // Find user by email
     db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
         if (err) {
             console.error('Error checking email:', err);
             return res.status(500).send('Error checking email');
         }
 
-        // Controleer of het e-mailadres in de database staat
+        // Check if email in the database.
         if (results.length === 0) {
             return res.status(404).send('Email not found');
         }
 
-        // Logica om het wachtwoordherstelproces te starten (bijv. e-mail versturen)
-        // Hier zou je normaal gesproken een e-mail sturen met instructies
         res.status(200).send('Password reset email sent');
     });
 });

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // To handle navigation after login
-import ErrorAlert from "./ErrorAlert"; 
+import { useNavigate } from "react-router-dom";
+import ErrorAlert from "./ErrorAlert";
 import LoginButtons from "./LoginButtons";
-import "./Style/LoginPage.css";
+import "./style/LoginPage.css";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -15,8 +15,8 @@ const LoginForm = () => {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [blockTime, setBlockTime] = useState(null);
   const [isBlocked, setIsBlocked] = useState(false);
-  const [loading, setLoading] = useState(false); // Added loading state
-  const navigate = useNavigate(); // To redirect users after a successful login.
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -55,7 +55,7 @@ const LoginForm = () => {
       showAlert('Login Successful', 'Redirecting to your dashboard...');
 
       setTimeout(() => {
-        navigate('/dashboard'); // Redirect to the dashboard after successful login
+        navigate('/homepage'); // Redirect to the dashboard after successful login
       }, 1000); // Short delay to show feedback
 
     } catch (error) {

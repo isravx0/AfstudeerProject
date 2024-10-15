@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import axios from "axios"; // Ensure axios is imported
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import "./Style/RegisterForm.css"; // Import your styles
+import "./style/RegisterForm.css"; // Import your styles
 
 const RegisterForm = () => {
   const navigate = useNavigate(); // Initialize useNavigate
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
     phoneNumber: "",
     location: "",
-  });
+  };
+  const [formData, setFormData] = useState(initialFormData);
 
   const [isSubmitted, setIsSubmitted] = useState(false); // State to track successful registration
   const [loading, setLoading] = useState(false); // For showing a loading indicator
@@ -59,7 +60,8 @@ const RegisterForm = () => {
 
   // Handle cancel button click (navigates back to welcome page)
   const handleCancel = () => {
-    navigate('/'); // Redirect to welcome page (or another page)
+    //setFormData(initialFormData);
+    navigate('/');
   };
 
   // If form is submitted successfully, show confirmation message
@@ -148,13 +150,14 @@ const RegisterForm = () => {
               <a href="/">Privacy Policy</a>.
             </label>
           </div>
-          <button type="submit" className="register-submit-button" disabled={loading}>
-            {loading ? "Registering..." : "Sign up"}
-          </button>
           
-          {/* Add the cancel button here */}
-          <button type="button" className="cancel-button" onClick={handleCancel}>Cancel</button>
-
+          <div className="register-button-container">
+            <button type="submit" className="register-submit-button" disabled={loading}>
+              {loading ? "Registering..." : "Sign up"}
+            </button>
+            {/* Add the cancel button here */}
+            <button type="button" className="register-cancel-button" onClick={handleCancel}>Cancel</button>
+          </div>
           {/* Display error message if there's one */}
           {error && <p className="error-message" style={{ color: "red" }}>{error}</p>}
         </form>
