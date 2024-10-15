@@ -1,32 +1,42 @@
 import React, { useState } from "react";
+import axios from 'axios';
 import './Style/password_reset.css';
 
 const PasswordReset = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false); // Om de staat van indienen bij te houden
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleChange = (e) => {
     setEmail(e.target.value);
   };
 
+  const validateEmailFormat = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Dummy validatie voor email opmaak
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Validatie van het e-mailadres
+    if (!validateEmailFormat(email)) {
       setMessage("Invalid email format. Please enter a valid email.");
       return;
     }
 
-    // Simulatie van een verzoek naar backend om wachtwoordherstel aan te vragen
     try {
-      // const response = await axios.post('/api/password-reset', { email });
-      setMessage("If this email is registered, you will receive an email with instructions to reset your password.");
+      // Verzoek naar de server om te controleren of het e-mailadres geregistreerd is
+      const response = await axios.post('http://localhost:5000/api/password-reset', { email });
+      setMessage("Password reset instructions have been sent to your email.");
       setIsSubmitted(true); // Formulier is succesvol ingediend
     } catch (error) {
-      setMessage("There was an error processing your request. Please try again.");
+      if (error.response && error.response.status === 404) {
+        // Als het e-mailadres niet is gevonden in de database
+        setMessage("This email is not registered.");
+      } else {
+        setMessage("There was an error processing your request. Please try again.");
+      }
     }
   };
 
@@ -39,7 +49,7 @@ const PasswordReset = () => {
       </div>
 
       <div className="password-reset-right-panel">
-        <p> <strong>Email address: *</strong> </p>
+        <p><strong>Email address: *</strong></p>
         <form onSubmit={handleSubmit} className="password-reset-form">
           <input
             type="email"
@@ -53,7 +63,6 @@ const PasswordReset = () => {
           <button type="submit" className="password-reset-button">Send Link!</button>
         </form>
 
-        {/* state om bij te houden of het formulier succesvol is ingediend.*/}
         {isSubmitted && message && (
           <p className="password-reset-message">{message}</p>
         )}
@@ -68,4 +77,3 @@ const PasswordReset = () => {
 };
 
 export default PasswordReset;
-

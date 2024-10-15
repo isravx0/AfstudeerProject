@@ -79,6 +79,29 @@ app.post('/api/login', (req, res) => {
     });
 });
 
+// Password reset endpoint
+app.post('/api/password-reset', (req, res) => {
+    const { email } = req.body;
+
+    // Zoek naar de gebruiker in de database op basis van e-mailadres
+    db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+        if (err) {
+            console.error('Error checking email:', err);
+            return res.status(500).send('Error checking email');
+        }
+
+        // Controleer of het e-mailadres in de database staat
+        if (results.length === 0) {
+            return res.status(404).send('Email not found');
+        }
+
+        // Logica om het wachtwoordherstelproces te starten (bijv. e-mail versturen)
+        // Hier zou je normaal gesproken een e-mail sturen met instructies
+        res.status(200).send('Password reset email sent');
+    });
+});
+
+
 // Start de server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
