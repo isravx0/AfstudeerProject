@@ -135,9 +135,9 @@ const Homepage = () => {
             />
           </div>
 
-          {/* 14-Day weather forecast with Weather API */}
+          {/* 14-Day Battery Status with Weather API */}
           <div className="col-md-4 chart-box">
-            <h4>14-day weather forecast</h4>
+            <h4>14-day Battery Status</h4>
             <div className="battery-status">
               {weatherData.length > 0 ? (
                 <ul>
