@@ -1,6 +1,8 @@
 body {
   background-color: #fff; /* Light gray */
   box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
 }
 
 main {
@@ -19,6 +21,7 @@ main button.register, main button.login {
   cursor: pointer;
   background-color: #1D3F75;
   color: #fff;
+  font-size: x-large;
 }
 
 main button.register:hover, main button.login:hover {
@@ -39,3 +42,9 @@ main h1{
 main h2{
   font-size: 200%;
 }
+/* Responsive styling */
+@media screen and (max-width: 768px) {
+  body{
+    font-size: medium;
+  }
+  }
