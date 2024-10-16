@@ -6,6 +6,7 @@ import Footer from './components/welcomepage/Footer';
 import LoginPage from './components/login/LoginPage';
 import RegisterPage from './components/register/RegisterPage';
 import PasswordReset from './components/password_reset/Password_reset';
+import ResetPassword from './components/password_reset/NewPassword';
 import Homepage from './components/homepage/homepage';
 import './App.css';
 
@@ -18,9 +19,10 @@ function App() {
             <Route path="/" element={<MainContent />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/password_reset" element={<PasswordReset />} /> {/* Voeg de nieuwe route toe */}
-            <Route path="/homepage" element={<Homepage />} /> {/* Voeg de nieuwe route toe */}
-
+            <Route path="/password_reset" element={<PasswordReset />} />
+            <Route path="/homepage" element={<Homepage />} />
+            <Route path="/reset/:token" element={<ResetPassword />} />
+            <Route path="/password-reset" element={<PasswordReset />} />
           </Routes>
         <Footer />
       </div>

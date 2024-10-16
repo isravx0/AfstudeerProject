@@ -1,5 +1,5 @@
 body {
-  background-color: #fff; /* Light gray */
+  background-color: #fff;
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
   font-size: large;
@@ -42,7 +42,7 @@ main h1{
 main h2{
   font-size: 200%;
 }
-/* Responsive styling */
+
 @media screen and (max-width: 768px) {
   body{
     font-size: medium;
