@@ -15,15 +15,15 @@ function App() {
     <Router>
       <div className="App">
         <Header />
-          <Routes>
-            <Route path="/" element={<MainContent />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/password_reset" element={<PasswordReset />} />
-            <Route path="/homepage" element={<Homepage />} />
-            <Route path="/reset/:token" element={<ResetPassword />} />
-            <Route path="/password-reset" element={<PasswordReset />} />
-          </Routes>
+        <Routes>
+          <Route path="/" element={<MainContent />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/password_reset" element={<PasswordReset />} />
+          <Route path="/homepage" element={<Homepage />} />
+          <Route path="/reset/:token" element={<ResetPassword />} />
+          <Route path="/password-reset" element={<PasswordReset />} />
+        </Routes>
         <Footer />
       </div>
     </Router>
