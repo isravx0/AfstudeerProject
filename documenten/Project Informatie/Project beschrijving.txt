@@ -3,3 +3,8 @@ De gebruiker kan invoeren hoeveel energie ze verbruiken, hoeveel zonnepanelen ze
 De applicatie berekent per uur wat de batterij doet (opladen, ontladen, of niets) en laat in een grafiek zien wat de impact is op de energiekosten. 
 Gebruikers kunnen verschillende instellingen proberen om te ontdekken wat de beste strategie is.
 Er zijn uitbreidingsmogelijkheden zoals meerdere dagen simuleren, gebruik van actuele energieprijzen, of het opslaan van instellingen.
+
+------------
+Een thuisbatterij is een grote batterij die je thuis kunt gebruiken om energie op te slaan. Stel je voor dat je met zonnepanelen energie maakt, net als je telefoon die wordt opgeladen als je hem in het stopcontact steekt. Maar soms maak je meer energie dan je meteen nodig hebt. Die extra energie kun je in een thuisbatterij stoppen, net zoals je spaarpot waar je geld in bewaart voor later.
+
+Deze simulator helpt je te begrijpen hoe je die batterij het beste kunt gebruiken. Het laat je per uur van de dag zien wat de batterij doet, zodat je kunt zien wanneer het slim is om energie te gebruiken of op te slaan. Je kunt zelf instellingen aanpassen, zoals hoe groot je batterij is en hoeveel zonnepanelen je hebt, om te zien hoe je het beste kunt besparen.

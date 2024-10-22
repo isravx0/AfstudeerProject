@@ -19,7 +19,7 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'backend_database'
+    database: 'depotproject_backend'
 });
 
 // Connect to the database
