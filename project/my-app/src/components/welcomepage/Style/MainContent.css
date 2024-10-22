@@ -43,6 +43,9 @@ main h2{
   font-size: 200%;
 }
 
+main li{
+  list-style-type: none;
+}
 @media screen and (max-width: 768px) {
   body{
     font-size: medium;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ErrorAlert from "./ErrorAlert";
+import SuccessAlert from "./SuccessAlert";
 import LoginButtons from "./LoginButtons";
 import "./style/LoginPage.css";
 
@@ -15,8 +16,8 @@ const LoginForm = () => {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [blockTime, setBlockTime] = useState(null);
   const [isBlocked, setIsBlocked] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // Added loading state
+  const navigate = useNavigate(); // To redirect users after a successful login.
 
   const handleChange = (e) => {
     setFormData({
@@ -52,10 +53,10 @@ const LoginForm = () => {
       }
 
       setLoginAttempts(0); // Reset failed attempts
-      showAlert('Login Successful', 'Redirecting to your dashboard...');
+      showAlert('Login Successful', 'Redirecting to your dashboard...', 'success'); // Toon succesmelding met groene alert
 
       setTimeout(() => {
-        navigate('/homepage'); // Redirect to the dashboard after successful login
+        navigate('/dashboard'); // Redirect to the dashboard after successful login
       }, 1000); // Short delay to show feedback
 
     } catch (error) {
@@ -65,11 +66,10 @@ const LoginForm = () => {
     }
   };
 
-  // Handle cancel button click (navigates back to welcome page)
   const handleCancel = () => {
     navigate('/'); // Redirect to welcome page (or another page)
   };
-
+  
   // Error handling function
   const handleError = (error) => {
     if (error.response) {
@@ -93,11 +93,13 @@ const LoginForm = () => {
     }
   };
 
-  const showAlert = (title, message) => {
+  // Functie om meldingen te tonen
+  const showAlert = (title, message, type = 'error') => {
     const newAlert = {
       id: Date.now(),
       title,
       message,
+      type, // Voeg het type alert toe (error of success)
       fading: false,
     };
     setAlerts(prev => [...prev, newAlert]);
@@ -161,21 +163,32 @@ const LoginForm = () => {
           </div>
           
           <div className="button">
-            <LoginButtons onClick={handleSubmit} />
+          <LoginButtons onClick={handleSubmit} />
             {/* Add the cancel button here */}
             <button type="button" className="cancel-button" onClick={handleCancel}>Back to welcome page</button>
           </div>
 
           <div className="alert-container">
             {alerts.map((alert) => (
-              <ErrorAlert
-                key={alert.id}
-                id={alert.id}
-                title={alert.title}
-                message={alert.message}
-                onClose={removeAlert}
-                className=""
-              />
+              alert.type === 'success' ? (
+                <SuccessAlert
+                  key={alert.id}
+                  id={alert.id}
+                  title={alert.title}
+                  message={alert.message}
+                  onClose={removeAlert}
+                  className=""
+                />
+              ) : (
+                <ErrorAlert
+                  key={alert.id}
+                  id={alert.id}
+                  title={alert.title}
+                  message={alert.message}
+                  onClose={removeAlert}
+                  className=""
+                />
+              )
             ))}
           </div>
 
@@ -187,17 +200,8 @@ const LoginForm = () => {
           <p className="login-signup-prompt">
             Don't have an account? <a href="/register" className="register-link">Register here</a>
           </p>
-
         </div>
 
-        <div className="login-or-divider">
-          <span>OR</span>
-        </div>
-        <div className="login-social-login">
-          <button className="login-social-button facebook">f</button>
-          <button className="login-social-button google">G</button>
-          <button className="login-social-button apple"></button>
-        </div>
       </div>
       <div className="login-right-panel">
         <h1>Welcome back!</h1>

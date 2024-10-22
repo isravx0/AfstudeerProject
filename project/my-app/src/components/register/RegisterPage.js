@@ -38,6 +38,27 @@ const RegisterForm = () => {
       return; // Exit the function
     }
 
+    // Validate that the password is at least 8 characters long
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      setLoading(false); // Stop loading
+      return; // Exit the function
+    }
+
+    // Validate that phoneNumber contains only numbers
+    const phoneNumberPattern = /^\d+$/;
+    if (!phoneNumberPattern.test(formData.phoneNumber)) {
+      setError("Phone number must contain only numbers");
+      setLoading(false); // Stop loading
+      return; // Exit the function
+    }
+
+    // Validate that the password is at least 8 characters long
+    if (formData.phoneNumber.length < 5) {
+      setError("Phone number must be at least 5 numbers long");
+      setLoading(false); // Stop loading
+      return; // Exit the function
+    }
     try {
       // Send the actual form data to the API
       await axios.post('http://localhost:5000/api/register', {
@@ -60,7 +81,6 @@ const RegisterForm = () => {
 
   // Handle cancel button click (navigates back to welcome page)
   const handleCancel = () => {
-    //setFormData(initialFormData);
     navigate('/');
   };
 
@@ -70,7 +90,7 @@ const RegisterForm = () => {
       <div className="confirmation-container">
         <h1>Registration Successful!</h1>
         <p>Welcome, {formData.name}! Your account has been successfully created.</p>
-        <p>You can now <a href="/login">log in</a> to access your dashboard and start managing your energy consumption.</p>
+        <p>You can now <strong> <a href="/login">log in</a> </strong> to access your dashboard and start managing your energy consumption.</p>
         <p>Thank you for joining us!</p>
       </div>
     );
@@ -150,30 +170,19 @@ const RegisterForm = () => {
               <a href="/">Privacy Policy</a>.
             </label>
           </div>
-          
+
           <div className="register-button-container">
             <button type="submit" className="register-submit-button" disabled={loading}>
               {loading ? "Registering..." : "Sign up"}
             </button>
-            {/* Add the cancel button here */}
             <button type="button" className="register-cancel-button" onClick={handleCancel}>Cancel</button>
           </div>
-          {/* Display error message if there's one */}
           {error && <p className="error-message" style={{ color: "red" }}>{error}</p>}
         </form>
         <p className="register-login-prompt">
           Have an account? <a href="/login">Log in here!</a>
         </p>
 
-        <div className="register-or-divider">
-          <span>OR</span>
-        </div>
-
-        <div className="register-social-login">
-          <button className="register-social-button facebook">f</button>
-          <button className="register-social-button google">G</button>
-          <button className="register-social-button apple"></button>
-        </div>
       </div>
     </div>
   );
