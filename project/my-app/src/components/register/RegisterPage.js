@@ -14,7 +14,6 @@ const RegisterForm = () => {
     location: "",
   };
   const [formData, setFormData] = useState(initialFormData);
-
   const [isSubmitted, setIsSubmitted] = useState(false); // State to track successful registration
   const [loading, setLoading] = useState(false); // For showing a loading indicator
   const [error, setError] = useState(null); // State for error messages
@@ -26,26 +25,45 @@ const RegisterForm = () => {
     });
   };
 
+  // Functie om wachtwoordsterkte te valideren
+  const validatePasswordStrength = (password) => {
+    const minLength = 8; // Minimale lengte van het wachtwoord
+
+    // Regex voor meer beveiliging (minimaal 8 tekens, 1 hoofdletter, 1 cijfer en 1 speciaal teken)
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+
+    if (password.length < minLength) {
+      return `Password must be at least ${minLength} characters long.`;
+    }
+
+    if (!strongPasswordRegex.test(password)) {
+      return 'Password must contain at least 1 uppercase letter, 1 number, and 1 special character.';
+    }
+
+    return ''; // Als het wachtwoord geldig is, geef een lege string terug
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Start loading state
     setError(null); // Reset error message
 
-    // Validate that the passwords match
+    // Valideer wachtwoordsterkte
+    const passwordError = validatePasswordStrength(formData.password);
+    if (passwordError) {
+      setError(passwordError);
+      setLoading(false); // Stop loading
+      return; // Exit the function
+    }
+
+    // Valideer dat de wachtwoorden overeenkomen
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       setLoading(false); // Stop loading
       return; // Exit the function
     }
 
-    // Validate that the password is at least 8 characters long
-    if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long");
-      setLoading(false); // Stop loading
-      return; // Exit the function
-    }
-
-    // Validate that phoneNumber contains only numbers
+    // Valideer dat phoneNumber alleen nummers bevat
     const phoneNumberPattern = /^\d+$/;
     if (!phoneNumberPattern.test(formData.phoneNumber)) {
       setError("Phone number must contain only numbers");
@@ -53,14 +71,15 @@ const RegisterForm = () => {
       return; // Exit the function
     }
 
-    // Validate that the password is at least 8 characters long
+    // Valideer dat het telefoonnummer minstens 5 tekens bevat
     if (formData.phoneNumber.length < 5) {
       setError("Phone number must be at least 5 numbers long");
       setLoading(false); // Stop loading
       return; // Exit the function
     }
+
     try {
-      // Send the actual form data to the API
+      // Verstuur de daadwerkelijke formulierdata naar de API
       await axios.post('http://localhost:5000/api/register', {
         email: formData.email,
         name: formData.name,
@@ -84,7 +103,7 @@ const RegisterForm = () => {
     navigate('/');
   };
 
-  // If form is submitted successfully, show confirmation message
+  // Als het formulier succesvol is ingediend, toon een bevestigingsbericht
   if (isSubmitted) {
     return (
       <div className="confirmation-container">
@@ -182,7 +201,6 @@ const RegisterForm = () => {
         <p className="register-login-prompt">
           Have an account? <a href="/login">Log in here!</a>
         </p>
-
       </div>
     </div>
   );

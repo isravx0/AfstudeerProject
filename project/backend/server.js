@@ -31,6 +31,39 @@ db.connect(err => {
     console.log('Connected to the database.');
 });
 
+// Rate limiting setup
+const requestCounts = {};
+const rateLimitWindow = 86400000; // 24 hours in milliseconds
+const requestLimit = 5;
+
+const rateLimiter = (req, res, next) => {
+    const email = req.body.email;
+    if (!email) return next();
+
+    const currentTime = Date.now();
+    
+    // Initialize request tracking for this email if it doesn't exist
+    if (!requestCounts[email]) {
+        requestCounts[email] = { count: 1, firstRequestTime: currentTime };
+    } else {
+        // Check if the current time is within the rate limit window
+        if (currentTime - requestCounts[email].firstRequestTime < rateLimitWindow) {
+            requestCounts[email].count += 1;
+            console.log(`Request from ${email}: Count = ${requestCounts[email].count}`);
+            
+            // If the limit is exceeded, send a 429 response
+            if (requestCounts[email].count > requestLimit) {
+                return res.status(429).json({ message: 'Too many requests. Please try again later.' });
+            }
+        } else {
+            // Reset the count after the window has expired
+            requestCounts[email] = { count: 1, firstRequestTime: currentTime };
+        }
+    }
+    next();
+};
+
+
 // Register endpoint
 app.post('/api/register', (req, res) => {
     const { email, name, password, phoneNumber, location } = req.body;
@@ -51,14 +84,14 @@ app.post('/api/register', (req, res) => {
                 console.error('Error message:', err.message);
                 return res.status(500).send('Error registering user');
             }
-            res.status(200).send('User  registered successfully');
+            res.status(200).send('User registered successfully');
         }
     );
 });
 
 // Login endpoint
 app.post('/api/login', (req, res) => {
-    const { email, password } = req .body;
+    const { email, password } = req.body;
 
     // Find user by email
     db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
@@ -80,8 +113,8 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-// Password reset endpoint
-app.post('/api/password-reset', (req, res) => {
+// Password reset request endpoint with rate limiting
+app.post('/api/password-reset', rateLimiter, (req, res) => {
     const { email } = req.body;
 
     // Validate that the email is provided
@@ -98,18 +131,29 @@ app.post('/api/password-reset', (req, res) => {
 
         // Check if email exists
         if (results.length === 0) {
-            return res.status(404).send('Email not found');
+            return res.status(404).json({ message: 'Email not registered' });
         }
 
         const user = results[0];
+        const currentTime = new Date();
+        const lastPasswordReset = user.lastPasswordReset ? new Date(user.lastPasswordReset) : null;
+
+        // Check if lastPasswordReset exists and if it's within the rate limit window
+        const requestsToday = lastPasswordReset && (currentTime - lastPasswordReset < rateLimitWindow) 
+            ? 1 : 0;
+
+        // If the user has requested more than the limit, deny the request
+        if (requestsToday >= requestLimit) {
+            return res.status(429).json({ message: 'You have reached the maximum number of password reset requests. Please try again later.' });
+        }
+
+        // Generate the reset token and expiration
         const token = crypto.randomBytes(20).toString('hex');
-        const tokenExpiration = new Date(Date.now() + 7200000);
+        const tokenExpiration = new Date(Date.now() + 3600000); // 1 hour expiration
 
-        console.log(`Generated Token: ${token}, Expiration: ${tokenExpiration.toISOString()}`);
-
-        // Save the token and expiration date in the database
-        db.query('UPDATE users SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE email = ?', 
-            [token, tokenExpiration, email], (err) => {
+        // Update the database with the token, expiration, and last password reset time
+        db.query('UPDATE users SET resetPasswordToken = ?, resetPasswordExpires = ?, lastPasswordReset = ? WHERE email = ?', 
+            [token, tokenExpiration, currentTime, email], (err) => {
                 if (err) {
                     console.error('Error saving token (UPDATE):', err);
                     return res.status(500).send('Error saving token in the database');
@@ -120,7 +164,7 @@ app.post('/api/password-reset', (req, res) => {
                     service: 'Gmail', 
                     auth: {
                         user: 'solarpanelsimulation@gmail.com',
-                        pass: 'zgyi dlqa zmgn gkdd',
+                        pass: 'zgyi dlqa zmgn gkdd', // Use environment variable or secret manager for real apps
                     },
                 });
 
@@ -157,6 +201,7 @@ app.post('/api/password-reset', (req, res) => {
     });
 });
 
+
 // Reset password verification endpoint
 app.get('/reset/:token', (req, res) => {
     const token = req.params.token;
@@ -164,7 +209,7 @@ app.get('/reset/:token', (req, res) => {
     // Find the user by token
     db.query('SELECT * FROM users WHERE resetPasswordToken = ? AND resetPasswordExpires > ?', 
     [token, Date.now()], (err, results) => {
-        if (err || results.length === 0 ) {
+        if (err || results.length === 0) {
             return res.status(400).send('Password reset token is invalid or has expired.');
         }
 
@@ -172,11 +217,9 @@ app.get('/reset/:token', (req, res) => {
     });
 });
 
+// Reset password endpoint
 app.post('/api/reset-password', (req, res) => {
     const { token, newPassword } = req.body;
-
-    console.log('Received token:', token);
-    console.log('Received new password:', newPassword);
 
     // Find the user based on the token
     db.query('SELECT * FROM users WHERE resetPasswordToken = ? AND resetPasswordExpires > ?', 

@@ -6,6 +6,7 @@ const PasswordReset = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state for feedback
 
   const handleChange = (e) => {
     setEmail(e.target.value);
@@ -18,31 +19,39 @@ const PasswordReset = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading
 
-    // Validatie van het e-mailadres
+    // Validate email format
     if (!validateEmailFormat(email)) {
       setMessage("Invalid email format. Please enter a valid email.");
+      setLoading(false); // Stop loading
       return;
     }
 
     try {
-      // Verzoek naar de server om te controleren of het e-mailadres geregistreerd is
+      // Request to the server to check if the email is registered
       const response = await axios.post('http://localhost:5000/api/password-reset', { email });
       setMessage("Password reset instructions have been sent to your email.");
-      setIsSubmitted(true); // Formulier is succesvol ingediend
+      setIsSubmitted(true);
     } catch (error) {
-      if (error.response && error.response.status === 404) {
-        // Als het e-mailadres niet is gevonden in de database
-        setMessage("This email is not registered.");
+      if (error.response) {
+        if (error.response.status === 404) {
+          setMessage("This email is not registered.");
+        } else if (error.response.status === 429) {
+          setMessage("You have reached the maximum number of password reset requests. Please try again later.");
+        } else {
+          setMessage("There was an error processing your request. Please try again.");
+        }
       } else {
-        setMessage("There was an error processing your request. Please try again.");
+        setMessage("Network error. Please check your connection.");
       }
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   return (
     <div className="password-reset-container">
-
       <div className="password-reset-left-panel">
         <h1>Forgot password?</h1>
         <p>No worries, we’ll help you reset your password. Enter your email address below, and we’ll send you a link to reset it.</p>
@@ -60,10 +69,12 @@ const PasswordReset = () => {
             className="password-reset-input"
             required
           />
-          <button type="submit" className="password-reset-button">Send Link!</button>
+          <button type="submit" className="password-reset-button" disabled={loading}>
+            {loading ? "Sending..." : "Send Link!"}
+          </button>
         </form>
 
-        {isSubmitted && message && (
+        {message && (
           <p className="password-reset-message">{message}</p>
         )}
 
