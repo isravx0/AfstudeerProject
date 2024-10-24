@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import axios from "axios"; // Ensure axios is imported
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import "./style/RegisterForm.css"; // Import your styles
+import axios from "axios"; 
+import { useNavigate } from "react-router-dom"; 
+import useRecaptchaV3 from "../captcha/Captcha"; 
+import { getFunctions, httpsCallable } from 'firebase/functions'; 
+import "./style/RegisterForm.css"; 
 
 const RegisterForm = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
   const initialFormData = {
     name: "",
     email: "",
@@ -13,10 +15,15 @@ const RegisterForm = () => {
     phoneNumber: "",
     location: "",
   };
+
   const [formData, setFormData] = useState(initialFormData);
-  const [isSubmitted, setIsSubmitted] = useState(false); // State to track successful registration
-  const [loading, setLoading] = useState(false); // For showing a loading indicator
-  const [error, setError] = useState(null); // State for error messages
+
+  const [isSubmitted, setIsSubmitted] = useState(false); 
+  const [loading, setLoading] = useState(false); 
+  const [error, setError] = useState(null); 
+
+  // Initialize reCAPTCHA
+  const executeRecaptcha = useRecaptchaV3('6Lc_A2EqAAAAANr-GXLMhgjBdRYWKpZ1y-YwF7Mk', 'register');
 
   const handleChange = (e) => {
     setFormData({
@@ -45,8 +52,8 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading state
-    setError(null); // Reset error message
+    setLoading(true); 
+    setError(null); 
 
     // Valideer wachtwoordsterkte
     const passwordError = validatePasswordStrength(formData.password);
@@ -63,7 +70,14 @@ const RegisterForm = () => {
       return; // Exit the function
     }
 
-    // Valideer dat phoneNumber alleen nummers bevat
+    // Validate that the password is at least 8 characters long
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      setLoading(false); // Stop loading
+      return; // Exit the function
+    }
+
+    // Validate that phoneNumber contains only numbers
     const phoneNumberPattern = /^\d+$/;
     if (!phoneNumberPattern.test(formData.phoneNumber)) {
       setError("Phone number must contain only numbers");
@@ -71,16 +85,15 @@ const RegisterForm = () => {
       return; // Exit the function
     }
 
-    // Valideer dat het telefoonnummer minstens 5 tekens bevat
+    // Validate that the password is at least 8 characters long
     if (formData.phoneNumber.length < 5) {
       setError("Phone number must be at least 5 numbers long");
       setLoading(false); // Stop loading
       return; // Exit the function
     }
-
     try {
-      // Verstuur de daadwerkelijke formulierdata naar de API
-      await axios.post('http://localhost:5000/api/register', {
+      // Send the actual form data to the API
+      await axios.post('http://localhost:3000/api/register', {
         email: formData.email,
         name: formData.name,
         password: formData.password,
@@ -89,21 +102,19 @@ const RegisterForm = () => {
       });
 
       alert('User registered successfully');
-      setIsSubmitted(true); // Mark form as successfully submitted
+      setIsSubmitted(true); 
     } catch (error) {
       console.log("Error registering:", error);
-      setError("Error registering user. Please try again."); // Set error message for user feedback
+      setError("Error registering user. Please try again.");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false); 
     }
   };
 
-  // Handle cancel button click (navigates back to welcome page)
   const handleCancel = () => {
-    navigate('/');
+    setFormData(initialFormData);
   };
 
-  // Als het formulier succesvol is ingediend, toon een bevestigingsbericht
   if (isSubmitted) {
     return (
       <div className="confirmation-container">
@@ -189,11 +200,11 @@ const RegisterForm = () => {
               <a href="/">Privacy Policy</a>.
             </label>
           </div>
-
+          
           <div className="register-button-container">
-            <button type="submit" className="register-submit-button" disabled={loading}>
-              {loading ? "Registering..." : "Sign up"}
-            </button>
+          <button type="submit" className="register-submit-button" disabled={loading}>
+            {loading ? "Registering..." : "Sign up"}
+          </button>
             <button type="button" className="register-cancel-button" onClick={handleCancel}>Cancel</button>
           </div>
           {error && <p className="error-message" style={{ color: "red" }}>{error}</p>}
@@ -201,6 +212,16 @@ const RegisterForm = () => {
         <p className="register-login-prompt">
           Have an account? <a href="/login">Log in here!</a>
         </p>
+
+        <div className="register-or-divider">
+          <span>OR</span>
+        </div>
+
+        <div className="register-social-login">
+          <button className="register-social-button facebook">f</button>
+          <button className="register-social-button google">G</button>
+          <button className="register-social-button apple">ï£¿</button>
+        </div>
       </div>
     </div>
   );

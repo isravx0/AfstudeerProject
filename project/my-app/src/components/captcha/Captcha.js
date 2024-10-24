@@ -1,38 +1,40 @@
-import React, { useState } from 'react';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { useState, useEffect, useCallback } from 'react';
 
-const Captcha = ({ onVerifyCaptcha }) => {
-  const { executeRecaptcha } = useGoogleReCaptcha();  // Hook to execute the reCAPTCHA
-  const [formSubmitted, setFormSubmitted] = useState(false);
+const useRecaptchaV3 = (siteKey) => {
+    const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+    useEffect(() => {
+        if (window.grecaptcha) {
+            setIsRecaptchaReady(true);
+        } else {
+            const script = document.createElement('script');
+            script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
+            script.async = true;
+            document.head.appendChild(script);
+            script.onload = () => setIsRecaptchaReady(true);
+            script.onerror = () => {
+                console.error("Failed to load reCAPTCHA script.");
+            };
+        }
+    }, [siteKey]);
 
-    if (!executeRecaptcha) {
-      console.log('Execute recaptcha not yet available');
-      return;
-    }
+    const executeRecaptcha = useCallback(async (action) => {
+        if (isRecaptchaReady && window.grecaptcha) {
+            try {
+                const token = await window.grecaptcha.execute(siteKey, { action });
+                console.log(`reCAPTCHA executed successfully for action "${action}". Token:`, token);
+                return token;
+            } catch (error) {
+                console.error(`Failed to execute reCAPTCHA for action "${action}".`, error);
+                return null;
+            }
+        } else {
+            console.warn("reCAPTCHA is not ready or grecaptcha is undefined.");
+            return null;
+        }
+    }, [isRecaptchaReady, siteKey]);
 
-    // Execute reCAPTCHA for the "submit" action
-    const token = await executeRecaptcha('submit');
-    console.log('Generated reCAPTCHA token:', token);
-
-    // Pass the token back to the parent (LoginForm)
-    if (onVerifyCaptcha) {
-      onVerifyCaptcha(token);
-    }
-
-    // You can now submit the form data along with the token to your backend
-    // For now, just log it and show a message
-    setFormSubmitted(true);
-    alert('Captcha verified with token! Form submitted.');
-  };
-
-  return (
-    <div>
-      {formSubmitted && <p>Form successfully submitted with reCAPTCHA v3!</p>}
-    </div>
-  );
+    return executeRecaptcha;
 };
 
-export default Captcha;
+export default useRecaptchaV3;

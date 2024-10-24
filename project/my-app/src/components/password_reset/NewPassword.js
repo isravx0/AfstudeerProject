@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import './Style/password_reset.css';
+import './style/password_reset.css';
 
 function ResetPassword() {
     const { token } = useParams(); // Get the token from the URL parameters
@@ -55,7 +55,7 @@ function ResetPassword() {
 
         // Make API call to reset the password
         try {
-            const response = await fetch('http://localhost:5000/api/reset-password', {
+            const response = await fetch('http://localhost:3000/api/reset-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

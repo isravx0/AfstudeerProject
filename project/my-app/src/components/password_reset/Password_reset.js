@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from 'axios';
-import './Style/password_reset.css';
+import './style/password_reset.css';
 
 const PasswordReset = () => {
   const [email, setEmail] = useState("");
@@ -30,7 +30,7 @@ const PasswordReset = () => {
 
     try {
       // Request to the server to check if the email is registered
-      const response = await axios.post('http://localhost:5000/api/password-reset', { email });
+      const response = await axios.post('http://localhost:3000/api/password-reset', { email });
       setMessage("Password reset instructions have been sent to your email.");
       setIsSubmitted(true);
     } catch (error) {

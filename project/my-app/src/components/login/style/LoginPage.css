@@ -1,6 +1,6 @@
-
+/* LoginPage.css */
 body {
-  background-color: #fff;
+  background-color: #fff; /* Wit achtergrond */
   box-sizing: border-box;
 }
 
@@ -13,10 +13,10 @@ body {
 }
 
 .login-right-panel {
-  background-color: #1b3b73;
+  background-color: #1b3b73; /* Donkerblauwe achtergrond */
   color: white;
-  width: 40%;
-  padding: 40px;
+  width: 40%; /* Breedte van het rechter paneel */
+  padding: 40px; /* Padding binnen het paneel */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -24,22 +24,22 @@ body {
 }
 
 .login-right-panel-title {
-  font-size: 28px;
-  margin-bottom: 20px;
+  font-size: 28px; /* Titelgrootte */
+  margin-bottom: 20px; /* Ruimte onder de titel */
 }
 
 .login-right-panel-description {
-  font-size: 16px;
-  margin-bottom: 15px;
+  font-size: 16px; /* Grootte van de beschrijving */
+  margin-bottom: 15px; /* Ruimte onder de beschrijving */
 }
 
 .login-left-panel {
-  width: 50%;
-  padding: 40px;
-  background-color: #f8f9fa;
-  align-items: center;
+  width: 50%; /* Breedte van het linker paneel */
+  padding: 40px; /* Padding binnen het paneel */
+  background-color: #f8f9fa; /* Lichtgrijze achtergrond */
+  align-items: center; /* Centreren van elementen */
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Verticale stapeling van elementen */
 }
 
 .login-form {
@@ -74,46 +74,46 @@ body {
 }
 
 .login-checkbox-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  justify-content: space-between;
+  display: flex; /* Flexbox voor checkbox en label */
+  align-items: center; /* Centreren van elementen */
+  margin-bottom: 20px; /* Ruimte onder de checkbox */
+  justify-content: space-between; /* Ruimte tussen checkbox en label */
 }
 
 .login-checkbox {
-  margin-right: 10px;
+  margin-right: 10px; /* Ruimte rechts van checkbox */
 }
 
 .login-terms-links a {
-  color: #1b3b73;
-  text-decoration: none;
+  color: #1b3b73; /* Kleur van de termen links */
+  text-decoration: none; /* Geen onderstreping */
 }
 
 .login-login-prompt {
-  margin-bottom: 20px;
+  margin-bottom: 20px; /* Ruimte onder de login prompt */
 }
 
 .login-login-prompt a {
-  color: #1b3b73;
-  text-decoration: none;
+  color: #1b3b73; /* Kleur van de login prompt link */
+  text-decoration: none; /* Geen onderstreping */
 }
 
 .login-social-login {
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
+  display: flex; /* Flexbox voor sociale knoppen */
+  justify-content: space-around; /* Ruimte tussen sociale knoppen */
+  width: 100%; /* Breedte van sociale login sectie */
 }
 
 .login-social-button {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  cursor: pointer;
-  border: 1px solid #ccc;
+  width: 40px; /* Breedte van sociale knoppen */
+  height: 40px; /* Hoogte van sociale knoppen */
+  border-radius: 50%; /* Ronde knoppen */
+  display: flex; /* Flexbox voor de sociale knoppen */
+  align-items: center; /* Centreren van iconen */
+  justify-content: center; /* Centreren van iconen */
+  font-size: 20px; /* Grootte van de iconen */
+  cursor: pointer; /* Cursor verandert naar pointer */
+  border: 1px solid #ccc; /* Grijze rand */
 }
 
 .login-social-button.facebook {
@@ -182,7 +182,7 @@ body {
   outline: none;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
-
+/* Responsive styling */
 @media screen and (max-width: 768px) {
   .login-container {
     flex-direction: column;
