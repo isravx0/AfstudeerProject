@@ -1,0 +1,42 @@
+.floating-chat-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #F89820 , #4b6cb7); /* Gradient background */
+    color: white;
+    padding: 12px 16px; /* Increased padding for a larger button */
+    border-radius: 50px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Enhanced shadow for depth */
+    cursor: pointer;
+    font-size: 18px; /* Increased font size */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Increased gap for better spacing */
+    transition: background-color 0.3s, transform 0.2s; /* Added transition for scaling effect */
+    z-index: 1000;
+    animation: pulse 2s infinite; /* Pulsing animation */
+}
+
+.floating-chat-button:hover {
+    background-color: #3b5de8; /* Lighter background color on hover */
+    transform: scale(1.05); /* Scale effect on hover */
+}
+
+/* Add a pulsing animation */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05); /* Slightly grow the button */
+    }
+}
+.chatbot-container {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1000;
+}

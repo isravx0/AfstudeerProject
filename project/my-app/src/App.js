@@ -7,6 +7,9 @@ import LoginPage from './components/login/LoginPage';
 import RegisterPage from './components/register/RegisterPage';
 import PasswordReset from './components/password_reset/Password_reset';
 import ResetPassword from './components/password_reset/NewPassword';
+import FAQPage from  './components/faq/FAQPage';
+import FloatingChatButton from './components/faq/FloatingChatButton.js';
+
 import Homepage from './components/homepage/homepage';
 import PrivateRoute from './components/PrivateRoute'; // Import the PrivateRoute component
 import { AuthProvider } from './components/AuthContext'; // Import AuthProvider
@@ -24,7 +27,7 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/password_reset" element={<PasswordReset />} />
             <Route path="/reset/:token" element={<ResetPassword />} />
-            
+            <Route path="/faq" element={<FAQPage />} />
             {/* Protect the /home route */}
             <Route 
               path="/home" 
@@ -32,10 +35,11 @@ function App() {
                 <PrivateRoute>
                   <Homepage />
                 </PrivateRoute>
-              } 
+              }     
             />
-            <Route path="/password-reset" element={<PasswordReset />} />
           </Routes>
+
+          <FloatingChatButton />
           <Footer />
         </div>
       </Router>
