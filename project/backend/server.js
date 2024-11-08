@@ -270,6 +270,51 @@ app.post('/api/reset-password', (req, res) => {
     });
 });
 
+// Feedback endpoint
+app.post('/api/feedback', rateLimiter, (req, res) => {
+    const { name, email, comments, rating, category } = req.body;
+
+    // Validation
+    if (!name || !email || !comments || !rating || !category) {
+        return res.status(400).send('All fields are required');
+    }
+
+    // Nodemailer setup for feedback
+    const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    const mailOptions = {
+        to: process.env.EMAIL_USER, // Replace with the company's email address
+        from: 'noreply@solarpanelsimulation.com',
+        subject: 'New Feedback Received',
+        text: `Feedback received from ${name} (${email}):\n\nCategory: ${category}\nRating: ${rating}\nComments: ${comments}`,
+        html: `<h2>New Feedback Received</h2>
+               <p><strong>Name:</strong> ${name}</p>
+               <p><strong>Email:</strong> ${email}</p>
+               <p><strong>Category:</strong> ${category}</p>
+               <p><strong>Rating:</strong> ${rating}</p>
+               <p><strong>Comments:</strong> ${comments}</p>`
+    };
+
+    // Sending the emails
+    transporter.sendMail(mailOptions, (err) => {
+        if (err) {
+            console.error('Error sending feedback email:', err);
+            return res.status(500).send('An error occurred while sending the feedback');
+        }
+        res.status(200).send('Feedback successfully sent');
+    });
+});
+
+
+
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

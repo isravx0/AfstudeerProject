@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios"; 
 import { useNavigate } from "react-router-dom"; 
 import useRecaptchaV3 from "../captcha/Captcha"; 
+import Swal from 'sweetalert2';
 import { getFunctions, httpsCallable } from 'firebase/functions'; 
 import "./style/RegisterForm.css"; 
 
@@ -101,7 +102,18 @@ const RegisterForm = () => {
         location: formData.location,
       });
 
-      alert('User registered successfully');
+      Swal.fire({
+        position: "top-end",
+        iconHeight: 50,
+        icon: "success",
+        title: "Registration Successful!",
+        text: "User registered successfully",
+        showConfirmButton: false,
+        timer: 1500,
+        customClass: {
+          popup: 'swal-small'
+        }
+        });
       setIsSubmitted(true); 
     } catch (error) {
       console.log("Error registering:", error);
@@ -123,6 +135,7 @@ const RegisterForm = () => {
         <p>You can now <strong> <a href="/login">log in</a> </strong> to access your dashboard and start managing your energy consumption.</p>
         <p>Thank you for joining us!</p>
       </div>
+      
     );
   }
 

@@ -31,6 +31,7 @@
         transform: scale(1.05); /* Slightly grow the button */
     }
 }
+
 .chatbot-container {
     position: fixed;
     bottom: 80px;
@@ -39,4 +40,36 @@
     border-radius: 8px;
     overflow: hidden;
     z-index: 1000;
+}
+
+/* Media Query for small screens */
+@media screen and (max-width: 480px) {
+    .floating-chat-button {
+        bottom: 10px; /* Position the button higher for smaller screens */
+        right: 10px;  /* Adjust to give space on the sides */
+        padding: 10px 12px; /* Slightly reduce padding */
+        font-size: 16px; /* Smaller font size */
+        gap: 8px; /* Reduced gap */
+    }
+
+    .chatbot-container {
+        bottom: 60px; /* Adjust position to accommodate the smaller screen */
+        right: 10px; /* Adjust to give space on the sides */
+    }
+}
+
+/* Media Query for medium-sized screens (e.g., tablets) */
+@media screen and (max-width: 768px) {
+    .floating-chat-button {
+        bottom: 15px; /* Slightly reduce the space from the bottom */
+        right: 15px;  /* Adjust for better placement */
+        padding: 11px 14px; /* Slightly reduce padding */
+        font-size: 17px; /* Adjust font size */
+        gap: 9px; /* Adjust spacing */
+    }
+
+    .chatbot-container {
+        bottom: 70px; /* Adjust chatbot position */
+        right: 15px; /* Adjust chatbot position */
+    }
 }

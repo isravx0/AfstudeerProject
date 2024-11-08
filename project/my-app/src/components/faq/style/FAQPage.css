@@ -1,3 +1,4 @@
+/* Base styles (for larger screens) */
 .faq-header-container {
     display: flex;
     flex-direction: column;
@@ -23,6 +24,7 @@
     padding: 20px;
     font-family: Arial, sans-serif;
 }
+
 .faq-list {
     border-top: 2px solid #ddd;
 }
@@ -60,7 +62,6 @@
     padding: 0.75rem 0;
 }
 
-
 .faq-answer {
     font-size: 1rem;
     color: #4a4a4a;
@@ -69,6 +70,7 @@
     border-top: 1px solid #e6e9ed;
     margin-top: 0.75rem;
 }
+
 .contact-section {
     background-color: white;
     border-radius: 12px;
@@ -145,5 +147,86 @@ button[type="submit"]:hover {
     transform: translateY(-2px);
 }
 
+/* Media Queries for small screens */
+@media (max-width: 768px) {
+    .faq-page {
+        max-width: 90%; /* Increase the width for small screens */
+        padding: 10px;
+    }
 
+    .faq-header-image {
+        max-width: 100%; /* Ensure the image fills the container */
+    }
 
+    .faq-title {
+        font-size: 1.75rem; /* Adjust the title size for mobile */
+    }
+
+    .faq-item {
+        padding: 1rem; /* Reduce padding for better spacing */
+    }
+
+    .faq-question {
+        font-size: 1.125rem; /* Slightly smaller font size */
+    }
+
+    .faq-answer {
+        font-size: 0.95rem; /* Slightly smaller font size */
+    }
+
+    .contact-section {
+        padding: 2rem; /* Adjust padding for smaller screens */
+        margin-top: 2rem; /* Reduce margin on top */
+    }
+
+    .contact-heading {
+        font-size: 1.75rem; /* Smaller heading size */
+    }
+
+    .contact-description {
+        font-size: 1rem; /* Adjust font size */
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 0.6rem; /* Adjust padding for smaller input fields */
+    }
+
+    button[type="submit"] {
+        padding: 0.75rem 1.25rem; /* Adjust button size */
+    }
+}
+
+@media (max-width: 480px) {
+    .faq-title {
+        font-size: 1.5rem; /* Smaller font size for very small screens */
+    }
+
+    .faq-item {
+        padding: 0.75rem; /* Further reduce padding */
+    }
+
+    .faq-question {
+        font-size: 1rem; /* Adjust font size for readability */
+    }
+
+    .faq-answer {
+        font-size: 0.85rem; /* Adjust font size for smaller screens */
+    }
+
+    .contact-form {
+        padding: 0; /* Remove extra padding */
+    }
+
+    .contact-heading {
+        font-size: 1.5rem; /* Further reduce heading size */
+    }
+
+    .contact-description {
+        font-size: 0.9rem; /* Adjust font size */
+    }
+
+    button[type="submit"] {
+        padding: 0.75rem 1rem; /* Adjust button size for small screens */
+    }
+}

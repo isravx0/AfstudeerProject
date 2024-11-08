@@ -1,10 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './style/MainContent.css';
 import RedirectButtons from './RedirectButtons';
+import { useAuth } from '../AuthContext';
+import './style/MainContent.css';
 
 const MainContent = () => {
   const navigate = useNavigate();
+
+  const { loggedIn, error } = useAuth();
 
   return (
     <main>
@@ -31,9 +34,20 @@ const MainContent = () => {
           Whether you want to save on energy costs, reduce your reliance on the grid, or simply explore the possibilities of a home battery—this simulator is here to help you. Start now and discover how you can improve your energy management!
         </p>
 
-        <div className="buttons">
-          <RedirectButtons />
-        </div>
+        {loggedIn ? (
+            <>
+
+            </>
+          ) : (
+            <>
+              <div className="buttons">
+                <RedirectButtons />
+              </div>
+            </>
+          )}
+
+        {error && <div className="error">{error}</div>}
+
       </div>
 
     </main>

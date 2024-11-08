@@ -1,12 +1,12 @@
 import React from 'react';
-import './style/Header.css';
 import logo from './images/logo.png';
 import profile from './images/profile.png';
 import LogoutButton from '../logout/LogoutButton'; 
 import { useAuth } from '../AuthContext';
+import './style/Header.css';
 
 const Header = () => {
-  const { loggedIn, userData, error, handleLogout } = useAuth();
+  const { loggedIn, userData, error } = useAuth();
 
   return (
     <div className='navbar'>
@@ -19,14 +19,29 @@ const Header = () => {
           {loggedIn ? (
             <>
               <ul>
-                <li>About Us</li>
-                <li>Customer Service</li>
-                <li>How it works?</li>
+                <a href='/home'><li>Home</li></a>
+                <a href='/solar-panel-dashboard'><li>Solar Panels Dashboard</li></a>
+                <a href='/battery-dashboard'><li>Battery Dashboard</li></a>
+                <a href='/simulation'><li>Simulation</li></a>
               </ul>
 
               <img src={profile} alt='profile' className='profile'></img>
               <span>{userData?.name}</span>
-              <LogoutButton />
+              <div className="dropdown-menu">
+                <div className="menu-icon">
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </div>
+                
+                <div className="dropdown-content">
+                  <a href="#home">Link1</a>
+                  <a href="#home">Link2</a>
+                  <a href="#home">Link3</a>
+                  <a href="#home">Link4</a>
+                  <LogoutButton />
+                </div>
+              </div>
             </>
           ) : (
             <>
@@ -38,13 +53,9 @@ const Header = () => {
             </>
           )}
 
-          {error && <div className="error">{error}</div>} {/* Display error message */}
+          {error && <div className="error">{error}</div>}
 
-          <div className="menu-icon">
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
+          
         </div>
       </div>
     </div>

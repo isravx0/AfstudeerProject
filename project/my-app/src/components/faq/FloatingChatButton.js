@@ -11,10 +11,10 @@ const FloatingChatButton = () => {
 
     return (
         <div>
-            {isOpen && <MyChatBot />}
+            {/* {isOpen && <MyChatBot />}
             <div className="floating-chat-button" onClick={toggleChat}>
                 <span>Chat with our bot!</span>
-            </div>
+            </div> */}
         </div>
     );
 };

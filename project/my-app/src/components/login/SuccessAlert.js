@@ -1,20 +1,23 @@
-import React from 'react';
-import './style/SuccesAlert.css';
+import React, { useEffect } from 'react';
+import Swal from 'sweetalert2';
+import './style/SuccessAlert.css';
 
-const SuccessAlert = ({ id, title, message, onClose, className }) => {
-  return (
-    <div className={`success-alert ${className}`} role="alert">
-      <div className="success-alert-content">
-        <div className="success-alert-icon" onClick={() => onClose(id)}>
-          <span className="success-alert-close">✖</span>
-        </div>
-        <div className="success-alert-text">
-          <strong>{title}</strong>
-          <p>{message}</p>
-        </div>
-      </div>
-    </div>
-  );
+const ErrorAlert = ({ title, message }) => {
+  useEffect(() => {
+    Swal.fire({
+      position: "top-end",
+      icon: "success",
+      title: title,
+      text: message,
+      showConfirmButton: false,
+      timer: 1500,
+      customClass: {
+        popup: 'swal-small'
+      }
+    });
+  }, [title, message]);
+
+  return null;
 };
 
-export default SuccessAlert;
+export default ErrorAlert;
