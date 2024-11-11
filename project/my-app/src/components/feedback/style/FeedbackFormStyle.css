@@ -1,11 +1,26 @@
+
 .feedback-form-container {
   max-width: 50%;
   margin: 20px auto;
   padding: 40px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
   background-color: #fff;
+}
+
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #555;
+  text-align: left;
 }
 
 
@@ -16,74 +31,35 @@
   margin-top: 15px;
 }
 
-.feedback-categories button:hover span {
-  color: black;
-}
-
-
-@media (max-width: 768px) {
-  .feedback-form-container {
-    max-width: 85%;
-    padding: 20px;
-  }
-
-  .feedback-categories {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-
-@media (max-width: 480px) {
-  .feedback-form-container {
-    max-width: 95%;
-    padding: 15px;
-  }
-
-  .feedback-categories {
-    grid-template-columns: 1fr;
-  }
-
- 
-  .form-group label,
-  .feedback-categories button {
-    font-size: 1.1em;
-  }
-
- 
-  .feedback-categories button {
-    padding: 15px;
-    font-size: 1.2em;
-    transition: background-color 0.3s, transform 0.2s;
-  }
-
-  .feedback-categories button:hover {
-    background-color: #007bff;
-    color: white;
-    transform: scale(1.05);
-  }
-}
-
 
 .feedback-categories button {
   padding: 12px;
-  background-color: #f0f0f0;
+  border-radius: 10px;
+  background-color: #f9f9f9;
   border: 1px solid #ddd;
-  border-radius: 5px;
   font-weight: 600;
   cursor: pointer;
+  width: 100%;
   transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
-  position: relative;
-  font-size: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9em;
   outline: none;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+.feedback-categories button span {
+  margin-left: 8px;
+  color: #444;
 }
 
 
 .feedback-categories button:hover {
   background-color: #007bff;
   color: white;
-  transform: scale(1.1);
-  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
 }
 
 
@@ -99,37 +75,42 @@
 }
 
 
-.feedback-categories button:active {
-  animation: pulse 0.5s ease-out;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.reset-button{
-  background-color: red;
-  color: #ffffff;
-  padding: 0.75rem 1.5rem;
+.reset-button, .submit-button {
+  padding: 10px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-  margin-top: 1.5rem;
+  transition: background-color 0.3s;
 }
 
-.feedback-categories button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+
+.reset-button {
+  background-color: #ff4d4d;
+  color: #ffffff;
+}
+
+
+.submit-button {
+  background-color: #f0ad4e;
+  color: #ffffff;
+}
+
+
+.reset-button:hover {
+  background-color: #e43f3f;
+}
+
+
+.submit-button:hover {
+  background-color: #ec971f;
+}
+
+
+.rating-stars-container {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
 }
 
 
@@ -142,4 +123,49 @@
 
 input.error, textarea.error {
   border: 1px solid red;
+}
+
+
+textarea {
+  width: 100%;
+  height: 50px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+
+@media (max-width: 768px) {
+  .feedback-form-container {
+    max-width: 85%;
+    padding: 20px;
+  }
+  .feedback-categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .feedback-form-container {
+    max-width: 95%;
+    padding: 15px;
+  }
+  .feedback-categories {
+    grid-template-columns: 1fr;
+  }
+  .form-group label,
+  .feedback-categories button {
+    font-size: 1.1em;
+  }
+  .feedback-categories button {
+    padding: 15px;
+    font-size: 1.2em;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  .feedback-categories button:hover {
+    background-color: #007bff;
+    color: white;
+    transform: scale(1.05);
+  }
 }
