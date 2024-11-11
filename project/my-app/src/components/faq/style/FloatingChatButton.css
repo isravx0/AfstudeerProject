@@ -2,74 +2,76 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background: linear-gradient(135deg, #F89820 , #4b6cb7); /* Gradient background */
+    background-color: #ec971f; /* Sky blue from your theme */
     color: white;
-    padding: 12px 16px; /* Increased padding for a larger button */
+    padding: 12px 16px;
     border-radius: 50px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Enhanced shadow for depth */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
     cursor: pointer;
-    font-size: 18px; /* Increased font size */
+    font-size: 18px;
     display: flex;
     align-items: center;
-    gap: 10px; /* Increased gap for better spacing */
-    transition: background-color 0.3s, transform 0.2s; /* Added transition for scaling effect */
+    gap: 10px;
+    transition: background-color 0.3s, transform 0.2s;
     z-index: 1000;
-    animation: pulse 2s infinite; /* Pulsing animation */
+    animation: pulse 2s infinite;
 }
 
 .floating-chat-button:hover {
-    background-color: #3b5de8; /* Lighter background color on hover */
-    transform: scale(1.05); /* Scale effect on hover */
+    background-color: #bc7512; /* Darker shade of blue on hover */
+    transform: scale(1.05);
 }
 
-/* Add a pulsing animation */
+/* Pulse animation */
 @keyframes pulse {
     0%, 100% {
         transform: scale(1);
     }
     50% {
-        transform: scale(1.05); /* Slightly grow the button */
+        transform: scale(1.05);
     }
 }
 
+/* Make the chatbot sticky */
 .chatbot-container {
     position: fixed;
     bottom: 80px;
     right: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
+    width: fit-content; /* Width of the chatbot */
+    max-height: 90%; /* Prevents overflow */
 }
 
-/* Media Query for small screens */
+/* Adjustments for mobile screens */
 @media screen and (max-width: 480px) {
     .floating-chat-button {
-        bottom: 10px; /* Position the button higher for smaller screens */
-        right: 10px;  /* Adjust to give space on the sides */
-        padding: 10px 12px; /* Slightly reduce padding */
-        font-size: 16px; /* Smaller font size */
-        gap: 8px; /* Reduced gap */
+        bottom: 10px;
+        right: 10px;
+        padding: 10px 12px;
+        font-size: 16px;
+        gap: 8px;
     }
 
     .chatbot-container {
-        bottom: 60px; /* Adjust position to accommodate the smaller screen */
-        right: 10px; /* Adjust to give space on the sides */
+        bottom: 60px;
+        right: 10px;
     }
 }
 
-/* Media Query for medium-sized screens (e.g., tablets) */
 @media screen and (max-width: 768px) {
     .floating-chat-button {
-        bottom: 15px; /* Slightly reduce the space from the bottom */
-        right: 15px;  /* Adjust for better placement */
-        padding: 11px 14px; /* Slightly reduce padding */
-        font-size: 17px; /* Adjust font size */
-        gap: 9px; /* Adjust spacing */
+        bottom: 15px;
+        right: 15px;
+        padding: 11px 14px;
+        font-size: 17px;
+        gap: 9px;
     }
 
     .chatbot-container {
-        bottom: 70px; /* Adjust chatbot position */
-        right: 15px; /* Adjust chatbot position */
+        bottom: 70px;
+        right: 15px;
     }
 }

@@ -144,13 +144,15 @@ const FeedbackForm = () => {
           </div>
 
           <h3>How satisfied are you with our website?</h3>
-          <Rating 
-            count={5}
-            value={rating}
-            onChange={(newRating) => setRating(newRating)}
-            size={24}
-            activeColor="#ffd700"
-          />
+          <div className="rating-stars-container">
+            <Rating 
+              count={5}
+              value={rating}
+              onChange={(newRating) => setRating(newRating)}
+              size={24}
+              activeColor="#ffd700" // Matching yellow star color
+            />
+          </div>
 
           <h3>Select your feedback category:</h3>
           <div className="feedback-categories">

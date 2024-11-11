@@ -1,232 +1,120 @@
-/* Base styles (for larger screens) */
-.faq-header-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0 auto;
-}
-
-.faq-header-image {
-    max-width: 600px;
-    width: 100%;
-    height: auto;
+.faq-page {
+    max-width: 75%;
+    margin: 20px auto;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: #fff;
 }
 
 .faq-title {
-    margin-top: 10px;
-    font-size: xx-large;
-    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
 }
 
-.faq-page {
-    max-width: 75%;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-bar input,
+.search-bar select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.search-bar select {
+    height: 43px;
 }
 
 .faq-list {
-    border-top: 2px solid #ddd;
-}
-
-.faq-container {
-    width: 100%;
-    max-width: 768px;
-    margin: 0 auto;
-    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .faq-item {
-    background-color: #fff;
-    border: 1px solid #d1d9e6;
-    border-left: 6px solid #2c3e50;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.faq-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    border-left-color: #F89820 ;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .faq-question {
+    font-weight: bold;
     display: flex;
     justify-content: space-between;
-    font-weight: 600;
-    font-size: 1.25rem;
-    color: black;
-    padding: 0.75rem 0;
+    cursor: pointer;
 }
 
 .faq-answer {
-    font-size: 1rem;
-    color: #4a4a4a;
-    padding-top: 0.75rem;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+    font-size: 0.9rem;
     line-height: 1.6;
-    border-top: 1px solid #e6e9ed;
-    margin-top: 0.75rem;
+    text-align: left;
+}
+button {
+    width: fit-content;
+}
+.general-comments-section {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
 }
 
-.contact-section {
-    background-color: white;
-    border-radius: 12px;
-    padding: 3rem;
-    margin-top: 3rem;
-    color: black;
-    text-align: center;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+.general-comments-section textarea {
+    width: 90%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
 }
 
-.contact-heading {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
+.general-comments-list li {
+    margin-top: 5px;
+    padding: 8px;
+    background-color: #e9ecef;
+    border-radius: 5px;
 }
 
-.contact-description {
-    font-size: 1.1rem;
-    font-weight: 300;
-    margin-bottom: 2.5rem;
+/* Contact Us Section */
+.contact-us-section {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contact-us-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.contact-us-section p {
+    margin-bottom: 15px;
 }
 
 .contact-form {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    gap: 15px;
 }
 
-.form-group {
-    width: 100%;
-    margin-bottom: 1.25rem;
+.contact-input,
+.contact-textarea {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
 }
 
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 0.8rem;
-    border-radius: 6px;
-    border: 1px solid #e0cfcc;
-    background-color: #f9fafb;
-    color: #333;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    border-color: #F89820;
-    box-shadow: 0 0 5px rgba(248, 152, 32, 0.5);
-    outline: none;
-}
-
-.form-group label {
-    font-weight: 500;
-    color: black;
-    margin-bottom: 0.5rem;
-    display: block;
-    text-align: left;
-}
-
-button[type="submit"] {
-    background-color: #F89820;
-    color: #ffffff;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-    margin-top: 1.5rem;
-}
-
-button[type="submit"]:hover {
-    background-color: #e0851c;
-    transform: translateY(-2px);
-}
-
-/* Media Queries for small screens */
-@media (max-width: 768px) {
-    .faq-page {
-        max-width: 90%; /* Increase the width for small screens */
-        padding: 10px;
-    }
-
-    .faq-header-image {
-        max-width: 100%; /* Ensure the image fills the container */
-    }
-
-    .faq-title {
-        font-size: 1.75rem; /* Adjust the title size for mobile */
-    }
-
-    .faq-item {
-        padding: 1rem; /* Reduce padding for better spacing */
-    }
-
-    .faq-question {
-        font-size: 1.125rem; /* Slightly smaller font size */
-    }
-
-    .faq-answer {
-        font-size: 0.95rem; /* Slightly smaller font size */
-    }
-
-    .contact-section {
-        padding: 2rem; /* Adjust padding for smaller screens */
-        margin-top: 2rem; /* Reduce margin on top */
-    }
-
-    .contact-heading {
-        font-size: 1.75rem; /* Smaller heading size */
-    }
-
-    .contact-description {
-        font-size: 1rem; /* Adjust font size */
-    }
-
-    .form-group input,
-    .form-group textarea {
-        padding: 0.6rem; /* Adjust padding for smaller input fields */
-    }
-
-    button[type="submit"] {
-        padding: 0.75rem 1.25rem; /* Adjust button size */
-    }
-}
-
-@media (max-width: 480px) {
-    .faq-title {
-        font-size: 1.5rem; /* Smaller font size for very small screens */
-    }
-
-    .faq-item {
-        padding: 0.75rem; /* Further reduce padding */
-    }
-
-    .faq-question {
-        font-size: 1rem; /* Adjust font size for readability */
-    }
-
-    .faq-answer {
-        font-size: 0.85rem; /* Adjust font size for smaller screens */
-    }
-
-    .contact-form {
-        padding: 0; /* Remove extra padding */
-    }
-
-    .contact-heading {
-        font-size: 1.5rem; /* Further reduce heading size */
-    }
-
-    .contact-description {
-        font-size: 0.9rem; /* Adjust font size */
-    }
-
-    button[type="submit"] {
-        padding: 0.75rem 1rem; /* Adjust button size for small screens */
-    }
+.contact-textarea {
+    height: 150px;
+    resize: none;
 }
