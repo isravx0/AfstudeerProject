@@ -18,6 +18,14 @@ const questionsAndAnswers = [
     { id: 15, question: "Is the simulation free to use?", answer: "Yes, our basic simulation is free to use. Advanced features may require a subscription." },
 ];
 
+const actionButtons = [
+    { label: "View Simulation Guide", description: "Read our guide to understand how the simulation works and calculates energy yield." },
+    { label: "Battery Optimization Tips", description: "Discover how to extend the lifespan of your battery and optimize performance." },
+    { label: "Different Solar Panel Options", description: "Explore the various solar panel options available in the simulation." },
+    { label: "Calculate Savings", description: "Use our tool to calculate how much you can save with solar energy." },
+];
+
+
 function FAQPage() {
     const [activeId, setActiveId] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
@@ -66,6 +74,16 @@ function FAQPage() {
         <div className="faq-page">
             <h1 className="faq-title">Frequently Asked Questions</h1>
 
+            {/* Action Buttons Grid */}
+            <div className="action-buttons">
+                {actionButtons.slice(0, 4).map((button, index) => (
+                    <div key={index} className="action-button">
+                        <h3>{button.label}</h3>
+                        <p>{button.description}</p>
+                    </div>
+                ))}
+            </div>
+            
             <div className="search-bar">
                 <input
                     type="text"
