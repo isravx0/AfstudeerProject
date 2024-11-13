@@ -270,7 +270,7 @@ app.post('/api/reset-password', (req, res) => {
     });
 });
 
-// Feedback endpoint
+// Feedback endpoint: store feedback in the database and send an email
 app.post('/api/feedback', rateLimiter, (req, res) => {
     const { name, email, comments, rating, category } = req.body;
 
@@ -279,37 +279,48 @@ app.post('/api/feedback', rateLimiter, (req, res) => {
         return res.status(400).send('All fields are required');
     }
 
-    // Nodemailer setup for feedback
-    const transporter = nodemailer.createTransport({
-        service: 'Gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-
-    const mailOptions = {
-        to: process.env.EMAIL_USER, // Replace with the company's email address
-        from: 'noreply@solarpanelsimulation.com',
-        subject: 'New Feedback Received',
-        text: `Feedback received from ${name} (${email}):\n\nCategory: ${category}\nRating: ${rating}\nComments: ${comments}`,
-        html: `<h2>New Feedback Received</h2>
-               <p><strong>Name:</strong> ${name}</p>
-               <p><strong>Email:</strong> ${email}</p>
-               <p><strong>Category:</strong> ${category}</p>
-               <p><strong>Rating:</strong> ${rating}</p>
-               <p><strong>Comments:</strong> ${comments}</p>`
-    };
-
-    // Sending the emails
-    transporter.sendMail(mailOptions, (err) => {
+    // Insert feedback into the database
+    const feedbackQuery = 'INSERT INTO feedback (name, email, comments, rating, category) VALUES (?, ?, ?, ?, ?)';
+    db.query(feedbackQuery, [name, email, comments, rating, category], (err, result) => {
         if (err) {
-            console.error('Error sending feedback email:', err);
-            return res.status(500).send('An error occurred while sending the feedback');
+            console.error('Database insertion error:', err);
+            return res.status(500).send('An error occurred while saving feedback to the database');
         }
-        res.status(200).send('Feedback successfully sent');
+
+        // Nodemailer setup for feedback email
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        const mailOptions = {
+            to: process.env.EMAIL_USER,
+            from: 'noreply@solarpanelsimulation.com',
+            subject: 'New Feedback Received',
+            text: `Feedback received from ${name} (${email}):\n\nCategory: ${category}\nRating: ${rating}\nComments: ${comments}`,
+            html: `<h2>New Feedback Received</h2>
+                   <p><strong>Name:</strong> ${name}</p>
+                   <p><strong>Email:</strong> ${email}</p>
+                   <p><strong>Category:</strong> ${category}</p>
+                   <p><strong>Rating:</strong> ${rating}</p>
+                   <p><strong>Comments:</strong> ${comments}</p>`
+        };
+
+        // Send the email with feedback details
+        transporter.sendMail(mailOptions, (err) => {
+            if (err) {
+                console.error('Error sending feedback email:', err);
+                return res.status(500).send('An error occurred while sending the feedback email');
+            }
+            // Respond to the client after successful database insertion and email
+            res.status(200).send('Feedback successfully saved and email sent');
+        });
     });
 });
+
 
 
 
