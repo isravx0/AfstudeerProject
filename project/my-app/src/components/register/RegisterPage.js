@@ -16,7 +16,18 @@ const RegisterForm = () => {
     phoneNumber: "",
     location: "",
   };
-
+  const locations = [
+    "Amsterdam",
+    "Rotterdam",
+    "Den Haag",
+    "Utrecht",
+    "Eindhoven",
+    "Groningen",
+    "Maastricht",
+    "Tilburg",
+    "Leiden",
+    "Delft",
+  ];
   const [formData, setFormData] = useState(initialFormData);
 
   const [isSubmitted, setIsSubmitted] = useState(false); 
@@ -197,15 +208,22 @@ const RegisterForm = () => {
             className="register-input"
             required
           />
-          <input
-            type="text"
+          <select
             name="location"
-            placeholder="Location *"
             value={formData.location}
             onChange={handleChange}
             className="register-input"
             required
-          />
+          >
+            <option value="" disabled>
+            Choose a location *
+            </option>
+            {locations.map((location) => (
+              <option key={location} value={location}>
+                {location}
+              </option>
+            ))}
+          </select>
           <div className="register-checkbox-container">
             <input type="checkbox" id="terms" required />
             <label htmlFor="terms">

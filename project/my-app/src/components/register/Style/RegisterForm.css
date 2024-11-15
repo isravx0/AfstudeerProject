@@ -41,7 +41,7 @@
   width: 75%;
 }
 
-.register-input {
+.register-input{
   padding: 12px;
   margin-bottom: 20px;
   border: 1px solid #ccc;
@@ -65,8 +65,8 @@
 }
 
 .register-checkbox-container {
-  display: flex;
   align-items: center;
+  text-align: left;
   margin-bottom: 20px;
 }
 
