@@ -1,0 +1,123 @@
+/* Settings Page Container */
+.settings-page {
+    padding: 20px;
+    max-width: 100%;
+    margin: 0 auto;
+    width: calc(100% - 240px); /* Adjusted for sidebar width */
+    margin-left: 240px; /* To avoid overlap with the sidebar */
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+    min-height: 100vh; /* Ensure full viewport height */
+  }
+  
+  /* Box for Settings Header */
+  .settings-box {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  
+  /* Settings Title */
+  .settings-box h1 {
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+  
+  /* Settings Description */
+  .settings-box p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #777;
+  }
+  
+  /* Individual setting items (checkboxes, select dropdowns) */
+  .setting-item {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+  
+  .setting-item label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+  
+  .setting-item input[type="checkbox"] {
+    margin-right: 10px;
+    margin-top: 5px;
+  }
+  
+  /* Style for dropdown (select) */
+  .setting-item select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 200px;
+    font-size: 1rem;
+  }
+  
+  /* Button Style */
+  .btn-save {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .btn-save:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .settings-page {
+      padding-left: 5%;
+    }
+  
+    .settings-box {
+      padding: 15px;
+    }
+  
+    .setting-item label {
+      font-size: 1rem;
+    }
+  
+    .setting-item select {
+      width: 100%; /* Full width on small screens */
+    }
+  
+    .btn-save {
+      padding: 12px 20px;
+      font-size: 1rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .settings-box h1 {
+      font-size: 24px;
+    }
+  
+    .settings-box p {
+      font-size: 14px;
+    }
+  
+    .setting-item label {
+      font-size: 1rem;
+    }
+  
+    .btn-save {
+      padding: 10px 15px;
+      font-size: 0.9rem;
+    }
+  }
+  

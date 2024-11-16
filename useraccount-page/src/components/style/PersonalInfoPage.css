@@ -1,0 +1,116 @@
+.personal-info-page {
+    background-color: #f9f9f9;
+    padding: 20px; /* Reduced padding */
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    margin: 0 auto;
+    width: calc(100% - 240px);
+    margin-left: 240px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    font-family: 'Arial', sans-serif;
+}
+
+.personal-info-container {
+    max-width: 95%;
+    margin: 20px auto;
+    padding: 30px; /* Reduced padding */
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+    width: 100%;
+}
+
+.personal-info-page h1 {
+    margin-bottom: 15px; /* Reduced space */
+    font-size: 2rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #555;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #0066cc;
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #004d99;
+}
+
+.profile-picture-container {
+    display: flex;
+    flex-direction: column; /* Changed to column to stack image on top */
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-picture-container img {
+    width: 100px; /* Increased size slightly */
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.upload-btn {
+    background-color: #28a745;
+    color: white;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.upload-btn:hover {
+    background-color: #218838;
+}
+
+.select-gender, .select-dob {
+    width: 48%;
+}
+
+@media (max-width: 768px) {
+    .select-gender, .select-dob {
+        width: 100%;
+    }
+}
