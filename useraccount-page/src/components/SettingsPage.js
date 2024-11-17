@@ -135,15 +135,6 @@ const SettingsPage = () => {
         <p>Manage access to your profile and shared content.</p>
         <button className="btn-save">Manage Sharing Settings</button>
       </div>
-
-      {/* Logout */}
-      <div className="settings-box">
-        <h2>Log Out</h2>
-        <button onClick={handleLogout} className="btn-logout">
-          Log Out
-        </button>
-      </div>
-
       {/* Save Changes */}
       <div className="settings-box">
         <button onClick={handleSaveChanges} className="btn-save">
