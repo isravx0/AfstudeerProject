@@ -90,6 +90,30 @@ width: 100% !important;
 height: 400px !important;
 }
 
+.export-options {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 10px; /* Adds space between buttons */
+}
+
+.export-options button {
+  padding: 10px;
+  background-color: #F89820;
+  color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.export-options button:hover {
+  background-color: #e38512; /* Button hover effect */
+  color: white; /* Text color change on hover */
+  transform: scale(1.05); /* Scale effect on hover */
+}
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
 .charts-container {

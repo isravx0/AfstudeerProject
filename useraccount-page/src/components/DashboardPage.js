@@ -11,6 +11,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import html2canvas from 'html2canvas';  // Importing html2canvas for image capture
+import jsPDF from 'jspdf';  // Importing jsPDF for PDF export
 import "./style/DashboardPage.css";
 
 // Registering the necessary components for charts
@@ -91,6 +93,29 @@ const DashboardPage = () => {
     },
   };
 
+  // Function to handle exporting chart as image
+  const exportChartAsImage = () => {
+    const chartElement = document.querySelector('.chart-container canvas');
+    html2canvas(chartElement).then((canvas) => {
+      const imageURL = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = imageURL;
+      link.download = 'chart-image.png';
+      link.click();
+    });
+  };
+
+  // Function to handle exporting chart as PDF
+  const exportChartAsPDF = () => {
+    const chartElement = document.querySelector('.chart-container');
+    html2canvas(chartElement).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF();
+      pdf.addImage(imgData, 'PNG', 10, 10, 180, 160);
+      pdf.save('chart.pdf');
+    });
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     sessionStorage.removeItem('authToken');
@@ -128,6 +153,13 @@ const DashboardPage = () => {
                 <option value="year">Year</option>
               </select>
             </div>
+
+             {/* Export Buttons */}
+             <div className="export-options mt-4">
+              <button className="btn btn-primary" onClick={exportChartAsImage}>Export as Image</button>
+              <button className="btn btn-success ml-3" onClick={exportChartAsPDF}>Export as PDF</button>
+            </div>
+
             <h4>Panel Output, Battery Usage, and Battery Level</h4>
             <div className="chart-container">
               <Line data={chartData} options={chartOptions} />
