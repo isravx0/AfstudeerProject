@@ -9,13 +9,18 @@ import PasswordReset from './components/password_reset/Password_reset';
 import ResetPassword from './components/password_reset/NewPassword';
 import FAQPage from  './components/faq/FAQPage';
 import FloatingChatButton from './components/faq/FloatingChatButton.js';
-import ContactPage from './components/contact/ContactPage'; // Importeer ContactPage component
+import ContactPage from './components/contact/ContactPage'; 
 import InformationPage from './components/information/InformationPage';
 import Homepage from './components/homepage/homepage';
-import UserAccountPage from './components/user_account/UserAccountPage.js';
+import PersonalInfoPage from './components/user_account/PersonalInfoPage';
+import DataSharingPage from './components/user_account/DataSharingPage';
+import DashboardPage from './components/user_account/DashboardPage';
+import SettingsPage from './components/user_account/SettingsPage';
+import Sidebar from './components/user_account/Sidebar';
+
 import FeedbackForm from './components/feedback/FeedbackForm.js';
-import PrivateRoute from './components/PrivateRoute'; // Import the PrivateRoute component
-import { AuthProvider } from './components/AuthContext'; // Import AuthProvider
+import PrivateRoute from './components/PrivateRoute'; 
+import { AuthProvider } from './components/AuthContext';
 import './App.css';
 
 function App() {
@@ -33,8 +38,11 @@ function App() {
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/information" element={<InformationPage />} />
-            <Route path="/user-account" element={<UserAccountPage />} />
             <Route path="/feedback" element={<FeedbackForm />} />
+            <Route path="/personal-info" element={<PersonalInfoPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/data-sharing" element={<DataSharingPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             {/* Protect the /home route */}
             <Route 
               path="/home" 
