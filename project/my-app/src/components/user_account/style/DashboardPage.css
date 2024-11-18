@@ -1,13 +1,13 @@
-.dashboard-page{
-    padding: 20px;
-    max-width: 100%;
-    margin: 0 auto;
-    width: calc(100% - 240px); /* Adjusted for sidebar width */
-    margin-left: 240px; /* To avoid overlap with the sidebar */
-    box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
-    min-height: 100vh; /* Ensure full viewport height */
+.dashboard-page {
+  padding: 20px;
+  max-width: 100%;
+  margin: 0;
+  width: 100%; /* Make content width 100% */
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+  min-height: 100vh;
 }
+
 /* Box for header */
 .dashboard-page-box-1 {
 background-color: #fff;
