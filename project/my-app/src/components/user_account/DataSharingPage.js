@@ -54,7 +54,7 @@ const DataSharingPage = () => {
 
             <div className="data-sharing-container">
                 <form onSubmit={handleSubmit} className="form">
-                    <div className="form-group">
+                    <div className="data-sharing-form-group">
                         <h3>General Data Sharing Options</h3>
                         <label className="custom-switch">
                             <input
@@ -80,7 +80,7 @@ const DataSharingPage = () => {
                         </label>
                     </div>
 
-                    <div className="form-group">
+                    <div className="data-sharing-form-group">
                         <h3>Grant Access to Others</h3>
                         <input
                             type="email"

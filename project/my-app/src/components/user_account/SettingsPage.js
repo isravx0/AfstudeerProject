@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./style/SettingsPage.css";
+import { Link } from 'react-router-dom';
+
 
 const SettingsPage = () => {
   const [notifications, setNotifications] = useState(true);
@@ -12,11 +14,6 @@ const SettingsPage = () => {
   const handleSaveChanges = () => {
     alert("Settings saved successfully!");
     // You can extend this functionality to persist the settings (e.g., via localStorage or a backend API)
-  };
-
-  const handleLogout = () => {
-    alert("Logged out successfully!");
-    // Add actual logout logic here
   };
 
   return (
@@ -129,11 +126,11 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* Sharing and Access */}
-      <div className="settings-box">
+       {/* Sharing and Access */}
+       <div className="settings-box">
         <h2>Sharing and Access</h2>
         <p>Manage access to your profile and shared content.</p>
-        <button className="btn-save">Manage Sharing Settings</button>
+        <Link to="/data-sharing" className="btn-save">Manage Sharing Settings</Link>
       </div>
       {/* Save Changes */}
       <div className="settings-box">

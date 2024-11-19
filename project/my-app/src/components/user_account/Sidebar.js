@@ -1,35 +1,46 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
 import "./style/Sidebar.css";
 
 const Sidebar = () => {
-    return (
-        <div className="sidebar">
-            <h2 className="sidebar-title">Dashboard</h2>
-            <ul className="sidebar-menu">
-                <li>
-                    <Link to="/personal-info" className="menu-item">
-                        Personal Info
-                    </Link>
-                </li>
-                <li>
-                    <Link to="/dashboard" className="menu-item">
-                        Dashboard
-                    </Link>
-                </li>
-                <li>
-                    <Link to="/data-sharing" className="menu-item">
-                        Data Sharing
-                    </Link>
-                </li>
-                <li>
-                    <Link to="/settings" className="menu-item">
-                        Settings
-                    </Link>
-                </li>
-            </ul>
-        </div>
-    );
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+
+      {/* Sidebar */}
+      <div className={`sidebar ${isOpen ? "open" : ""}`}>
+      <ul>
+        <h2 className="sidebar-title">Dashboard</h2>
+        <li>
+            <NavLink to="/user/personal-info" activeClassName="active">
+            <span className="icon">👤</span>
+            <span className="text">Personal Info</span>
+            </NavLink>
+        </li>
+        <li>
+            <NavLink to="/user/data-sharing" activeClassName="active">
+            <span className="icon">🔄</span>
+            <span className="text">Data Sharing</span>
+            </NavLink>
+        </li>
+        <li>
+            <NavLink to="/user/dashboard" activeClassName="active">
+            <span className="icon">📊</span>
+            <span className="text">Dashboard</span>
+            </NavLink>
+        </li>
+        <li>
+            <NavLink to="/user/settings" activeClassName="active">
+            <span className="icon">⚙️</span>
+            <span className="text">Settings</span>
+            </NavLink>
+        </li>
+        </ul>
+
+      </div>
+    </>
+  );
 };
 
 export default Sidebar;

@@ -3,7 +3,7 @@
   padding: 20px;
   max-width: 100%;
   margin: 0 auto;
-  width: calc(100% - 240px);
+  width: 100%;
   box-sizing: border-box;
   font-family: "Arial", sans-serif;
   min-height: 100vh;
@@ -43,12 +43,12 @@
 }
 
 /* Toggle Button */
-.toggle-switch {
+.setting-item .toggle-switch {
   display: flex;
   align-items: center;
 }
 
-.toggle-btn {
+.setting-item .toggle-btn {
   padding: 10px 20px;
   border-radius: 25px;
   border: none;
@@ -57,38 +57,33 @@
   transition: background-color 0.3s ease;
 }
 
-.toggle-btn.on {
+.setting-item .toggle-btn.on {
   background-color: #28a745;
   color: white;
 }
 
-.toggle-btn.off {
+.setting-item .toggle-btn.off {
   background-color: #dc3545;
   color: white;
 }
 
-.toggle-btn:hover {
+.setting-item .toggle-btn:hover {
   opacity: 0.9;
 }
 
-/* Save and Logout Buttons */
-.btn-save,
-.btn-logout {
+/* Save Button */
+.settings-box .btn-save {
+  display: inline-block;
+  padding: 10px 20px;
   background-color: #007bff;
   color: white;
-  padding: 12px 20px;
-  font-size: 1.1rem;
+  text-decoration: none;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
+  text-align: center;
   cursor: pointer;
-  width: 100%;
 }
 
-.btn-logout {
-  background-color: #dc3545;
-}
-
-.btn-save:hover,
-.btn-logout:hover {
+.btn-save:hover {
   opacity: 0.9;
 }

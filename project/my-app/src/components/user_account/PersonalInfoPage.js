@@ -95,17 +95,13 @@ const PersonalInfoPage = () => {
               />
             </div>
             <div className="form-group">
-              <label>Location</label>
-              <select
-                name="location"
-                value={userData.location}
+              <label>Date of Birth</label>
+              <input
+                type="date"
+                name="dob"
+                value={userData.dob}
                 onChange={handleInputChange}
-              >
-                <option value="New York, USA">New York, USA</option>
-                <option value="London, UK">London, UK</option>
-                <option value="Sydney, Australia">Sydney, Australia</option>
-                <option value="Tokyo, Japan">Tokyo, Japan</option>
-              </select>
+              />
             </div>
           </div>
 
@@ -124,13 +120,17 @@ const PersonalInfoPage = () => {
               </select>
             </div>
             <div className="form-group">
-              <label>Date of Birth</label>
-              <input
-                type="date"
-                name="dob"
-                value={userData.dob}
+              <label>Location</label>
+              <select
+                name="location"
+                value={userData.location}
                 onChange={handleInputChange}
-              />
+              >
+                <option value="New York, USA">New York, USA</option>
+                <option value="London, UK">London, UK</option>
+                <option value="Sydney, Australia">Sydney, Australia</option>
+                <option value="Tokyo, Japan">Tokyo, Japan</option>
+              </select>
             </div>
           </div>
 

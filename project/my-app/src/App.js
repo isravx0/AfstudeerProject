@@ -7,7 +7,7 @@ import LoginPage from './components/login/LoginPage';
 import RegisterPage from './components/register/RegisterPage';
 import PasswordReset from './components/password_reset/Password_reset';
 import ResetPassword from './components/password_reset/NewPassword';
-import FAQPage from './components/faq/FAQPage';
+import FAQPage from  './components/faq/FAQPage';
 import FloatingChatButton from './components/faq/FloatingChatButton.js';
 import ContactPage from './components/contact/ContactPage'; 
 import InformationPage from './components/information/InformationPage';
@@ -17,6 +17,7 @@ import DataSharingPage from './components/user_account/DataSharingPage';
 import DashboardPage from './components/user_account/DashboardPage';
 import SettingsPage from './components/user_account/SettingsPage';
 import Sidebar from './components/user_account/Sidebar';
+import UserAccountLayout from './components/user_account/UserAccountLayout.js';
 import FeedbackForm from './components/feedback/FeedbackForm.js';
 import PrivateRoute from './components/PrivateRoute'; 
 import { AuthProvider } from './components/AuthContext';
@@ -38,60 +39,16 @@ function App() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/information" element={<InformationPage />} />
             <Route path="/feedback" element={<FeedbackForm />} />
+            <Route path="/personal-info" element={<PersonalInfoPage />} />
+         
 
-            {/* Protect user account pages with Sidebar */}
-            <Route 
-              path="/personal-info" 
-              element={
-                <PrivateRoute>
-                  <div style={{ display: 'flex' }}>
-                    <Sidebar />
-                    <div style={{ marginLeft: '250px', width: '100%' }}>
-                      <PersonalInfoPage />
-                    </div>
-                  </div>
-                </PrivateRoute>
-              }
-            />
-            <Route 
-              path="/dashboard" 
-              element={
-                <PrivateRoute>
-                  <div style={{ display: 'flex' }}>
-                    <Sidebar />
-                    <div style={{ marginLeft: '250px', width: '100%' }}>
-                      <DashboardPage />
-                    </div>
-                  </div>
-                </PrivateRoute>
-              }
-            />
-            <Route 
-              path="/data-sharing" 
-              element={
-                <PrivateRoute>
-                  <div style={{ display: 'flex' }}>
-                    <Sidebar />
-                    <div style={{ marginLeft: '250px', width: '100%' }}>
-                      <DataSharingPage />
-                    </div>
-                  </div>
-                </PrivateRoute>
-              }
-            />
-            <Route 
-              path="/settings" 
-              element={
-                <PrivateRoute>
-                  <div style={{ display: 'flex' }}>
-                    <Sidebar />
-                    <div style={{ marginLeft: '250px', width: '100%' }}>
-                      <SettingsPage />
-                    </div>
-                  </div>
-                </PrivateRoute>
-              }
-            />
+            <Route path="/user" element={<UserAccountLayout />}>
+                <Route path="personal-info" element={<PersonalInfoPage />} />
+                <Route path="data-sharing" element={<DataSharingPage />} />
+                <Route path="dashboard" element={<DashboardPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+            </Route>
+            
             {/* Protect the /home route */}
             <Route 
               path="/home" 
