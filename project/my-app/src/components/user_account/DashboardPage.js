@@ -136,7 +136,7 @@ const DashboardPage = () => {
       <div className="dashboard-page-container charts-container my-4">
         <div className="homepage-charts-row">
           {/* Panel Output, Battery Usage, and Battery Level Chart */}
-          <div className="col-md-12 chart-box">
+          <div className="col-md-12 dashboard-page-chart-box">
             <h2 className="chart-title">Energy Production and Battery Status</h2>
             {/* Time Period Selection (Inside the main chart container) */}
             <div className="time-period-selector mt-4">

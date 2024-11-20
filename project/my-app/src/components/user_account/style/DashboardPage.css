@@ -16,8 +16,8 @@ box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 border-radius: 8px;
 }
 
-dashboard-page-container{
-    max-width: 90%;
+.dashboard-page-container{
+    max-width: 93%;
     margin: 20px auto;
     padding: 30px; /* Reduced padding */
     border-radius: 12px;
@@ -26,23 +26,37 @@ dashboard-page-container{
     width: 100%;
 }
 
-/* Styling for Time Period Dropdown */
-.dashboard-page-box-1 .time-period-selector {
-    display: inline-block;
-    margin-top: 20px;
-  }
-  
-  .dashboard-page-container .form-control {
-    max-width: 200px;
-    display: inline-block;
-    margin-left: 10px;
-  }
-  .dashboard-page-container .time-period-selector {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    margin-top: 20px;
-  }
+/* Styling for the Time Period Dropdown */
+.dashboard-page-container .time-period-selector select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.dashboard-page-container .time-period-selector select:focus {
+  border-color: #007bff;
+  outline: none;
+  background-color: #fff;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+.dashboard-page-container .time-period-selector select:hover {
+  border-color: #0056b3;
+  background-color: #f0f8ff;
+}
+
+/* Enhancing the Label Style */
+.dashboard-page-container .time-period-selector label {
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: 10px;
+  color: #333;
+}
   
   .dashboard-page-box-1 h1 {
     font-size: 30px;
@@ -152,5 +166,11 @@ height: 400px !important;
 
 .chart-box h4 {
     font-size: 16px;
+}
+.dashboard-page-container .time-period-selector select {
+  font-size: 13px;
+}
+.dashboard-page-container .time-period-selector label {
+  font-size: 14px;
 }
 }
