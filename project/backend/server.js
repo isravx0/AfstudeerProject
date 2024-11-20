@@ -321,8 +321,44 @@ app.post('/api/feedback', rateLimiter, (req, res) => {
     });
 });
 
+// Chatbot API endpoint
+app.post('/api/send-support-email', (req, res) => {
+    const { name, email, topic, question } = req.body;
 
+    // Basic validation
+    if (!name || !email || !topic || !question) {
+        return res.status(400).send('All fields (name, email, topic, question) are required.');
+    }
 
+    const transporter = nodemailer.createTransport({
+        service: 'gmail', // Example using Gmail
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    const mailOptions = {
+        from: email,
+        to: process.env.EMAIL_USER, // Send to your support email
+        subject: `Support Request: ${topic}`,
+        text: `Name: ${name}\nEmail: ${email}\nTopic: ${topic}\nQuestion: ${question}`,
+        html: `<h3>Support Request from ${name}</h3>
+               <p><strong>Email:</strong> ${email}</p>
+               <p><strong>Topic:</strong> ${topic}</p>
+               <p><strong>Question:</strong> ${question}</p>`,
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+            console.error('Error sending email:', err);
+            return res.status(500).send('Failed to send email');
+        }
+        console.log('Email sent: ' + info.response);
+        res.status(200).send('Email sent successfully');
+    });
+});
 
 
 
