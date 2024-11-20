@@ -1,4 +1,5 @@
 /* Sidebar Container */
+
 .sidebar {
   width: 300px; /* Full width on large screens */
   height: 100vh;
@@ -124,12 +125,9 @@
   .charts-container {
     flex-direction: column;
     align-items: center;
+    width: 100%;
   }
 
-  .chart-box {
-    margin-bottom: 15px;
-    max-width: 100%;
-  }
 
   .chart-box canvas {
     max-height: 300px;

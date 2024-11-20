@@ -130,7 +130,7 @@ const SettingsPage = () => {
        <div className="settings-box">
         <h2>Sharing and Access</h2>
         <p>Manage access to your profile and shared content.</p>
-        <Link to="/data-sharing" className="btn-save">Manage Sharing Settings</Link>
+        <Link to="/user/data-sharing" className="btn-save">Manage Sharing Settings</Link>
       </div>
       {/* Save Changes */}
       <div className="settings-box">

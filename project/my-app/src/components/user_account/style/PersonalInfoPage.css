@@ -105,8 +105,8 @@
   }
   
   .personal-info-page input,
-  select,
-  textarea {
+  .personal-info-page select,
+  .personal-info-page textarea {
     padding: 10px;
     font-size: 1rem;
     border: 1px solid #ccc;

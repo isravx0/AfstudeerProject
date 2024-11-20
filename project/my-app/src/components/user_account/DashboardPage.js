@@ -133,7 +133,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Main chart container */}
-      <div className="dashboard-container charts-container my-4">
+      <div className="dashboard-page-container charts-container my-4">
         <div className="homepage-charts-row">
           {/* Panel Output, Battery Usage, and Battery Level Chart */}
           <div className="col-md-12 chart-box">

@@ -32,12 +32,12 @@ dashboard-page-container{
     margin-top: 20px;
   }
   
-  .dashboard-container .form-control {
+  .dashboard-page-container .form-control {
     max-width: 200px;
     display: inline-block;
     margin-left: 10px;
   }
-  .dashboard-container .time-period-selector {
+  .dashboard-page-container .time-period-selector {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -53,17 +53,17 @@ dashboard-page-container{
   }
   
   /* Styling for Chart Title */
-.dashboard-container .chart-title {
+.dashboard-page-container .chart-title {
     font-size: 22px;
     font-weight: bold;
     margin-bottom: 20px;
   }
 /* Flexbox for horizontal chart alignment */
-.charts-container {
+.dashboard-page-container .charts-container {
 margin-top: 20px;
 }
 
-.homepage-charts-row {
+.dashboard-page-container .homepage-charts-row {
 display: flex;
 gap: 20px;
 }
