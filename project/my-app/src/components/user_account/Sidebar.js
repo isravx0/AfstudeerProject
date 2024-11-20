@@ -7,37 +7,35 @@ const Sidebar = () => {
 
   return (
     <>
-
       {/* Sidebar */}
       <div className={`sidebar ${isOpen ? "open" : ""}`}>
-      <ul>
-        <h2 className="sidebar-title">Dashboard</h2>
-        <li>
+        <ul>
+          <h2 className="sidebar-title">Dashboard</h2>
+          <li>
             <NavLink to="/user-account/personal-info" activeClassName="active">
-            <span className="icon">👤</span>
-            <span className="text">Personal Info</span>
+              <i className="bi bi-person"></i> {/* Bootstrap Icon for Person */}
+              <span className="text">Personal Info</span>
             </NavLink>
-        </li>
-        <li>
+          </li>
+          <li>
             <NavLink to="/user-account/data-sharing" activeClassName="active">
-            <span className="icon">🔄</span>
-            <span className="text">Data Sharing</span>
+              <i className="bi bi-arrow-repeat"></i> {/* Bootstrap Icon for Sync */}
+              <span className="text">Data Sharing</span>
             </NavLink>
-        </li>
-        <li>
+          </li>
+          <li>
             <NavLink to="/user-account/dashboard" activeClassName="active">
-            <span className="icon">📊</span>
-            <span className="text">Dashboard</span>
+              <i className="bi bi-bar-chart"></i> {/* Bootstrap Icon for Chart */}
+              <span className="text">Dashboard</span>
             </NavLink>
-        </li>
-        <li>
+          </li>
+          <li>
             <NavLink to="/user-account/settings" activeClassName="active">
-            <span className="icon">⚙️</span>
-            <span className="text">Settings</span>
+              <i className="bi bi-gear"></i> {/* Bootstrap Icon for Settings */}
+              <span className="text">Settings</span>
             </NavLink>
-        </li>
+          </li>
         </ul>
-
       </div>
     </>
   );

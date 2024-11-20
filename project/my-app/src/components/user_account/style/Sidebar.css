@@ -1,6 +1,6 @@
 /* Sidebar Container */
 .sidebar {
-  width: 300px; /* Full width on large screens */
+  width: 200px; /* Full width on large screens */
   height: 100vh;
   background-color: #ffffff;
   box-shadow: 1px 0 7px rgba(146, 146, 146, 0.1);
@@ -43,15 +43,11 @@
   border-radius: 5px;
   transition: background 0.3s;
   transition: background-color 0.3s ease, color 0.3s ease;
+  width: 100%;
 }
 
-.sidebar a:hover {
-  background-color: #1772d3;
-  color: white;
-}
-
-.sidebar a.active {
-  background-color: #0056b3;
+.sidebar a:hover , .sidebar a.active  {
+  background-color: #0c539f;
   color: white;
 }
 
@@ -119,17 +115,5 @@
   .personal-info-page,
   .settings-page {
     width: 100%;
-  }
-
-  .charts-container {
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
-
-
-  .chart-box canvas {
-    max-height: 300px;
-    height: 300px !important;
   }
 }
