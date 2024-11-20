@@ -321,42 +321,33 @@ app.post('/api/feedback', rateLimiter, (req, res) => {
     });
 });
 
-// Chatbot API endpoint
-app.post('/api/send-support-email', (req, res) => {
+// 
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Example using Gmail, adjust for your email provider
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    }
+});
+
+app.post('/api/send-email', (req, res) => {
     const { name, email, topic, question } = req.body;
 
-    // Basic validation
-    if (!name || !email || !topic || !question) {
-        return res.status(400).send('All fields (name, email, topic, question) are required.');
-    }
-
-    const transporter = nodemailer.createTransport({
-        service: 'gmail', // Example using Gmail
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-
     const mailOptions = {
-        from: email,
-        to: process.env.EMAIL_USER, // Send to your support email
-        subject: `Support Request: ${topic}`,
-        text: `Name: ${name}\nEmail: ${email}\nTopic: ${topic}\nQuestion: ${question}`,
-        html: `<h3>Support Request from ${name}</h3>
-               <p><strong>Email:</strong> ${email}</p>
-               <p><strong>Topic:</strong> ${topic}</p>
-               <p><strong>Question:</strong> ${question}</p>`,
+        from: 'your-email@gmail.com',
+        to: process.env.EMAIL_USER,
+        subject: `New inquiry from ${name || 'Anonymous'}`,
+        text: `Topic: ${topic}\nQuestion: ${question}\nEmail: ${email}`
     };
 
-    // Send email
-    transporter.sendMail(mailOptions, (err, info) => {
-        if (err) {
-            console.error('Error sending email:', err);
-            return res.status(500).send('Failed to send email');
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error("Error sending email:", error); // Log the error
+            return res.status(500).json({ message: 'Failed to send email', error });
+        } else {
+            console.log('Email sent: ' + info.response);
+            return res.status(200).json({ message: 'Email sent successfully', info });
         }
-        console.log('Email sent: ' + info.response);
-        res.status(200).send('Email sent successfully');
     });
 });
 

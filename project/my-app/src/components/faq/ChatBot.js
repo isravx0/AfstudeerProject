@@ -26,41 +26,6 @@ const MyChatBot = () => {
         return regex.test(email);
     };
 
-    // Define the sendEmail function to send email to backend
-    const sendEmail = async (params) => {
-        const { name, email, topic } = clientInfo;
-        const question = params.userInput;
-
-        // Prepare the payload
-        const payload = {
-            name: name || "Customer",  // Use default name if not provided
-            email,
-            topic,
-            question,
-        };
-
-        try {
-            // Send the email to your backend API
-            const response = await fetch("http://localhost:3000/api/send-support-email", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to send email.");
-            }
-
-            // On success, send this message to the user
-            return `Thank you, ${name || "customer"}! Your message has been sent to our support team. We'll contact you soon.`;
-        } catch (error) {
-            console.error("Error sending email:", error);
-            return "Sorry, there was an error sending your message. Please try again later.";
-        }
-    };
-
     const flow = {
         start: {
             message: "Hello! Before we proceed, can I have your email address?",
@@ -78,7 +43,19 @@ const MyChatBot = () => {
                 }
 
                 setClientInfo(prevInfo => ({ ...prevInfo, email }));
-                return "Thanks! Now, let's proceed. What would you like to know about? (Battery, Solar Panel, Simulator, or Other)";
+                return "Thanks! Now, can you please provide your name?";
+            },
+            path: "get_name"
+        },
+        get_name: {
+            message: "What is your name?",
+            path: "store_name"
+        },
+        store_name: {
+            message: async (params) => {
+                const name = params.userInput;
+                setClientInfo(prevInfo => ({ ...prevInfo, name }));
+                return "Thanks, " + name + "! Now, what would you like to know about? (Battery, Solar Panel, Simulator, or Other)";
             },
             path: "choose_topic"
         },
@@ -145,12 +122,46 @@ const MyChatBot = () => {
         send_email: {
             message: async (params) => {
                 const { name, email, topic } = clientInfo;
-
-                // Send the email request to backend
-                return await sendEmail(params);
+                const userQuestion = params.userInput; // The user's question
+                
+                // Debugging log: Check the data being sent
+                console.log('Client Info:', clientInfo);
+                console.log('User Question:', userQuestion);
+        
+                const emailData = {
+                    name: name || "Anonymous",
+                    email: email,
+                    topic: topic,
+                    question: userQuestion
+                };
+        
+                try {
+                    console.log('Sending email with data:', emailData); // Debugging log
+        
+                    const response = await fetch('http://localhost:3000/api/send-email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(emailData)
+                    });
+        
+                    if (!response.ok) {
+                        throw new Error('Failed to send email');
+                    }
+        
+                    const result = await response.json();
+                    console.log("Email sent successfully:", result);
+        
+                    return `Thank you, ${name || "customer"}! Your message has been sent to our support team. We'll contact you soon.`;
+                } catch (error) {
+                    console.error("Error sending email:", error);
+                    return "Sorry, there was an issue sending your message. Please try again later.";
+                }
             },
             path: "thank_user"
         },
+        
         thank_user: {
             message: "Thank you for reaching out! Have a great day!",
             path: null // End the conversation
