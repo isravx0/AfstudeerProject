@@ -42,7 +42,7 @@ function App() {
             <Route path="/personal-info" element={<PersonalInfoPage />} />
          
 
-            <Route path="/user" element={<UserAccountLayout />}>
+            <Route path="/user-account" element={<UserAccountLayout />}>
                 <Route path="personal-info" element={<PersonalInfoPage />} />
                 <Route path="data-sharing" element={<DataSharingPage />} />
                 <Route path="dashboard" element={<DashboardPage />} />
