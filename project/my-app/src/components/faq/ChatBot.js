@@ -19,6 +19,7 @@ const faqData = {
 
 const MyChatBot = () => {
     const [clientInfo, setClientInfo] = useState({});
+    const [emailValidated, setEmailValidated] = useState(false);
 
     // Email validation regex
     const validateEmail = (email) => {
@@ -28,53 +29,24 @@ const MyChatBot = () => {
 
     const flow = {
         start: {
-            message: "Hello! Before we proceed, can I have your email address?",
-            path: "get_email"
-        },
-        get_email: {
-            message: "Please provide your email address so we can contact you if needed.",
-            path: "validate_email"
-        },
-        validate_email: {
-            message: async (params) => {
-                const email = params.userInput;
-                if (!email || !validateEmail(email)) {
-                    return "Please provide a valid email address.";
-                }
-
-                setClientInfo(prevInfo => ({ ...prevInfo, email }));
-                return "Thanks! Now, can you please provide your name?";
-            },
-            path: "get_name"
-        },
-        get_name: {
-            message: "What is your name?",
-            path: "store_name"
-        },
-        store_name: {
-            message: async (params) => {
-                const name = params.userInput;
-                setClientInfo(prevInfo => ({ ...prevInfo, name }));
-                return "Thanks, " + name + "! Now, what would you like to know about? (Battery, Solar Panel, Simulator, or Other)";
-            },
-            path: "choose_topic"
-        },
-        choose_topic: {
-            message: "Please choose a topic to learn about:",
-            options: ["Battery", "Solar Panel", "Simulator", "Other"],
+            message: "Hello! How can I assist you today? Please choose a topic:",
+            options: ["Battery", "Solar Panel", "Simulator", "Other", "Yes, contact support"],
             path: (params) => {
-                const topic = params.userInput.toLowerCase();
-                if (topic === "battery") {
+                const userChoice = params.userInput.toLowerCase();
+                if (userChoice === "battery") {
                     setClientInfo(prevInfo => ({ ...prevInfo, topic: "battery" }));
                     return "battery_question";
                 }
-                if (topic === "solar panel") {
+                if (userChoice === "solar panel") {
                     setClientInfo(prevInfo => ({ ...prevInfo, topic: "solar panel" }));
                     return "solar_question";
                 }
-                if (topic === "simulator") {
+                if (userChoice === "simulator") {
                     setClientInfo(prevInfo => ({ ...prevInfo, topic: "simulator" }));
                     return "simulator_question";
+                }
+                if (userChoice === "yes, contact support") {
+                    return "get_email"; // Proceed to email collection if user wants support
                 }
                 return "other_question";
             }
@@ -112,29 +84,70 @@ const MyChatBot = () => {
         },
         need_more_help: {
             message: "Is there anything else I can help you with?",
-            options: ["Yes, contact support", "No, I'm good"],
-            path: (params) => params.userInput.toLowerCase() === "yes, contact support" ? "get_question_details" : "thank_user"
+            options: ["Yes, visit dashboard", "Yes, contact support", "No, I'm good"],
+            path: (params) => {
+                const userChoice = params.userInput.toLowerCase();
+                if (userChoice === "yes, visit dashboard") {
+                    return "visit_dashboard";
+                }
+                if (userChoice === "yes, contact support") {
+                    return "get_email"; // Ask for email again if user chooses to contact support
+                }
+                return "thank_user";
+            }
         },
-        get_question_details: {
-            message: "Please explain your question in detail.",
+        visit_dashboard: {
+            message: "Would you like to visit the dashboard pages for Battery, Solar Panel, or Simulator?",
+            options: ["Battery Dashboard", "Solar Panel Dashboard", "Simulator Dashboard", "None"],
+            path: (params) => {
+                const userChoice = params.userInput.toLowerCase();
+                if (userChoice === "battery dashboard") {
+                    window.location.href = "/battery-dashboard"; // Redirect to the battery dashboard
+                    return "Redirecting to the battery dashboard...";
+                }
+                if (userChoice === "solar panel dashboard") {
+                    window.location.href = "/solar-panel-dashboard"; // Redirect to the solar panel dashboard
+                    return "Redirecting to the solar panel dashboard...";
+                }
+                if (userChoice === "simulator dashboard") {
+                    window.location.href = "/simulator-dashboard"; // Redirect to the simulator dashboard
+                    return "Redirecting to the simulator dashboard...";
+                }
+                return "Sorry, I didn't understand that. Please choose a valid dashboard.";
+            }
+        },
+        get_email: {
+            message: "To contact support, please provide your email address so we can get in touch with you:",
+            path: "validate_email"
+        },
+        validate_email: {
+            message: async (params) => {
+                const email = params.userInput;
+                if (!email || !validateEmail(email)) {
+                    return "Please provide a valid email address."; // Prompt again if email is invalid
+                }
+
+                // Save the email to clientInfo
+                setClientInfo(prevInfo => ({ ...prevInfo, email }));
+                setEmailValidated(true);  // Mark email as validated
+
+                // Ask for the question they need help with
+                return "Thanks for providing your email! Please explain your question in detail.";
+            },
             path: "send_email"
         },
         send_email: {
             message: async (params) => {
-                const { name, email, topic } = clientInfo;
+                const { name, email } = clientInfo;
                 const userQuestion = params.userInput; // The user's question
                 
-                // Debugging log: Check the data being sent
-                console.log('Client Info:', clientInfo);
-                console.log('User Question:', userQuestion);
-        
+                // Prepare the email data to send
                 const emailData = {
                     name: name || "Anonymous",
                     email: email,
-                    topic: topic,
                     question: userQuestion
                 };
-        
+                
                 try {
                     console.log('Sending email with data:', emailData); // Debugging log
         
@@ -161,7 +174,6 @@ const MyChatBot = () => {
             },
             path: "thank_user"
         },
-        
         thank_user: {
             message: "Thank you for reaching out! Have a great day!",
             path: null // End the conversation
