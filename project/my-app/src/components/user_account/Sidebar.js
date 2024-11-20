@@ -13,25 +13,25 @@ const Sidebar = () => {
       <ul>
         <h2 className="sidebar-title">Dashboard</h2>
         <li>
-            <NavLink to="/user/personal-info" activeClassName="active">
+            <NavLink to="/user-account/personal-info" activeClassName="active">
             <span className="icon">👤</span>
             <span className="text">Personal Info</span>
             </NavLink>
         </li>
         <li>
-            <NavLink to="/user/data-sharing" activeClassName="active">
+            <NavLink to="/user-account/data-sharing" activeClassName="active">
             <span className="icon">🔄</span>
             <span className="text">Data Sharing</span>
             </NavLink>
         </li>
         <li>
-            <NavLink to="/user/dashboard" activeClassName="active">
+            <NavLink to="/user-account/dashboard" activeClassName="active">
             <span className="icon">📊</span>
             <span className="text">Dashboard</span>
             </NavLink>
         </li>
         <li>
-            <NavLink to="/user/settings" activeClassName="active">
+            <NavLink to="/user-account/settings" activeClassName="active">
             <span className="icon">⚙️</span>
             <span className="text">Settings</span>
             </NavLink>
