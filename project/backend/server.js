@@ -272,16 +272,20 @@ app.post('/api/reset-password', (req, res) => {
 
 // Feedback endpoint: store feedback in the database and send an email
 app.post('/api/feedback', rateLimiter, (req, res) => {
-    const { name, email, comments, rating, category } = req.body;
+    const { name, email, comments, rating, category, anonymous } = req.body;
 
-    // Validation
-    if (!name || !email || !comments || !rating || !category) {
-        return res.status(400).send('All fields are required');
+    // Validation for non-anonymous users
+    if (!comments || !rating || !category || (anonymous !== true && (!name || !email))) {
+        return res.status(400).send('Required fields are missing');
     }
+
+    // Use placeholders for anonymous submissions
+    const finalName = anonymous ? 'Anonymous' : name;
+    const finalEmail = anonymous ? 'anonymous@noemail.com' : email;
 
     // Insert feedback into the database
     const feedbackQuery = 'INSERT INTO feedback (name, email, comments, rating, category) VALUES (?, ?, ?, ?, ?)';
-    db.query(feedbackQuery, [name, email, comments, rating, category], (err, result) => {
+    db.query(feedbackQuery, [finalName, finalEmail, comments, rating, category], (err, result) => {
         if (err) {
             console.error('Database insertion error:', err);
             return res.status(500).send('An error occurred while saving feedback to the database');
@@ -300,10 +304,10 @@ app.post('/api/feedback', rateLimiter, (req, res) => {
             to: process.env.EMAIL_USER,
             from: 'noreply@solarpanelsimulation.com',
             subject: 'New Feedback Received',
-            text: `Feedback received from ${name} (${email}):\n\nCategory: ${category}\nRating: ${rating}\nComments: ${comments}`,
+            text: `Feedback received from ${finalName} (${finalEmail}):\n\nCategory: ${category}\nRating: ${rating}\nComments: ${comments}`,
             html: `<h2>New Feedback Received</h2>
-                   <p><strong>Name:</strong> ${name}</p>
-                   <p><strong>Email:</strong> ${email}</p>
+                   <p><strong>Name:</strong> ${finalName}</p>
+                   <p><strong>Email:</strong> ${finalEmail}</p>
                    <p><strong>Category:</strong> ${category}</p>
                    <p><strong>Rating:</strong> ${rating}</p>
                    <p><strong>Comments:</strong> ${comments}</p>`
@@ -321,7 +325,8 @@ app.post('/api/feedback', rateLimiter, (req, res) => {
     });
 });
 
-// 
+
+// Chatbot API endpoint
 const transporter = nodemailer.createTransport({
     service: 'gmail', // Example using Gmail, adjust for your email provider
     auth: {
