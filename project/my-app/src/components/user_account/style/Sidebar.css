@@ -12,15 +12,7 @@
   display: flex;
   flex-direction: column;
   transition: width 0.3s ease; /* Smooth collapse effect */
-  
 }
-
-.sidebar-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
 
 /* Navigation List */
 .sidebar ul {
@@ -28,6 +20,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  flex-grow: 1; /* Allow space for logout link to be pushed to the bottom */
 }
 
 .sidebar li {
@@ -46,7 +39,8 @@
   width: 100%;
 }
 
-.sidebar a:hover , .sidebar a.active  {
+.sidebar a:hover,
+.sidebar a.active {
   background-color: #0c539f;
   color: white;
 }
@@ -58,13 +52,71 @@
   text-align: center;
 }
 
-.sidebar:hover .icon {
+.sidebar .icon:hover {
   margin-right: 15px; /* Adjust spacing on hover */
 }
 
 .sidebar a .text {
   display: inline-block;
 }
+
+/* Logout Section at the bottom */
+.logout-section {
+  margin-top: auto; /* Push logout link to the bottom */
+  padding: 10px;
+  text-align: center;
+}
+
+.logout-link {
+  text-decoration: none;
+  color: #f44336; /* Red color for logout */
+  font-weight: bold;
+}
+
+.logout-link .icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.logout-link .text {
+  display: inline-block;
+  font-size: 16px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px; /* Narrow width */
+    padding: 10px 0; /* Reduce padding */
+    overflow-x: hidden; /* Hide long text */
+  }
+
+  .sidebar a {
+    padding: 12px 10px; /* Adjust padding */
+    font-size: 18px; /* Smaller text */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ellipsis for long text */
+  }
+
+  .sidebar .icon {
+    font-size: 25px; /* Smaller icon */
+  }
+
+  .sidebar:hover {
+    width: 200px; /* Expand on hover */
+    padding: 20px 0; /* Restore padding */
+  }
+  
+  .sidebar .text {
+    display: none; /* Hide text in collapsed state */
+  }
+
+  .sidebar:hover .text {
+    display: inline-block; /* Show text on hover */
+  }
+}
+
 /* Responsive Pages */
 .dashboard-page,
 .data-sharing-page,
@@ -92,10 +144,14 @@
 
   .sidebar a {
     padding: 12px 10px; /* Adjust padding */
-    font-size: 14px; /* Smaller text */
+    font-size: 18px; /* Smaller text */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; /* Ellipsis for long text */
+  }
+
+  .sidebar .icon {
+    font-size: 25px; /* Smaller icon */
   }
 
   .sidebar:hover {
