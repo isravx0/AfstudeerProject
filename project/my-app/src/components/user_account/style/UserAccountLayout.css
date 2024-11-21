@@ -1,0 +1,29 @@
+/* User Account Layout */
+.user-account-layout {
+    display: flex;
+    min-height: 100vh;
+    text-align: left;
+  }
+  
+  .user-account-layout .user-account-content {
+    flex-grow: 1;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    margin-left: 300px;
+  }
+  
+  .user-account-layout.collapsed .user-account-content {
+    margin-left: 170px;
+  }
+  
+  .sidebar {
+    transition: width 0.3s ease;
+  }
+  
+  .sidebar.collapsed {
+    width: 150px;
+  }
+  
+  .sidebar.collapsed .text {
+    display: none;
+  }
+  

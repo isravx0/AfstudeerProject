@@ -44,14 +44,14 @@ function App() {
             <Route path="/battery_dashboard" element={<BatteryDashboard />} />
             <Route path="/personal-info" element={<PersonalInfoPage />} />
 
-
+            {/* User Account Section */}
             <Route path="/user-account" element={<UserAccountLayout />}>
-                <Route path="personal-info" element={<PersonalInfoPage />} />
-                <Route path="data-sharing" element={<DataSharingPage />} />
-                <Route path="dashboard" element={<DashboardPage />} />
-                <Route path="settings" element={<SettingsPage />} />
+              <Route path="personal-info" element={<PersonalInfoPage />} />
+              <Route path="data-sharing" element={<DataSharingPage />} />
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="settings" element={<SettingsPage />} />
             </Route>
-            
+
             {/* Protect the /home route */}
             <Route 
               path="/home" 
