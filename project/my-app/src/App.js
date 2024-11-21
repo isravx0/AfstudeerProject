@@ -19,6 +19,8 @@ import SettingsPage from './components/user_account/SettingsPage';
 import Sidebar from './components/user_account/Sidebar';
 import UserAccountLayout from './components/user_account/UserAccountLayout.js';
 import FeedbackForm from './components/feedback/FeedbackForm.js';
+import BatteryDashboard from './components/battery_dashboard/batteryDashboard';
+
 import PrivateRoute from './components/PrivateRoute'; 
 import { AuthProvider } from './components/AuthContext';
 import './App.css';
@@ -39,8 +41,9 @@ function App() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/information" element={<InformationPage />} />
             <Route path="/feedback" element={<FeedbackForm />} />
+            <Route path="/battery_dashboard" element={<BatteryDashboard />} />
             <Route path="/personal-info" element={<PersonalInfoPage />} />
-         
+
 
             <Route path="/user-account" element={<UserAccountLayout />}>
                 <Route path="personal-info" element={<PersonalInfoPage />} />
