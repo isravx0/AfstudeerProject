@@ -431,6 +431,40 @@ app.post('/api/user-action', authenticateToken, (req, res) => {
     res.status(200).json({ message: 'User ID received successfully', userId });
 });
 
+// Get user data
+app.get('/api/user-data', verifyToken, (req, res) => {
+    const userId = req.userId;
+
+    db.query('SELECT name, email, phone, location, gender, dob, bio FROM users WHERE id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching user data:', err);
+            return res.status(500).json({ error: 'Failed to fetch user data' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        res.json(results[0]); // Return user data.
+    });
+});
+
+// Update user data
+app.put('/api/user-data', verifyToken, (req, res) => {
+    const userId = req.userId;
+    const { name, email, phone, location, gender, dob, bio } = req.body;
+
+    db.query(
+        'UPDATE users SET name = ?, email = ?, phone = ?, location = ?, gender = ?, dob = ?, bio = ? WHERE id = ?',
+        [name, email, phone, location, gender, dob, bio, userId],
+        (err, result) => {
+            if (err) {
+                console.error('Error updating user data:', err);
+                return res.status(500).json({ error: 'Failed to update user data' });
+            }
+            res.json({ message: 'User data updated successfully' });
+        }
+    );
+});
+
 
 // Start the server
 app.listen(PORT, () => {

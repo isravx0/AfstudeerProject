@@ -1,17 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./style/PersonalInfoPage.css";
 
 const PersonalInfoPage = () => {
   const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "123-456-7890",
-    location: "New York, USA",
-    gender: "",
-    dob: "",
-    profilePicture: null,
-    bio: "",
+    name: "",
+    email: "",
+    phoneNumber: "",
+    location: "",
   });
+  
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get("/api/user-data", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        const defaultUserData = {
+          name: "",
+          email: "",
+          phoneNumber: "",
+          location: "",
+          gender: "", // Add default values for optional fields
+          bio: "",
+          dob: "",
+        };
+        setUserData({ ...defaultUserData, ...response.data });
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setError("Failed to load user data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserData();
+  }, []);
+  
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -25,130 +54,139 @@ const PersonalInfoPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Changes saved successfully!");
-    console.log("User Data Submitted:", userData);
+
+    try {
+      const formData = new FormData();
+      Object.keys(userData).forEach((key) => {
+        formData.append(key, userData[key]);
+      });
+
+      if (userData.profilePicture instanceof File) {
+        formData.append("profilePicture", userData.profilePicture);
+      }
+
+      await axios.put("/api/user-data", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      alert("Changes saved successfully!");
+    } catch (err) {
+      console.error("Error updating user data:", err);
+      alert("Failed to save changes.");
+    }
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div className="personal-info-page">
-        <div className="personal-info-container">
-            <h1>Personal Information</h1>
-            <p>Update your personal details and profile preferences</p>
+      <form onSubmit={handleSubmit} className="personal-info-form">
+        <div className="form-group">
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={userData.name}
+            onChange={handleInputChange}
+          />
         </div>
 
-      <div className="personal-info-container">
-        {/* Profile Picture */}
-        <div className="profile-picture-container">
-          {userData.profilePicture ? (
-            <img src={userData.profilePicture} alt="Profile" />
-          ) : (
-            <div className="placeholder">No profile picture uploaded</div>
-          )}
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={userData.email}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="phone">Phone:</label>
+          <input
+            type="text"
+            id="phone"
+            name="phone"
+            value={userData.phone}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="location">Location:</label>
+          <input
+            type="text"
+            id="location"
+            name="location"
+            value={userData.location}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="gender">Gender:</label>
+          <select
+            id="gender"
+            name="gender"
+            value={userData.gender}
+            onChange={handleInputChange}
+          >
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="dob">Date of Birth:</label>
+          <input
+            type="date"
+            id="dob"
+            name="dob"
+            value={userData.dob}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="profilePicture">Profile Picture:</label>
           <input
             type="file"
+            id="profilePicture"
+            name="profilePicture"
             onChange={handleFileChange}
-            accept="image/*"
-            style={{ display: "none" }}
-            id="profile-picture-upload"
           />
-          <label className="upload-btn" htmlFor="profile-picture-upload">
-            Upload Profile Picture
-          </label>
+          {userData.profilePicture && (
+            <img
+              src={userData.profilePicture}
+              alt="Profile Preview"
+              className="profile-picture-preview"
+            />
+          )}
         </div>
 
-        {/* Form */}
-        <form className="form" onSubmit={handleSubmit}>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Name</label>
-              <input
-                type="text"
-                name="name"
-                value={userData.name}
-                onChange={handleInputChange}
-                placeholder="Enter your name"
-              />
-            </div>
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="email"
-                name="email"
-                value={userData.email}
-                onChange={handleInputChange}
-                placeholder="Enter your email"
-              />
-            </div>
-          </div>
+        <div className="form-group">
+          <label htmlFor="bio">Bio:</label>
+          <textarea
+            id="bio"
+            name="bio"
+            value={userData.bio}
+            onChange={handleInputChange}
+          ></textarea>
+        </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Phone</label>
-              <input
-                type="text"
-                name="phone"
-                value={userData.phone}
-                onChange={handleInputChange}
-                placeholder="Enter your phone number"
-              />
-            </div>
-            <div className="form-group">
-              <label>Date of Birth</label>
-              <input
-                type="date"
-                name="dob"
-                value={userData.dob}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>Gender</label>
-              <select
-                name="gender"
-                value={userData.gender}
-                onChange={handleInputChange}
-              >
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label>Location</label>
-              <select
-                name="location"
-                value={userData.location}
-                onChange={handleInputChange}
-              >
-                <option value="New York, USA">New York, USA</option>
-                <option value="London, UK">London, UK</option>
-                <option value="Sydney, Australia">Sydney, Australia</option>
-                <option value="Tokyo, Japan">Tokyo, Japan</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Bio</label>
-            <textarea
-              name="bio"
-              value={userData.bio}
-              onChange={handleInputChange}
-              placeholder="Tell us about yourself"
-            ></textarea>
-          </div>
-
-          <button type="submit" className="btn-save">
-            Save Changes
-          </button>
-        </form>
-      </div>
+        <button type="submit" className="save-button">
+          Save Changes
+        </button>
+      </form>
     </div>
   );
 };
