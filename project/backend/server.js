@@ -8,6 +8,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/userRoutes');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const router = express.Router();
 
 
 const app = express();
@@ -431,39 +432,47 @@ app.post('/api/user-action', authenticateToken, (req, res) => {
     res.status(200).json({ message: 'User ID received successfully', userId });
 });
 
-// Get user data
-app.get('/api/user-data', verifyToken, (req, res) => {
+// Get user profile data
+app.get('/api/user-profile', verifyToken, (req, res) => {
     const userId = req.userId;
 
-    db.query('SELECT name, email, phone, location, gender, dob, bio FROM users WHERE id = ?', [userId], (err, results) => {
-        if (err) {
-            console.error('Error fetching user data:', err);
-            return res.status(500).json({ error: 'Failed to fetch user data' });
+    // Query to get user details
+    db.query('SELECT name, email, phoneNumber, location, bio, gender FROM users WHERE id = ?', [userId], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(404).send('User not found');
         }
-        if (results.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        res.json(results[0]); // Return user data.
+        
+        // Send the user data as response
+        const user = results[0];
+        res.status(200).json({
+            name: user.name,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            location: user.location,
+            bio: user.bio || '',   // Return empty string if bio is not set
+            gender: user.gender || '', // Return empty string if gender is not set
+        });
     });
 });
 
-// Update user data
-app.put('/api/user-data', verifyToken, (req, res) => {
-    const userId = req.userId;
-    const { name, email, phone, location, gender, dob, bio } = req.body;
-
+// Update user profile
+router.put('/update-profile', verifyToken, (req, res) => {
+    const userId = req.userId; // Assuming you're using JWT and extracting the user ID from the token
+    const { name, email, phoneNumber, location, bio, gender, dob } = req.body; // Include all the fields
+  
+    // Update the user's profile in the database
     db.query(
-        'UPDATE users SET name = ?, email = ?, phone = ?, location = ?, gender = ?, dob = ?, bio = ? WHERE id = ?',
-        [name, email, phone, location, gender, dob, bio, userId],
-        (err, result) => {
-            if (err) {
-                console.error('Error updating user data:', err);
-                return res.status(500).json({ error: 'Failed to update user data' });
-            }
-            res.json({ message: 'User data updated successfully' });
+      'UPDATE users SET name = ?, email = ?, phoneNumber = ?, location = ?, bio = ?, gender = ?, dob = ? WHERE id = ?',
+      [name, email, phoneNumber, location, bio, gender, dob, userId],
+      (err, result) => {
+        if (err) {
+          return res.status(500).send('Failed to update profile');
         }
+        res.status(200).send('Profile updated successfully');
+      }
     );
-});
+  });
+  
 
 
 // Start the server
