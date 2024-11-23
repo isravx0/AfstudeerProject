@@ -456,24 +456,26 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
 });
 
 // Update user profile
-router.put('/update-profile', verifyToken, (req, res) => {
-    const userId = req.userId; // Assuming you're using JWT and extracting the user ID from the token
-    const { name, email, phoneNumber, location, bio, gender, dob } = req.body; // Include all the fields
-  
-    // Update the user's profile in the database
-    db.query(
-      'UPDATE users SET name = ?, email = ?, phoneNumber = ?, location = ?, bio = ?, gender = ?, dob = ? WHERE id = ?',
-      [name, email, phoneNumber, location, bio, gender, dob, userId],
-      (err, result) => {
-        if (err) {
-          return res.status(500).send('Failed to update profile');
-        }
-        res.status(200).send('Profile updated successfully');
-      }
-    );
-  });
-  
+app.put('/update-profile', verifyToken, (req, res) => {
+    const userId = req.userId;
+    const { name, email, phoneNumber, location, bio, gender, dob } = req.body;
 
+    console.log('Request body from React:', req.body); // Log the incoming data
+    console.log('User ID from token:', userId); // Log user ID to confirm token decoding
+
+    db.query(
+        'UPDATE users SET name = ?, email = ?, phoneNumber = ?, location = ?, bio = ?, gender = ?, dob = ? WHERE id = ?',
+        [name, email, phoneNumber, location, bio, gender, dob, userId],
+        (err, result) => {
+            if (err) {
+                console.error('Error during update:', err);
+                return res.status(500).send('Failed to update profile');
+            }
+            console.log('Update successful:', result); // Log successful updates
+            res.status(200).send('Profile updated successfully');
+        }
+    );
+});
 
 // Start the server
 app.listen(PORT, () => {

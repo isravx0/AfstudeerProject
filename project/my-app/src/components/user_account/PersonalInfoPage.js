@@ -101,41 +101,43 @@ const PersonalInfoPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+    console.log('Data being sent to backend:', userData);
+
     if (validateForm()) {
-      // Send the updated user data to the backend
-      axios.put('/api/update-profile', userData, {
+
+      // Log the data to the console
+      console.log('Data being sent to the API:', userData);
+      console.log('Authorization Token:', token);
+
+      // Send data to the API using the token
+
+      axios.put('http://localhost:3001/update-profile', userData, {
         headers: {
-          Authorization: `Bearer ${token}`, // Send the token for authentication
-        }
-      })
-      .then(response => {
-        // On success, update userData in context and show success message
-        setUserData(userData);
-        Swal.fire({
-          icon: 'success',
-          title: 'Profile updated successfully!',
-          text: 'Your personal information has been updated.',
-          timer: 1500,  // Show for 1.5 seconds
-          showConfirmButton: false,  // Hide the confirm button
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+
+            console.log('Update response:', response.data); // Log response from backend
+            Swal.fire({
+                icon: 'success',
+                title: 'Profile updated successfully!',
+                text: 'Your personal information has been updated.',
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        })
+        .catch(error => {
+            console.error('Error during update:', error.response || error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Update Failed',
+                text: 'There was an error updating your profile. Please try again.',
+            });
         });
-      })
-      .catch(error => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Update Failed',
-          text: 'There was an error updating your profile. Please try again.',
-        });
-        console.error('Error updating profile:', error);
-      });
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Submission Error',
-        text: 'Please fill out all required fields correctly.',
-      });
     }
-  };
+};
 
   return (
     <div className="personal-info-page">
