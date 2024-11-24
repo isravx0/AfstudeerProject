@@ -20,12 +20,17 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get('http://localhost:3000/api/user-info', {
         headers: { Authorization: token },
       });
+  
+      // Log the response data to check its structure and content
+      console.log('User data fetched:', response.data);
+  
       setUserData(response.data.user);
     } catch (error) {
       setError('Error fetching user data.');
       console.error('Error fetching user data:', error);
     }
   };
+  
 
   // Function to handle login
   const login = async (token) => {

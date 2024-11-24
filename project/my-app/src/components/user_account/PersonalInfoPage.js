@@ -62,7 +62,7 @@ const PersonalInfoPage = () => {
   };
 
   const validateForm = () => {
-    const { name, email, phoneNumber, location } = userData;
+    const { name, email, phoneNumber, location} = userData;
     let newErrors = {};
     let isValid = true;
 

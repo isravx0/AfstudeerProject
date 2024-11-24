@@ -437,22 +437,24 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
     const userId = req.userId;
 
     // Query to get user details
-    db.query('SELECT name, email, phoneNumber, location, bio, gender FROM users WHERE id = ?', [userId], (err, results) => {
+    db.query('SELECT id, name, email, phoneNumber, location, bio, gender, dob FROM users WHERE id = ?', [userId], (err, results) => {
         if (err || results.length === 0) {
             return res.status(404).send('User not found');
         }
-        
-        // Send the user data as response
         const user = results[0];
         res.status(200).json({
-            name: user.name,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
-            location: user.location,
-            bio: user.bio || '',   // Return empty string if bio is not set
-            gender: user.gender || '', // Return empty string if gender is not set
+            user: {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              phoneNumber: user.phoneNumber,
+              location: user.location,
+              bio: user.bio,   // Ensure this is included
+              gender: user.gender, // Ensure this is included
+              dob: user.dob || ''    // Ensure this is included
+            }
         });
-    });
+      });
 });
 
 // Update user profile
