@@ -276,12 +276,15 @@ const PersonalInfoPage = () => {
                 <input
                   type="date"
                   name="dob"
-                  value={userData?.dob ? userData.dob.slice(0, 10) : ""} // Ensuring the format is 'YYYY-MM-DD'
+                  value={userData?.dob ? userData.dob.slice(0, 10) : ""}
                   onChange={handleInputChange}
                 />
+                {errors.dob && (
+                <div className="error-message">{errors.dob}</div>
+              )}
               </div>
             </div>
-            </div>
+          </div>
 
 
           <div className="form-row">
