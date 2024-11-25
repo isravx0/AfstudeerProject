@@ -270,16 +270,19 @@ const PersonalInfoPage = () => {
               )}
             </div>
 
-            <div className="form-group">
-              <label>Date of Birth</label>
-              <input
-                type="date"
-                name="dob"
-                value={userData?.dob || ""}
-                onChange={handleInputChange}
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label>Date of Birth</label>
+                <input
+                  type="date"
+                  name="dob"
+                  value={userData?.dob ? userData.dob.slice(0, 10) : ""} // Ensuring the format is 'YYYY-MM-DD'
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
-          </div>
+            </div>
+
 
           <div className="form-row">
             <div className="form-group">
