@@ -20,6 +20,7 @@ const secretKey = process.env.JWT_SECRET || '77b22a07938ccbb0565abc929d9ee5726af
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database configuration
 const db = mysql.createConnection({
@@ -496,7 +497,7 @@ const storage = multer.diskStorage({
       cb(null, Date.now() + path.extname(file.originalname));
     }
   });
-  
+
   const upload = multer({ storage });
   
   // Ensure the directory exists

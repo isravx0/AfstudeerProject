@@ -210,11 +210,12 @@ const PersonalInfoPage = () => {
       <div className="personal-info-container">
         {/* Profile Picture */}
         <div className="profile-picture-container">
-          {userData?.profilePicture ? (
-            <img src={userData.profilePicture} alt="Profile" />
-          ) : (
-            <div className="placeholder">No profile picture uploaded</div>
-          )}
+        {userData?.profilePicture ? (
+          <img src={`http://localhost:3000${userData.profilePicture}`} alt="Profile" />
+        ) : (
+          <div className="placeholder">No profile picture uploaded</div>
+        )}
+
           <input
             type="file"
             onChange={handleFileChange}
