@@ -226,6 +226,7 @@ const PersonalInfoPage = () => {
           <label className="upload-btn" htmlFor="profile-picture-upload">
             Upload Profile Picture
           </label>
+          <p> {userData?.bio || ""} </p>
         </div>
 
         {/* Form */}
