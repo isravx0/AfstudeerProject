@@ -51,54 +51,61 @@ const PersonalInfoPage = () => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-      if (file.size <= 5 * 1024 * 1024) {
-        const formData = new FormData();
-        formData.append("profilePicture", file);
-        setLoading(true);
-
-        axios
-          .post("http://localhost:3000/upload-profile-picture", formData, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then((response) => {
-            console.log("File uploaded:", response.data);
-            Swal.fire({
-              icon: "success",
-              title: "Profile picture updated!",
-              text: "Your new profile picture has been saved.",
-              timer: 1500,
-              showConfirmButton: false,
-            });
-          })
-          .catch((error) => {
-            console.error("Upload error:", error);
-            Swal.fire({
-              icon: "error",
-              title: "Upload Failed",
-              text: "There was an error uploading your profile picture. Please try again.",
-            });
-          })
-          .finally(() => setLoading(false));
+      const file = e.target.files[0];
+      if (file && file.type.startsWith("image/")) {
+        if (file.size <= 5 * 1024 * 1024) {
+          const formData = new FormData();
+          formData.append("profilePicture", file); // Append the file to the form data
+    
+          setLoading(true);
+    
+          axios
+            .put("http://localhost:3000/upload-profile-picture", formData, {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                "Content-Type": "multipart/form-data", // Ensure that the Content-Type is set correctly
+              },
+            })
+            .then((response) => {
+              console.log("File uploaded:", response.data);
+              // Update the user profile with the new picture URL (file path)
+              setUserData((prevData) => ({
+                ...prevData,
+                profilePicture: response.data.filePath, // Update the profile picture path in the state
+              }));
+              Swal.fire({
+                icon: "success",
+                title: "Profile picture updated!",
+                text: "Your new profile picture has been saved.",
+                timer: 1500,
+                showConfirmButton: false,
+              });
+            })
+            .catch((error) => {
+              console.error("Upload error:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Upload Failed",
+                text: "There was an error uploading your profile picture. Please try again.",
+              });
+            })
+            .finally(() => setLoading(false));
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "File Size Too Large",
+            text: "Please upload an image smaller than 5MB.",
+          });
+        }
       } else {
         Swal.fire({
           icon: "error",
-          title: "File Size Too Large",
-          text: "Please upload an image smaller than 5MB.",
+          title: "Invalid File Type",
+          text: "Please upload a valid image file.",
         });
       }
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid File Type",
-        text: "Please upload a valid image file.",
-      });
-    }
-  };
+    };
+    
 
   const validateForm = () => {
     const { name, email, phoneNumber, location } = userData;

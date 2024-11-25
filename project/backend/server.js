@@ -9,7 +9,8 @@ const userRoutes = require('./routes/userRoutes');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const router = express.Router();
-
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -483,8 +484,44 @@ app.put('/update-profile', verifyToken, (req, res) => {
       }
     );
   });
+
+// Upload profile picture
+
+// Set storage engine for multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, './uploads/');
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + path.extname(file.originalname));
+    }
+  });
   
+  const upload = multer({ storage });
   
+  // Ensure the directory exists
+  const fs = require('fs');
+  if (!fs.existsSync('./uploads')) {
+    fs.mkdirSync('./uploads');
+  }
+  
+  app.put('/upload-profile-picture', verifyToken, upload.single('profilePicture'), (req, res) => {
+    const userId = req.userId;
+    const filePath = `/uploads/${req.file.filename}`; // Store the file path
+  
+    // Update the user's profile picture in the database
+    db.query(
+      'UPDATE users SET profilePicture = ? WHERE id = ?',
+      [filePath, userId],
+      (err, result) => {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: 'Failed to update profile picture' });
+        }
+        res.status(200).json({ message: 'Profile picture updated successfully', filePath });
+      }
+    );
+  });
 
 
 // Start the server
