@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../AuthContext"; // Importeer de context om gebruikersgegevens op te halen
+import defaultProfilePic from "./images/profile-image.png"; // Zorg ervoor dat het bestand correct wordt geïmporteerd
 import "./style/Sidebar.css";
-import profilePic from "./images/profile-image.png";
 
 const Sidebar = ({ onToggle }) => {
+  const { userData } = useAuth(); // Verkrijg de gebruikersgegevens uit de context
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleSidebar = () => {
@@ -12,12 +14,6 @@ const Sidebar = ({ onToggle }) => {
     if (onToggle) {
       onToggle(newCollapsedState); // Notify parent about the collapse state
     }
-  };
-
-  // Example user data (can be dynamic based on logged-in user)
-  const user = {
-    name: "John Doe",
-    profilePic: profilePic, // Example profile pic URL
   };
 
   return (
@@ -55,10 +51,17 @@ const Sidebar = ({ onToggle }) => {
         </li>
       </ul>
 
-      {/* Profile Section (Moved to right above Logout) */}
+      {/* Profile Section */}
       <div className="profile-section">
-        <img src={user.profilePic} alt="Profile" />
-        <span className="name">{user.name}</span>
+        {userData?.profilePicture ? (
+          <img
+            src={`http://localhost:3000${userData.profilePicture}`} // Dynamisch de afbeelding weergeven
+            alt="Profile"
+          />
+        ) : (
+          <img src={defaultProfilePic} alt="Default Profile" /> // Standaard afbeelding als er geen profiel is
+        )}
+        <span className="name">{userData?.name || "User Name"}</span> {/* Dynamisch de naam van de gebruiker */}
       </div>
 
       {/* Logout Section */}
