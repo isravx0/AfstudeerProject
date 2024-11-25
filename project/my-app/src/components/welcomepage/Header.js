@@ -1,19 +1,24 @@
 import React from 'react';
 import logo from './images/logo.png';
-import profile from './images/profile.png';
-import LogoutButton from '../logout/LogoutButton'; 
+import defaultProfilePic from './images/profile.png'; // Default profile picture in case user doesn't have one
+import LogoutButton from '../logout/LogoutButton';
 import { useAuth } from '../AuthContext';
 import './style/Header.css';
 
 const Header = () => {
   const { loggedIn, userData, error } = useAuth();
 
+  // Determine profile picture to show (either user's or default)
+  const profilePic = userData?.profilePicture
+    ? `http://localhost:3000${userData.profilePicture}` // If the user has a profile picture, use it
+    : defaultProfilePic; // Otherwise, use the default profile image
+
   return (
     <div className='navbar'>
       <a href='/'>
-        <img className='logo' src={logo} alt='logo'></img>
+        <img className='logo' src={logo} alt='logo' />
       </a>
-      
+
       <div className='headerMenu'>
         <div className='rightMenu'>
           {loggedIn ? (
@@ -25,7 +30,8 @@ const Header = () => {
                 <a href='/simulation'><li>Simulation</li></a>
               </ul>
 
-              <img src={profile} alt='profile' className='profile'></img>
+              {/* Display profile picture */}
+              <img src={profilePic} alt='profile' className='profile' />
               <span>{userData?.name}</span>
               <div className="dropdown-menu">
                 <div className="menu-icon">
@@ -33,7 +39,7 @@ const Header = () => {
                   <div></div>
                   <div></div>
                 </div>
-                
+
                 <div className="dropdown-content">
                   <a href="#home">Link1</a>
                   <a href="#home">Link2</a>
@@ -54,8 +60,6 @@ const Header = () => {
           )}
 
           {error && <div className="error">{error}</div>}
-
-          
         </div>
       </div>
     </div>
