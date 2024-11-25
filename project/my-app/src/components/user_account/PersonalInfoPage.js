@@ -1,69 +1,101 @@
 import React, { useState, useEffect } from "react";
-import Swal from 'sweetalert2';
-import { useAuth } from '../AuthContext'; // Context for user data and authentication token
-import axios from 'axios';
+import Swal from "sweetalert2";
+import { useAuth } from "../AuthContext"; // Context for user data and authentication token
+import axios from "axios";
 import "./style/PersonalInfoPage.css";
 
 const PersonalInfoPage = () => {
   const { userData, setUserData, token } = useAuth();
-  const locations = ["Amsterdam", "Rotterdam", "Den Haag", "Utrecht", "Eindhoven", "Groningen", "Maastricht", "Tilburg", "Leiden", "Delft"];
+  const locations = [
+    "Amsterdam",
+    "Rotterdam",
+    "Den Haag",
+    "Utrecht",
+    "Eindhoven",
+    "Groningen",
+    "Maastricht",
+    "Tilburg",
+    "Leiden",
+    "Delft",
+  ];
 
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    phoneNumber: "",
-    location: "",
-  });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch user profile data when the component mounts if token is available
+    // Fetch user profile data when the component mounts if the token is available
     if (token) {
-      axios.get('/api/user-profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(response => {
-        setUserData(response.data); // Set the fetched data in context
-      })
-      .catch(err => {
-        console.error('Failed to load user data:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to load user data. Please try again later.',
+      axios
+        .get("/api/user-info", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          setUserData(response.data.user); // Set the fetched data in context
+        })
+        .catch((err) => {
+          console.error("Failed to load user data:", err);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to load user data. Please try again later.",
+          });
         });
-      });
     }
   }, [token, setUserData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUserData(prevData => ({ ...prevData, [name]: value }));
+    setUserData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) { // Check if the file is an image
-      if (file.size <= 5 * 1024 * 1024) { // Check if the file size is under 5MB
-        setUserData(prevData => ({ ...prevData, profilePicture: URL.createObjectURL(file) }));
+    if (file && file.type.startsWith("image/")) {
+      if (file.size <= 5 * 1024 * 1024) {
+        const formData = new FormData();
+        formData.append("profilePicture", file);
+        axios.post("http://localhost:3000/upload-profile-picture", formData, {
+          headers: {
+              Authorization: `Bearer ${token}`, // Removed 'Token' prefix
+              "Content-Type": "multipart/form-data",
+          },
+      }).then((response) => {
+            console.log("File uploaded:", response.data);
+            Swal.fire({
+              icon: "success",
+              title: "Profile picture updated!",
+              text: "Your new profile picture has been saved.",
+              timer: 1500,
+              showConfirmButton: false,
+            });
+          })
+          .catch((error) => {
+            console.error("Upload error:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Upload Failed",
+              text: "There was an error uploading your profile picture. Please try again.",
+            });
+          });
       } else {
         Swal.fire({
-          icon: 'error',
-          title: 'File Size Too Large',
-          text: 'Please upload an image smaller than 5MB.',
+          icon: "error",
+          title: "File Size Too Large",
+          text: "Please upload an image smaller than 5MB.",
         });
       }
     } else {
       Swal.fire({
-        icon: 'error',
-        title: 'Invalid File Type',
-        text: 'Please upload a valid image file.',
+        icon: "error",
+        title: "Invalid File Type",
+        text: "Please upload a valid image file.",
       });
     }
   };
 
   const validateForm = () => {
-    const { name, email, phoneNumber, location} = userData;
-    let newErrors = {};
+    const { name, email, phoneNumber, location } = userData;
+    const newErrors = {};
     let isValid = true;
 
     if (!name) {
@@ -73,22 +105,16 @@ const PersonalInfoPage = () => {
     if (!email) {
       newErrors.email = "Email is required.";
       isValid = false;
-    } else {
-      const emailRegex = /\S+@\S+\.\S+/;
-      if (!emailRegex.test(email)) {
-        newErrors.email = "Please enter a valid email address.";
-        isValid = false;
-      }
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Please enter a valid email address.";
+      isValid = false;
     }
     if (!phoneNumber) {
       newErrors.phoneNumber = "Phone number is required.";
       isValid = false;
-    } else {
-      const phoneRegex = /^\d{10,}$/;
-      if (!phoneRegex.test(phoneNumber)) {
-        newErrors.phoneNumber = "Please enter a valid phone number (at least 10 digits).";
-        isValid = false;
-      }
+    } else if (!/^\d{10,}$/.test(phoneNumber)) {
+      newErrors.phoneNumber = "Please enter a valid phone number (at least 10 digits).";
+      isValid = false;
     }
     if (!location) {
       newErrors.location = "Location is required.";
@@ -99,45 +125,57 @@ const PersonalInfoPage = () => {
     return isValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Data being sent to backend:', userData);
-
-    if (validateForm()) {
-
-      // Log the data to the console
-      console.log('Data being sent to the API:', userData);
-      console.log('Authorization Token:', token);
-
-      // Send data to the API using the token
-
-      axios.put('http://localhost:3001/update-profile', userData, {
-        headers: {
+  
+    // Validate form
+    if (!validateForm()) return;
+  
+    setLoading(true);
+  
+    try {
+      const response = await axios.put(
+        "http://localhost:3001/update-profile",  // Ensure this matches your backend URL
+        userData,
+        {
+          headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            }
-        })
-        .then(response => {
-
-            console.log('Update response:', response.data); // Log response from backend
-            Swal.fire({
-                icon: 'success',
-                title: 'Profile updated successfully!',
-                text: 'Your personal information has been updated.',
-                timer: 1500,
-                showConfirmButton: false,
-            });
-        })
-        .catch(error => {
-            console.error('Error during update:', error.response || error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Update Failed',
-                text: 'There was an error updating your profile. Please try again.',
-            });
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      // Show success message after profile update
+      Swal.fire({
+        icon: "success",
+        title: "Profile updated successfully!",
+        text: response.data.message,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error during update:", error);
+      if (error.response?.status === 401) {
+        Swal.fire({
+          icon: "error",
+          title: "Session Expired",
+          text: "Your session has expired. Please log in again.",
+          confirmButtonText: "Log In",
+        }).then(() => {
+          window.location.href = "/login";  // Redirect to login page
         });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: "There was an error updating your profile. Please try again.",
+        });
+      }
+    } finally {
+      setLoading(false);
     }
-};
+  };
+  
+  
 
   return (
     <div className="personal-info-page">
@@ -174,7 +212,7 @@ const PersonalInfoPage = () => {
               <input
                 type="text"
                 name="name"
-                value={userData?.name || ''}
+                value={userData?.name || ""}
                 onChange={handleInputChange}
                 placeholder="Enter your name"
               />
@@ -185,7 +223,7 @@ const PersonalInfoPage = () => {
               <input
                 type="email"
                 name="email"
-                value={userData?.email || ''}
+                value={userData?.email || ""}
                 onChange={handleInputChange}
                 placeholder="Enter your email"
               />
@@ -199,11 +237,13 @@ const PersonalInfoPage = () => {
               <input
                 type="text"
                 name="phoneNumber"
-                value={userData?.phoneNumber || ''}
+                value={userData?.phoneNumber || ""}
                 onChange={handleInputChange}
                 placeholder="Enter your phone number"
               />
-              {errors.phoneNumber && <div className="error-message">{errors.phoneNumber}</div>}
+              {errors.phoneNumber && (
+                <div className="error-message">{errors.phoneNumber}</div>
+              )}
             </div>
 
             <div className="form-group">
@@ -211,7 +251,7 @@ const PersonalInfoPage = () => {
               <input
                 type="date"
                 name="dob"
-                value={userData?.dob || ''}
+                value={userData?.dob || ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -222,7 +262,7 @@ const PersonalInfoPage = () => {
               <label>Gender</label>
               <select
                 name="gender"
-                value={userData?.gender || ''}
+                value={userData?.gender || ""}
                 onChange={handleInputChange}
               >
                 <option value="">Select Gender (Optional)</option>
@@ -235,7 +275,7 @@ const PersonalInfoPage = () => {
               <label>Location</label>
               <select
                 name="location"
-                value={userData?.location || ''}
+                value={userData?.location || ""}
                 onChange={handleInputChange}
               >
                 <option value="" disabled>
@@ -247,7 +287,9 @@ const PersonalInfoPage = () => {
                   </option>
                 ))}
               </select>
-              {errors.location && <div className="error-message">{errors.location}</div>}
+              {errors.location && (
+                <div className="error-message">{errors.location}</div>
+              )}
             </div>
           </div>
 
@@ -255,14 +297,14 @@ const PersonalInfoPage = () => {
             <label>Bio</label>
             <textarea
               name="bio"
-              value={userData?.bio || ''}
+              value={userData?.bio || ""}
               onChange={handleInputChange}
               placeholder="Tell us about yourself"
             ></textarea>
           </div>
 
-          <button type="submit" className="btn-save">
-            Save Changes
+          <button type="submit" className="btn-save" disabled={loading}>
+            {loading ? "Saving..." : "Save Changes"}
           </button>
         </form>
       </div>

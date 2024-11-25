@@ -20,17 +20,12 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get('http://localhost:3000/api/user-info', {
         headers: { Authorization: token },
       });
-  
-      // Log the response data to check its structure and content
-      console.log('User data fetched:', response.data);
-  
       setUserData(response.data.user);
     } catch (error) {
       setError('Error fetching user data.');
       console.error('Error fetching user data:', error);
     }
   };
-  
 
   // Function to handle login
   const login = async (token) => {
@@ -47,6 +42,29 @@ export const AuthProvider = ({ children }) => {
     setUserData(null); // Reset user data
   };
 
+  // Function to update user profile
+  const updateProfile = async (updatedData) => {
+    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+    try {
+      const response = await axios.put(
+        'http://localhost:3001/api/update-profile',
+        updatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log("Profile updated:", response.data); // Log response data to check if it's updated
+      setUserData(response.data.user); // Update user data after successful update
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setError('Error updating profile.');
+    }
+  };
+
+
   useEffect(() => {
     const checkLoginStatus = isLoggedIn();
     setLoggedIn(checkLoginStatus);
@@ -56,7 +74,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ loggedIn, userData, error, setUserData, login, logout }}>
+    <AuthContext.Provider value={{ loggedIn, userData, error, setUserData, login, logout, updateProfile}}>
       {children}
     </AuthContext.Provider>
   );
