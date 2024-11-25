@@ -25,9 +25,11 @@ const PersonalInfoPage = () => {
   useEffect(() => {
     // Fetch user profile data when the component mounts if the token is available
     if (token) {
+      const authToken = localStorage.getItem("authToken");
+
       axios
         .get("/api/user-info", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${authToken}` },
         })
         .then((response) => {
           setUserData(response.data.user); // Set the fetched data in context
@@ -54,12 +56,16 @@ const PersonalInfoPage = () => {
       if (file.size <= 5 * 1024 * 1024) {
         const formData = new FormData();
         formData.append("profilePicture", file);
-        axios.post("http://localhost:3000/upload-profile-picture", formData, {
-          headers: {
-              Authorization: `Bearer ${token}`, // Removed 'Token' prefix
+        setLoading(true);
+
+        axios
+          .post("http://localhost:3000/upload-profile-picture", formData, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
               "Content-Type": "multipart/form-data",
-          },
-      }).then((response) => {
+            },
+          })
+          .then((response) => {
             console.log("File uploaded:", response.data);
             Swal.fire({
               icon: "success",
@@ -76,7 +82,8 @@ const PersonalInfoPage = () => {
               title: "Upload Failed",
               text: "There was an error uploading your profile picture. Please try again.",
             });
-          });
+          })
+          .finally(() => setLoading(false));
       } else {
         Swal.fire({
           icon: "error",
@@ -127,19 +134,21 @@ const PersonalInfoPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validate form
     if (!validateForm()) return;
-  
+
     setLoading(true);
-  
+
     try {
+      const authToken = localStorage.getItem("authToken");
+
       const response = await axios.put(
-        "http://localhost:3001/update-profile",  // Ensure this matches your backend URL
+        "http://localhost:3000/update-profile", // Ensure this matches your backend URL
         userData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
           },
         }
@@ -161,21 +170,28 @@ const PersonalInfoPage = () => {
           text: "Your session has expired. Please log in again.",
           confirmButtonText: "Log In",
         }).then(() => {
-          window.location.href = "/login";  // Redirect to login page
+          localStorage.removeItem("authToken"); // Clear token
+          window.location.href = "/login"; // Redirect to login page
         });
       } else {
+        const status = error.response?.status || "Unknown";
+        const message = error.response?.data?.message || "An unexpected error occurred.";
+        const details = error.response?.data || {};
+
+        console.error("Error status:", status);
+        console.error("Error message:", message);
+        console.error("Error details:", details);
+
         Swal.fire({
           icon: "error",
-          title: "Update Failed",
-          text: "There was an error updating your profile. Please try again.",
+          title: `Error ${status}`,
+          text: message,
         });
       }
     } finally {
       setLoading(false);
     }
   };
-  
-  
 
   return (
     <div className="personal-info-page">
@@ -299,8 +315,8 @@ const PersonalInfoPage = () => {
               name="bio"
               value={userData?.bio || ""}
               onChange={handleInputChange}
-              placeholder="Tell us about yourself"
-            ></textarea>
+              placeholder="Tell us a bit about yourself"
+            />
           </div>
 
           <button type="submit" className="btn-save" disabled={loading}>

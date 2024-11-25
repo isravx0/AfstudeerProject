@@ -9,7 +9,7 @@ import PasswordReset from './components/password_reset/Password_reset';
 import ResetPassword from './components/password_reset/NewPassword';
 import FAQPage from './components/faq/FAQPage';
 import FloatingChatButton from './components/faq/FloatingChatButton';
-import ContactPage from './components/contact/ContactPage';
+import ContactPage from './components/contact/ContactPage'; 
 import InformationPage from './components/information/InformationPage';
 import Homepage from './components/homepage/homepage';
 import PersonalInfoPage from './components/user_account/PersonalInfoPage';
@@ -21,7 +21,7 @@ import UserAccountLayout from './components/user_account/UserAccountLayout';
 import FeedbackForm from './components/feedback/FeedbackForm';
 import BatteryDashboard from './components/battery_dashboard/batteryDashboard';
 
-import PrivateRoute from './components/PrivateRoute';
+import PrivateRoute from './components/PrivateRoute'; 
 import { AuthProvider } from './components/AuthContext';
 import './App.css';
 
@@ -31,7 +31,7 @@ function App() {
       <Router>
         <div className="App">
           <Header />
-
+          
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<MainContent />} />
@@ -45,8 +45,8 @@ function App() {
             <Route path="/feedback" element={<FeedbackForm />} />
             <Route path="/battery_dashboard" element={<BatteryDashboard />} />
 
-            {/* User Account Section (Protected) */}
-            <Route path="/user-account" element={<PrivateRoute><UserAccountLayout /></PrivateRoute>}>
+            {/* User Account Section (Nested Routes) */}
+            <Route path="/user-account" element={<UserAccountLayout />}>
               <Route path="personal-info" element={<PersonalInfoPage />} />
               <Route path="data-sharing" element={<DataSharingPage />} />
               <Route path="dashboard" element={<DashboardPage />} />
@@ -60,9 +60,8 @@ function App() {
                 <PrivateRoute>
                   <Homepage />
                 </PrivateRoute>
-              }
+              }     
             />
-
           </Routes>
 
           <FloatingChatButton />
