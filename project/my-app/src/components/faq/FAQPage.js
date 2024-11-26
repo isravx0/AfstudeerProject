@@ -8,14 +8,7 @@ const questionsAndAnswers = [
     { id: 4, question: "Can I simulate different solar panel brands?", answer: "Yes, the simulation tool allows you to compare different solar panel brands to see how each performs.", tag: "Solar Panels" },
     { id: 5, question: "How accurate is the energy output prediction?", answer: "Our simulation uses advanced algorithms and weather data to predict energy output with high accuracy.", tag: "Simulation" },
     { id: 6, question: "What factors affect battery performance?", answer: "Battery performance can be affected by temperature, charge cycles, and energy demand.", tag: "Battery" },
-    { id: 7, question: "How can I maximize the battery life of my system?", answer: "To extend battery life, avoid deep discharges, maintain optimal temperature, and use energy efficiently.", tag: "Battery" },
-    { id: 8, question: "What is included in the simulation report?", answer: "The report includes estimated energy production, cost savings, environmental impact, and potential system efficiency.", tag: "Simulation" },
-    { id: 9, question: "How does the system handle cloudy days?", answer: "The simulation adjusts for weather variations, such as cloudy days, to estimate realistic energy production." },
-    { id: 10, question: "Does the simulation take weather conditions into account?", answer: "Yes, our simulation includes local weather data to provide more accurate energy production estimates." },
-    { id: 11, question: "How often should I perform a simulation?", answer: "It's recommended to run a simulation annually or when there are significant changes in energy usage patterns." },
-    { id: 12, question: "What is the recommended battery capacity for my setup?", answer: "The recommended battery capacity depends on your daily energy usage, solar panel output, and backup needs." },
-    { id: 14, question: "Can I export the simulation results?", answer: "Yes, you can export the results as a PDF or CSV file for further analysis." },
-    { id: 15, question: "Is the simulation free to use?", answer: "Yes, our basic simulation is free to use. Advanced features may require a subscription." },
+    { id: 7, question: "What is included in the simulation report?", answer: "The report includes estimated energy production, cost savings, environmental impact, and potential system efficiency.", tag: "Simulation" },
 ];
 
 const actionButtons = [
@@ -55,16 +48,6 @@ function FAQPage() {
     return (
         <div className="faq-page">
             <h1 className="faq-title">Frequently Asked Questions</h1>
-
-            {/* Action Buttons Grid */}
-            <div className="action-buttons">
-                {actionButtons.slice(0, 4).map((button, index) => (
-                    <div key={index} className="action-button">
-                        <h3>{button.label}</h3>
-                        <p>{button.description}</p>
-                    </div>
-                ))}
-            </div>
             
             <div className="search-bar">
                 <input
@@ -79,6 +62,16 @@ function FAQPage() {
                     <option value="Battery">Battery</option>
                     <option value="Simulation">Simulation</option>
                 </select>
+            </div>
+
+            {/* Action Buttons Grid */}
+            <div className="action-buttons">
+                {actionButtons.slice(0, 4).map((button, index) => (
+                    <div key={index} className="action-button">
+                        <h3>{button.label}</h3>
+                        <p>{button.description}</p>
+                    </div>
+                ))}
             </div>
 
             <div className="faq-list">
