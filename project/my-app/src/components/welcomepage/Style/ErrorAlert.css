@@ -62,8 +62,3 @@
     width: 60px;
     height: 60px;
 }
-.swal-small {
-    width: 300px !important; /* Adjust the width */
-    font-size: 14px; /* Adjust the font size */
-    padding: 10px 15px; /* Adjust padding */
-  }

@@ -1,7 +1,8 @@
 import React from 'react';
+import './style/Footer.css'; // Ensure you have this file for styling
+import logo from './images/logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn } from '@fortawesome/free-brands-svg-icons'
-import './style/Footer.css';
 
 const Footer = () => {
   return (
@@ -16,12 +17,12 @@ const Footer = () => {
 
         <div className='footerNav'>
           <ul>
-            <li><a href='/features'>Features</a></li>
-            <li><a href='/pricing'>Pricing</a></li>
-            <li><a href='/help'>Help Center</a></li>
-            <li><a href='/feedback'>Feedback</a></li>
-            <li><a href='/about-us'>About us</a></li>
-            <li><a href='/faq'>FAQ</a></li>
+            <li><a href='/home'>Home</a></li>
+            <li><a href='/information'>Information</a></li>
+            <li><a href='/contact'>Contact us</a></li>
+            <li><a href='/FAQ'>FAQ</a></li>
+            <li><a href='/aboutus'>About us</a></li>
+            <li><a href='/feedback'>Rate us</a></li>
           </ul>
         </div>
 
