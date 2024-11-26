@@ -82,20 +82,27 @@ function FAQPage() {
             </div>
 
             <div className="faq-list">
-                {filteredQuestions.map(({ id, question, answer }) => (
-                    <div key={id} className="faq-item">
-                        <div className="faq-question" onClick={() => toggleAnswer(id)}>
-                            <span>{question}</span>
-                            <span className="faq-icon">{activeId === id ? "−" : "+"}</span>
-                        </div>
-                        {activeId === id && (
-                            <div className="faq-answer">
-                                {answer}
+                {filteredQuestions.length > 0 ? (
+                    filteredQuestions.map(({ id, question, answer }) => (
+                        <div key={id} className="faq-item">
+                            <div className="faq-question" onClick={() => toggleAnswer(id)}>
+                                <span>{question}</span>
+                                <span className="faq-icon">{activeId === id ? "−" : "+"}</span>
                             </div>
-                        )}
+                            {activeId === id && (
+                                <div className="faq-answer">
+                                    {answer}
+                                </div>
+                            )}
+                        </div>
+                    ))
+                ) : (
+                    <div className="no-results">
+                        <p>No results found for your search. Please try a different term or browse by topic.</p>
                     </div>
-                ))}
+                )}
             </div>
+
 
             {/* Contact Us Section */}
             <div className="contact-us-section">
