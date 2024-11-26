@@ -52,24 +52,6 @@ function FAQPage() {
         return matchesSearch && matchesTag;
     });
 
-    const handleGeneralCommentSubmit = () => {
-        if (newComment.trim() !== "") {
-            setGeneralComments([...generalComments, newComment]);
-            setNewComment("");
-        }
-    };
-
-    // Handle Contact Us form submission
-    const handleContactSubmit = (e) => {
-        e.preventDefault();
-        // In a real app, here you would send the form data to your backend or email service
-        console.log("Contact Form Submitted", { contactName, contactEmail, contactMessage });
-        // Clear the contact form after submission
-        setContactName("");
-        setContactEmail("");
-        setContactMessage("");
-    };
-
     return (
         <div className="faq-page">
             <h1 className="faq-title">Frequently Asked Questions</h1>
