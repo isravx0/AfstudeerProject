@@ -18,7 +18,7 @@ const PersonalInfoPage = () => {
     "Leiden",
     "Delft",
   ];
-
+  
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 

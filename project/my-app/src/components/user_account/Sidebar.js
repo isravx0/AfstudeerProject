@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate} from "react-router-dom";
 import { useAuth } from "../AuthContext"; // Importeer de context om gebruikersgegevens op te halen
 import defaultProfilePic from "./images/profile-image.png"; // Zorg ervoor dat het bestand correct wordt geïmporteerd
 import "./style/Sidebar.css";
 
 const Sidebar = ({ onToggle }) => {
-  const { userData } = useAuth(); // Verkrijg de gebruikersgegevens uit de context
+  const { userData , logout } = useAuth(); // Verkrijg de gebruikersgegevens uit de context
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();  // Gebruik de navigate functie voor redirects
 
   const toggleSidebar = () => {
     const newCollapsedState = !isCollapsed;
@@ -16,6 +17,12 @@ const Sidebar = ({ onToggle }) => {
     }
   };
 
+  const handleLogout = () => {
+    logout();  // Roep de logout functie aan
+    navigate('/login');  // Redirect naar de loginpagina
+  };
+
+  
   return (
     <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
       {/* Toggle Button */}
@@ -66,9 +73,9 @@ const Sidebar = ({ onToggle }) => {
 
       {/* Logout Section */}
       <div className="logout-section">
-        <NavLink to="/logout" className="logout-link">
+        <NavLink to="/login" className="logout-link">
           <i className="icon bi bi-box-arrow-right"></i>
-          <span className="logout-link text">Logout</span>
+          <span className="logout-link text" onClick={handleLogout}>Logout</span>
         </NavLink>
       </div>
     </div>
