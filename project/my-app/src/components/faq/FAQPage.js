@@ -118,48 +118,7 @@ function FAQPage() {
             {/* Contact Us Section */}
             <div className="contact-us-section">
                 <h2>Couldn't find your question?</h2>
-                <p>If you have any other questions or need assistance, please contact us using the form below.</p>
-                <form onSubmit={handleContactSubmit} className="contact-form">
-                    <input
-                        type="text"
-                        placeholder="Your Name"
-                        value={contactName}
-                        onChange={(e) => setContactName(e.target.value)}
-                        className="contact-input"
-                        required
-                    />
-                    <input
-                        type="email"
-                        placeholder="Your Email"
-                        value={contactEmail}
-                        onChange={(e) => setContactEmail(e.target.value)}
-                        className="contact-input"
-                        required
-                    />
-                    <textarea
-                        placeholder="Your Message"
-                        value={contactMessage}
-                        onChange={(e) => setContactMessage(e.target.value)}
-                        className="contact-textarea"
-                        required
-                    ></textarea>
-                    <button type="submit" className="submit-button">Submit</button>
-                </form>
-            </div>
-
-            <div className="general-comments-section">
-                <h3>Have a Question or Comment?</h3>
-                <textarea
-                    placeholder="Add your question or comment here"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                ></textarea>
-                <button onClick={handleGeneralCommentSubmit} className="submit-button">Submit</button>
-                <ul className="general-comments-list">
-                    {generalComments.map((comment, idx) => (
-                        <li key={idx}>{comment}</li>
-                    ))}
-                </ul>
+                <p>If you have any other questions or need assistance, please contact us through out <a href="/contact" className="information-contact-link">contact page</a>.</p>
             </div>
         </div>
     );
