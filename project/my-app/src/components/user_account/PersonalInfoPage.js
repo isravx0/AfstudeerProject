@@ -270,8 +270,6 @@ const PersonalInfoPage = () => {
                 <div className="error-message">{errors.phoneNumber}</div>
               )}
             </div>
-
-            <div className="form-row">
               <div className="form-group">
                 <label>Date of Birth</label>
                 <input
@@ -285,7 +283,6 @@ const PersonalInfoPage = () => {
               )}
               </div>
             </div>
-          </div>
 
 
           <div className="form-row">
