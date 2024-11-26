@@ -46,7 +46,14 @@ function App() {
             <Route path="/battery_dashboard" element={<BatteryDashboard />} />
 
             {/* User Account Section (Nested Routes) */}
-            <Route path="/user-account" element={<UserAccountLayout />}>
+            <Route 
+              path="/user-account/*" 
+              element={
+                <PrivateRoute>
+                  <UserAccountLayout />
+                </PrivateRoute>
+              }
+            >
               <Route path="personal-info" element={<PersonalInfoPage />} />
               <Route path="data-sharing" element={<DataSharingPage />} />
               <Route path="dashboard" element={<DashboardPage />} />
