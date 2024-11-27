@@ -23,45 +23,71 @@ function FAQPage() {
     const [activeId, setActiveId] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedTag, setSelectedTag] = useState("All");
-    const [generalComments, setGeneralComments] = useState([]);
-    const [newComment, setNewComment] = useState("");
+    const [showSuggestions, setShowSuggestions] = useState(false);
 
-    // Contact form state
-    const [contactName, setContactName] = useState("");
-    const [contactEmail, setContactEmail] = useState("");
-    const [contactMessage, setContactMessage] = useState("");
-
-
-    const toggleAnswer = (id) => {
-        setActiveId(activeId === id ? null : id);
-    };
-
-    const handleSearch = (e) => setSearchTerm(e.target.value);
-    const handleFilterChange = (e) => setSelectedTag(e.target.value);
-
+    // Filter questions based on search term and selected tag
     const filteredQuestions = questionsAndAnswers.filter(({ question, tag }) => {
         const matchesSearch = question.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesTag = selectedTag === "All" || tag === selectedTag;
         return matchesSearch && matchesTag;
     });
 
+    const toggleAnswer = (id) => setActiveId(activeId === id ? null : id);
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setShowSuggestions(true); // Show suggestions when typing
+    };
+
+    const handleSuggestionClick = (suggestion) => {
+        setSearchTerm(suggestion);
+        setShowSuggestions(false); // Hide suggestions when clicked
+    };
+
+    const suggestions = questionsAndAnswers
+        .filter(({ question }) => question.toLowerCase().includes(searchTerm.toLowerCase()))
+        .map(({ question }) => question);
+
     return (
         <div className="faq-page">
             <h1 className="faq-title">Frequently Asked Questions</h1>
-            
-            <div className="search-bar">
-                <input
-                    type="text"
-                    placeholder="Search for answers..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                />
-                <select onChange={handleFilterChange} value={selectedTag}>
+
+            {/* Search Bar */}
+            <div className="search-bar" style={{ position: "relative" }}>
+                <div className="search-input-container">
+                    <i className="bi bi-search search-icon"></i>
+                    <input
+                        type="text"
+                        placeholder="Search for answers..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+                </div>
+                <select onChange={(e) => setSelectedTag(e.target.value)} value={selectedTag}>
                     <option value="All">All Topics</option>
                     <option value="Solar Panels">Solar Panels</option>
                     <option value="Battery">Battery</option>
                     <option value="Simulation">Simulation</option>
                 </select>
+
+                {/* Suggestions Bar */}
+                {showSuggestions && searchTerm && (
+                    <div className="suggestions-bar">
+                        {suggestions.length > 0 ? (
+                            suggestions.map((suggestion, index) => (
+                                <div
+                                    key={index}
+                                    className="suggestion-item"
+                                    onClick={() => handleSuggestionClick(suggestion)}
+                                >
+                                    {suggestion}
+                                </div>
+                            ))
+                        ) : (
+                            <div className="suggestion-item">No suggestions found</div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Action Buttons Grid */}
@@ -74,6 +100,7 @@ function FAQPage() {
                 ))}
             </div>
 
+            {/* FAQ List */}
             <div className="faq-list">
                 {filteredQuestions.length > 0 ? (
                     filteredQuestions.map(({ id, question, answer }) => (
@@ -96,13 +123,13 @@ function FAQPage() {
                 )}
             </div>
 
-
             {/* Contact Us Section */}
             <div className="contact-us-section">
                 <h2>Couldn't find your question?</h2>
-                <p>If you have any other questions or need assistance, please contact us through out <a href="/contact" className="information-contact-link">contact page</a>.</p>
+                <p>If you have any other questions or need assistance, please contact us through our <a href="/contact" className="information-contact-link">contact page</a>.</p>
             </div>
         </div>
     );
 }
+
 export default FAQPage;
