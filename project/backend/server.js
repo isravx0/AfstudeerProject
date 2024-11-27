@@ -461,6 +461,7 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
 });
 
 // Update user profile
+// Update user profile
 app.put('/update-profile', verifyToken, (req, res) => {
     const userId = req.userId;  // Assumed you get the userId from token verification middleware
     const { name, email, phoneNumber, location, bio, gender, dob } = req.body;
@@ -474,17 +475,51 @@ app.put('/update-profile', verifyToken, (req, res) => {
           console.error('Database error:', err);
           return res.status(500).json({ error: 'Failed to update profile' });
         }
-        // Return the updated user data
-        db.query('SELECT id, name, email, phoneNumber, location, bio, gender, dob FROM users WHERE id = ?', [userId], (err, results) => {
+        
+        // Step 1: Fetch updated user details for email notification
+        db.query('SELECT email, name FROM users WHERE id = ?', [userId], (err, results) => {
           if (err || results.length === 0) {
             return res.status(404).send('User not found');
           }
+
           const user = results[0];
-          res.status(200).json({ user });
+
+          // Step 2: Set up email transporter
+          const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+          });
+
+          const mailOptions = {
+            to: user.email,
+            from: 'noreply@yourdomain.com',
+            subject: 'Profile Updated',
+            text: `Hello ${user.name},\n\nYour account profile has been successfully updated.\n\nIf you did not make this change, please contact our support team immediately.\n\nBest regards,\nThe Team`,
+            html: `<h2>Profile Updated</h2>
+                   <p>Hello ${user.name},</p>
+                   <p>Your account profile has been successfully updated.</p>
+                   <p>If you did not make this change, please contact our support team immediately.</p>
+                   <p>Best regards,<br/>The Team</p>`,
+          };
+
+          // Step 3: Send confirmation email
+          transporter.sendMail(mailOptions, (err) => {
+            if (err) {
+              console.error('Error sending update email:', err);
+              return res.status(500).json({ error: 'Error sending email notification' });
+            }
+
+            // Step 4: Return the updated user data
+            res.status(200).json({ user });
+          });
         });
       }
     );
-  });
+});
+
 
 // Upload profile picture
 
@@ -506,7 +541,7 @@ const storage = multer.diskStorage({
     fs.mkdirSync('./uploads');
   }
   
-  app.put('/upload-profile-picture', verifyToken, upload.single('profilePicture'), (req, res) => {
+app.put('/upload-profile-picture', verifyToken, upload.single('profilePicture'), (req, res) => {
     const userId = req.userId;
     const filePath = `/uploads/${req.file.filename}`; // Store the file path
   
@@ -519,10 +554,51 @@ const storage = multer.diskStorage({
           console.error('Database error:', err);
           return res.status(500).json({ error: 'Failed to update profile picture' });
         }
-        res.status(200).json({ message: 'Profile picture updated successfully', filePath });
+
+        // Step 1: Fetch updated user details for email notification
+        db.query('SELECT email, name FROM users WHERE id = ?', [userId], (err, results) => {
+          if (err || results.length === 0) {
+            return res.status(404).send('User not found');
+          }
+
+          const user = results[0];
+
+          // Step 2: Set up email transporter
+          const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+          });
+
+          const mailOptions = {
+            to: user.email,
+            from: 'noreply@yourdomain.com',
+            subject: 'Profile Picture Updated',
+            text: `Hello ${user.name},\n\nYour profile picture has been successfully updated.\n\nIf you did not make this change, please contact our support team immediately.\n\nBest regards,\nThe Team`,
+            html: `<h2>Profile Picture Updated</h2>
+                   <p>Hello ${user.name},</p>
+                   <p>Your profile picture has been successfully updated.</p>
+                   <p>If you did not make this change, please contact our support team immediately.</p>
+                   <p>Best regards,<br/>The Team</p>`,
+          };
+
+          // Step 3: Send confirmation email
+          transporter.sendMail(mailOptions, (err) => {
+            if (err) {
+              console.error('Error sending profile picture update email:', err);
+              return res.status(500).json({ error: 'Error sending email notification' });
+            }
+
+            // Step 4: Send successful response
+            res.status(200).json({ message: 'Profile picture updated successfully', filePath });
+          });
+        });
       }
     );
-  });
+});
+
 
 // Deleting user account API endpoint
 app.delete('/api/delete-account', verifyToken, (req, res) => {
