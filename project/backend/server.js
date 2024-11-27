@@ -431,8 +431,6 @@ app.post('/api/contact', (req, res) => {
     });
 });
 
-
-
 // Endpoint to add a battery
 app.post('/api/addBattery', verifyToken, (req, res) => {
     console.log('Request body:', req.body);
