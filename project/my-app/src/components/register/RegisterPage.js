@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom"; 
 import useRecaptchaV3 from "../captcha/Captcha"; 
 import Swal from 'sweetalert2';
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Importing React Icons for eye toggle
 import { getFunctions, httpsCallable } from 'firebase/functions'; 
 import "./style/RegisterForm.css"; 
 
@@ -29,10 +30,13 @@ const RegisterForm = () => {
     "Delft",
   ];
   const [formData, setFormData] = useState(initialFormData);
-
   const [isSubmitted, setIsSubmitted] = useState(false); 
   const [loading, setLoading] = useState(false); 
   const [error, setError] = useState(null); 
+
+  // State to manage password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Initialize reCAPTCHA
   const executeRecaptcha = useRecaptchaV3('6Lc_A2EqAAAAANr-GXLMhgjBdRYWKpZ1y-YwF7Mk', 'register');
@@ -97,12 +101,13 @@ const RegisterForm = () => {
       return; // Exit the function
     }
 
-    // Validate that the password is at least 8 characters long
+    // Validate that the phone number is at least 5 digits long
     if (formData.phoneNumber.length < 5) {
       setError("Phone number must be at least 5 numbers long");
       setLoading(false); // Stop loading
       return; // Exit the function
     }
+    
     try {
       // Send the actual form data to the API
       await axios.post('http://localhost:3000/api/register', {
@@ -124,7 +129,8 @@ const RegisterForm = () => {
         customClass: {
           popup: 'swal-small'
         }
-        });
+      });
+
       setIsSubmitted(true); 
     } catch (error) {
       console.log("Error registering:", error);
@@ -146,7 +152,6 @@ const RegisterForm = () => {
         <p>You can now <strong> <a href="/login">log in</a> </strong> to access your dashboard and start managing your energy consumption.</p>
         <p>Thank you for joining us!</p>
       </div>
-      
     );
   }
 
@@ -181,24 +186,41 @@ const RegisterForm = () => {
             className="register-input"
             required
           />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password *"
-            value={formData.password}
-            onChange={handleChange}
-            className="register-input"
-            required
-          />
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm password *"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            className="register-input"
-            required
-          />
+          <div className="password-input-container">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password *"
+              value={formData.password}
+              onChange={handleChange}
+              className="register-input"
+              required
+            />
+            <div
+              className="password-toggle-icon"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
+            </div>
+          </div>
+
+          <div className="password-input-container">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              placeholder="Confirm password *"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="register-input"
+              required
+            />
+            <div
+              className="password-toggle-icon"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+            </div>
+          </div>
           <input
             type="text"
             name="phoneNumber"
@@ -216,7 +238,7 @@ const RegisterForm = () => {
             required
           >
             <option value="" disabled>
-            Choose a location *
+              Choose a location *
             </option>
             {locations.map((location) => (
               <option key={location} value={location}>
@@ -233,26 +255,15 @@ const RegisterForm = () => {
           </div>
           
           <div className="register-button-container">
-          <button type="submit" className="register-submit-button" disabled={loading}>
-            {loading ? "Registering..." : "Sign up"}
-          </button>
-            <button type="button" className="register-cancel-button" onClick={handleCancel}>Cancel</button>
+            <button type="submit" className="register-submit-button" disabled={loading}>
+              {loading ? "Registering..." : "Sign up"}
+            </button>
+            <button type="button" className="register-cancel-button" onClick={handleCancel}>
+              Cancel
+            </button>
           </div>
-          {error && <p className="error-message" style={{ color: "red" }}>{error}</p>}
+          {error && <p className="register-error">{error}</p>}
         </form>
-        <p className="register-login-prompt">
-          Have an account? <a href="/login">Log in here!</a>
-        </p>
-
-        <div className="register-or-divider">
-          <span>OR</span>
-        </div>
-
-        <div className="register-social-login">
-          <button className="register-social-button facebook">f</button>
-          <button className="register-social-button google">G</button>
-          <button className="register-social-button apple">ï£¿</button>
-        </div>
       </div>
     </div>
   );
