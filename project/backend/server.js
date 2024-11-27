@@ -231,7 +231,6 @@ app.post('/api/password-reset', rateLimiter, (req, res) => {
     });
 });
 
-
 // Reset password verification endpoint
 app.get('/reset/:token', (req, res) => {
     const token = req.params.token;
@@ -461,7 +460,6 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
 });
 
 // Update user profile
-// Update user profile
 app.put('/update-profile', verifyToken, (req, res) => {
     const userId = req.userId;  // Assumed you get the userId from token verification middleware
     const { name, email, phoneNumber, location, bio, gender, dob } = req.body;
@@ -520,9 +518,7 @@ app.put('/update-profile', verifyToken, (req, res) => {
     );
 });
 
-
 // Upload profile picture
-
 // Set storage engine for multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -534,7 +530,6 @@ const storage = multer.diskStorage({
   });
 
   const upload = multer({ storage });
-  
   // Ensure the directory exists
   const fs = require('fs');
   if (!fs.existsSync('./uploads')) {
@@ -599,7 +594,6 @@ app.put('/upload-profile-picture', verifyToken, upload.single('profilePicture'),
     );
 });
 
-
 // Deleting user account API endpoint
 app.delete('/api/delete-account', verifyToken, (req, res) => {
     const userId = req.userId;  // Extract user ID from the JWT token
@@ -657,6 +651,9 @@ app.delete('/api/delete-account', verifyToken, (req, res) => {
         });
     });
 });
+
+// Changing password in settings page
+
 
 // Start the server
 app.listen(PORT, () => {

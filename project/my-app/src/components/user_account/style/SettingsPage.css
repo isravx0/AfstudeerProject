@@ -129,6 +129,15 @@
   border-color: #1D3F75;
 }
 
+
+.setting-item input{
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  width: 95%;
+}
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {
   .settings-page {
@@ -160,3 +169,5 @@
     font-size: 0.9rem;
   }
 }
+
+
