@@ -213,26 +213,54 @@ const PersonalInfoPage = () => {
       if (result.isConfirmed) {
         try {
           const authToken = localStorage.getItem("authToken");
+          if (!authToken) {
+            Swal.fire({
+              icon: "error",
+              title: "Authorization Error",
+              text: "You are not authorized to delete this account. Please log in again.",
+            });
+            return;
+          }
+  
           const response = await axios.delete("http://localhost:3000/delete-account", {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
           });
+  
           Swal.fire({
             icon: "success",
             title: "Account deleted!",
-            text: "Your account has been permanently deleted.",
+            text: response.data.message || "Your account has been permanently deleted.",
             timer: 1500,
             showConfirmButton: false,
           });
+  
+          // Remove token and redirect after successful deletion
           localStorage.removeItem("authToken");
-          window.location.href = "/login"; // Redirect to login page or landing page
+          sessionStorage.removeItem("authToken"); // Make sure to remove session token as well
+          window.location.href = "/login"; // Redirect to login or home page
         } catch (error) {
-          Swal.fire({
-            icon: "error",
-            title: "Error deleting account",
-            text: "There was an issue deleting your account. Please try again.",
-          });
+          console.error("Error during account deletion:", error);
+          
+          // Enhanced error handling based on backend response
+          if (error.response?.status === 401) {
+            Swal.fire({
+              icon: "error",
+              title: "Session Expired",
+              text: "Your session has expired. Please log in again.",
+              confirmButtonText: "Log In",
+            }).then(() => {
+              localStorage.removeItem("authToken");
+              window.location.href = "/login"; // Redirect to login page
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error deleting account",
+              text: error.response?.data?.message || "There was an issue deleting your account. Please try again.",
+            });
+          }
         }
       }
     });

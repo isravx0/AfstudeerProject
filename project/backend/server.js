@@ -527,53 +527,55 @@ const storage = multer.diskStorage({
 // Deleting user account API endpoint
 app.delete('/api/delete-account', verifyToken, (req, res) => {
     const userId = req.userId;  // Extract user ID from the JWT token
-
     if (!userId) {
         return res.status(400).json({ message: 'User ID is required' });
     }
 
-    // Step 1: Delete the user account from the database
-    db.query('DELETE FROM users WHERE id = ?', [userId], (err, result) => {
-        if (err) {
-            console.error('Error deleting account:', err);
-            return res.status(500).json({ error: 'Error deleting account' });
+    // Step 1: Fetch user details for email notification
+    db.query('SELECT email, name FROM users WHERE id = ?', [userId], (err, results) => {
+        if (err || results.length === 0) {
+            console.error('Error fetching user for email notification:', err);
+            return res.status(500).json({ error: 'Error fetching user details for email' });
         }
 
-        // Step 2: Send confirmation email to the user
-        db.query('SELECT email, name FROM users WHERE id = ?', [userId], (err, results) => {
-            if (err || results.length === 0) {
-                console.error('Error fetching user for email notification:', err);
-                return res.status(500).json({ error: 'Error fetching user details for email' });
+        const user = results[0];
+
+        // Step 2: Set up email transporter
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        const mailOptions = {
+            to: user.email,
+            from: 'noreply@yourdomain.com',
+            subject: 'Account Deletion Confirmation',
+            text: `Hello ${user.name},\n\nYour account has been successfully deleted. We're sorry to see you go.\n\nIf this was a mistake, please contact our support team.\n\nBest regards,\nThe Team`,
+            html: `<h2>Account Deletion Confirmation</h2>
+                   <p>Hello ${user.name},</p>
+                   <p>Your account has been successfully deleted. We're sorry to see you go.</p>
+                   <p>If this was a mistake, please contact our support team.</p>
+                   <p>Best regards,<br/>The Team</p>`,
+        };
+
+        // Step 3: Send confirmation email
+        transporter.sendMail(mailOptions, (err) => {
+            if (err) {
+                console.error('Error sending account deletion email:', err);
+                return res.status(500).json({ error: 'Error sending email notification' });
             }
 
-            const user = results[0];
-            const transporter = nodemailer.createTransport({
-                service: 'Gmail',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS,
-                },
-            });
-
-            const mailOptions = {
-                to: user.email,
-                from: 'noreply@yourdomain.com',
-                subject: 'Account Deletion Confirmation',
-                text: `Hello ${user.name},\n\nYour account has been successfully deleted. We're sorry to see you go.\n\nIf this was a mistake, please contact our support team.\n\nBest regards,\nThe Team`,
-                html: `<h2>Account Deletion Confirmation</h2>
-                       <p>Hello ${user.name},</p>
-                       <p>Your account has been successfully deleted. We're sorry to see you go.</p>
-                       <p>If this was a mistake, please contact our support team.</p>
-                       <p>Best regards,<br/>The Team</p>`,
-            };
-
-            transporter.sendMail(mailOptions, (err) => {
+            // Step 4: Delete the user account from the database
+            db.query('DELETE FROM users WHERE id = ?', [userId], (err, result) => {
                 if (err) {
-                    console.error('Error sending account deletion email:', err);
-                    return res.status(500).json({ error: 'Error sending email notification' });
+                    console.error('Error deleting account:', err);
+                    return res.status(500).json({ error: 'Error deleting account' });
                 }
 
-                // Step 3: Send a successful response to the client
+                // Step 5: Send a successful response to the client
                 res.status(200).json({ message: 'Account deleted successfully. A confirmation email has been sent.' });
             });
         });
