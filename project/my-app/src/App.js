@@ -20,10 +20,14 @@ import Sidebar from './components/user_account/Sidebar';
 import UserAccountLayout from './components/user_account/UserAccountLayout';
 import FeedbackForm from './components/feedback/FeedbackForm';
 import BatteryDashboard from './components/battery_dashboard/batteryDashboard';
+import SolarDashboard from './components/solar_dashboard/solarDashboard';
 
 import PrivateRoute from './components/PrivateRoute'; 
 import { AuthProvider } from './components/AuthContext';
 import './App.css';
+
+
+
 
 function App() {
   return (
@@ -44,7 +48,7 @@ function App() {
             <Route path="/information" element={<InformationPage />} />
             <Route path="/feedback" element={<FeedbackForm />} />
             <Route path="/battery_dashboard" element={<BatteryDashboard />} />
-
+            <Route path="/solar_dashboard" element={<SolarDashboard />} />
             {/* User Account Section (Nested Routes) */}
             <Route 
               path="/user-account/*" 
@@ -70,6 +74,8 @@ function App() {
               }     
             />
           </Routes>
+
+          
 
           <FloatingChatButton />
           <Footer />

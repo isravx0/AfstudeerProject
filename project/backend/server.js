@@ -327,7 +327,6 @@ app.post('/api/feedback', rateLimiter, (req, res) => {
     });
 });
 
-
 // Chatbot API endpoint
 const transporter = nodemailer.createTransport({
     service: 'gmail', // Example using Gmail, adjust for your email provider
@@ -370,6 +369,69 @@ const authenticateToken = (req, res, next) => {
     // If verified
     next();
 };
+
+// Contact form route
+app.post('/api/contact', (req, res) => {
+    const { name, email, phone, message } = req.body;
+
+    // Check if required fields are present
+    if (!name || !email || !message) {
+        console.log("Validation error: Missing required fields");
+        return res.status(400).json({ message: 'Please fill in all required fields.' });
+    }
+
+    // Set up Nodemailer transporter with Gmail
+    const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        }
+    });
+
+    // Email setup for sending to the company
+    const companyMailOptions = {
+        from: email,
+        to: 'contactpaginatest@gmail.com',
+        subject: `New Contact Request from ${name}`,
+        text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\n\nMessage:\n${message}`
+    };
+
+    console.log("Attempting to send email to company...");
+
+    // Attempt to send the company email
+    transporter.sendMail(companyMailOptions, (error, info) => {
+        if (error) {
+            console.error('Error during company email send:', error.message);  // Log specific error message
+            console.error('Error stack trace:', error.stack);  // Log stack trace for detailed error info
+            return res.status(500).json({ message: 'Error sending the email to the company.' });
+        }
+        console.log('Email sent to company successfully:', info.response);
+
+        // Email setup for confirmation to the user
+        const userMailOptions = {
+            from: 'no-reply@contactpaginatest.com',
+            to: email,
+            subject: 'Your Contact Request has been Received!',
+            text: `Hello ${name},\n\nThank you for reaching out! We've received your message:\n\n"${message}"\n\nOur team will get back to you soon.\n\nBest regards,\nCompany Support`
+        };
+
+        console.log("Attempting to send confirmation email to user...");
+
+        // Attempt to send confirmation email to the user
+        transporter.sendMail(userMailOptions, (error, info) => {
+            if (error) {
+                console.error('Error during confirmation email send:', error.message);  // Log specific error message
+                console.error('Error stack trace:', error.stack);  // Log stack trace for detailed error info
+                return res.status(500).json({ message: 'Error sending confirmation email to user.' });
+            }
+            console.log('Confirmation email sent to user successfully:', info.response);
+            res.status(200).json({ message: 'Message successfully sent!' });
+        });
+    });
+});
+
+
 
 // Endpoint to add a battery
 app.post('/api/addBattery', verifyToken, (req, res) => {
