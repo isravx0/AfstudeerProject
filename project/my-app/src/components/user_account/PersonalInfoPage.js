@@ -200,6 +200,44 @@ const PersonalInfoPage = () => {
     }
   };
 
+  const handleDeleteAccount = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Deleting your account will permanently remove your data and cannot be undone. This action cannot be recovered.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const authToken = localStorage.getItem("authToken");
+          const response = await axios.delete("http://localhost:3000/delete-account", {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
+          Swal.fire({
+            icon: "success",
+            title: "Account deleted!",
+            text: "Your account has been permanently deleted.",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+          localStorage.removeItem("authToken");
+          window.location.href = "/login"; // Redirect to login page or landing page
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Error deleting account",
+            text: "There was an issue deleting your account. Please try again.",
+          });
+        }
+      }
+    });
+  };
+
   return (
     <div className="personal-info-page">
       <div className="personal-info-container">
@@ -335,6 +373,16 @@ const PersonalInfoPage = () => {
             {loading ? "Saving..." : "Save Changes"}
           </button>
         </form>
+      </div>
+
+      {/* Delete Account Section */}
+      <div className="personal-info-container">
+        <div className="delete-account-container">
+            <h3 className="warning-text">Warning: This action is irreversible!</h3>
+            <button className="delete-account-btn" onClick={handleDeleteAccount}>
+              Delete Account
+            </button>
+          </div>
       </div>
     </div>
   );

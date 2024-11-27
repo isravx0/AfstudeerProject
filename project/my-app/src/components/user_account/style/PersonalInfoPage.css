@@ -131,7 +131,7 @@
 }
 
 /* Save Button */
-.personal-info-page .btn-save {
+.personal-info-page .btn-save , .personal-info-page .delete-account-btn{
   background-color: #1D3F75; /* Lucrasoft-blauw */
   color: white;
   padding: 12px 25px;
@@ -148,6 +148,9 @@
   transform: scale(1.05);
 }
 
+.personal-info-page .delete-account-btn{
+  background-color: red;
+}
 /* Responsive Design */
 @media (max-width: 768px) {
   .personal-info-page .form-row {
