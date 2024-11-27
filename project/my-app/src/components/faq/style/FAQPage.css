@@ -176,31 +176,31 @@ button {
 }
 
 .contact-us-section h2 {
-    font-size: 1.8rem;
-    margin-bottom: 15px;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
 }
 
 .contact-us-section p {
-    margin-bottom: 15px;
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 20px;
 }
 
-.contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.information-contact-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-.contact-input,
-.contact-textarea {
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+.information-contact-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
 }
 
-.contact-textarea {
-    height: 150px;
-    resize: none;
-}
 
 /* Responsive Design for iPad (768px to 1024px) */
 @media (max-width: 1024px) and (min-width: 768px) {
