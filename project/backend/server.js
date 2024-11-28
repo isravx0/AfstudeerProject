@@ -521,21 +521,22 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
 });
 
 // Update user profile
+// Update user profile
 app.put('/update-profile', verifyToken, (req, res) => {
     const userId = req.userId; // Assumed you get the userId from token verification middleware
     const { name, email, phoneNumber, location, bio, gender, dob, notifications } = req.body;
 
-    // Update user profile in the database
+    // Update user profile in the database (including email)
     db.query(
         'UPDATE users SET name = ?, email = ?, phoneNumber = ?, location = ?, bio = ?, gender = ?, dob = ? WHERE id = ?',
-        [name, email, phoneNumber, location, bio, gender, dob, userId], // Remove `notifications` here
+        [name, email, phoneNumber, location, bio, gender, dob, userId],
         (err, result) => {
             if (err) {
                 console.error('Database error:', err);
                 return res.status(500).json({ error: 'Failed to update profile' });
             }
 
-            // Fetch user details and notification preferences
+            // Fetch the updated user details including the updated email and notification preferences
             db.query(
                 'SELECT email, name, notifications FROM users WHERE id = ?',
                 [userId],
@@ -562,7 +563,7 @@ app.put('/update-profile', verifyToken, (req, res) => {
                     });
 
                     const mailOptions = {
-                        to: user.email,
+                        to: user.email, // Send to the updated email address
                         from: 'noreply@yourdomain.com',
                         subject: 'Profile Updated',
                         text: `Hello ${user.name},\n\nYour account profile has been successfully updated.\n\nIf you did not make this change, please contact our support team immediately.\n\nBest regards,\nThe Team`,
@@ -588,6 +589,7 @@ app.put('/update-profile', verifyToken, (req, res) => {
         }
     );
 });
+
 
 // Upload profile picture
 // Set storage engine for multer
