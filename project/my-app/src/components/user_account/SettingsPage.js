@@ -13,6 +13,7 @@ const SettingsPage = () => {
   const [language, setLanguage] = useState("English");
   const [fontSize, setFontSize] = useState("Medium");
   const [privacy, setPrivacy] = useState("Public");
+  const [twoFactorAuth, setTwoFactorAuth] = useState(false); // New state for 2FA
 
   const handleSaveChanges = () => {
     Swal.fire({
@@ -23,12 +24,22 @@ const SettingsPage = () => {
       showConfirmButton: false
     });
   };
-  
+
+  const handleTwoFactorToggle = () => {
+    setTwoFactorAuth(!twoFactorAuth);
+    Swal.fire({
+      icon: 'info',
+      title: twoFactorAuth ? 'Two-Factor Authentication Disabled' : 'Two-Factor Authentication Enabled',
+      text: `You have ${twoFactorAuth ? "disabled" : "enabled"} two-factor authentication.`,
+      timer: 1500,
+      showConfirmButton: false
+    });
+  };
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     setLoading(true); // Start loading
-  
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -36,7 +47,7 @@ const SettingsPage = () => {
       setLoading(false); // Stop loading
       return;
     }
-  
+
     try {
       // API request to send reset link
       const response = await axios.post('http://localhost:3000/api/password-reset', { email });
@@ -79,7 +90,7 @@ const SettingsPage = () => {
       setLoading(false); // Stop loading
     }
   };
-  
+
   return (
     <div className="settings-page">
       <div className="settings-box">
@@ -155,22 +166,18 @@ const SettingsPage = () => {
       <div className="settings-box">
         <h2>Privacy</h2>
         <div className="setting-item">
-          <label htmlFor="privacy">Profile Visibility:</label>
-          <select
-            id="privacy"
-            value={privacy}
-            onChange={(e) => setPrivacy(e.target.value)}
-            className="form-control"
+          <label>Two-Factor Authentication:</label>
+          <button
+            className={`toggle-btn ${twoFactorAuth ? "on" : "off"}`}
+            onClick={handleTwoFactorToggle}
           >
-            <option value="Public">Public</option>
-            <option value="Private">Private</option>
-            <option value="Friends Only">Friends Only</option>
-          </select>
+            {twoFactorAuth ? "Enabled" : "Disabled"}
+          </button>
         </div>
       </div>
 
-     {/* Change Password Section */}
-     <div className="settings-box">
+      {/* Change Password Section */}
+      <div className="settings-box">
         <h2>Change Password</h2>
         <p>If you want to change your password, enter your email and request a password reset.</p>
 
