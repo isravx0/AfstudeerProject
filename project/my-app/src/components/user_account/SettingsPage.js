@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./style/SettingsPage.css";
+import { useAuth } from "../AuthContext"; // Context for user data and authentication token
 import Swal from "sweetalert2";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -14,7 +15,33 @@ const SettingsPage = () => {
   const [fontSize, setFontSize] = useState("Medium");
   const [privacy, setPrivacy] = useState("Public");
   const [twoFactorAuth, setTwoFactorAuth] = useState(false); // New state for 2FA
+  const { userData, setUserData, token } = useAuth();
 
+  // Use effect to get user settings from API
+  useEffect(() => {
+    // Fetch user profile data when the component mounts if the token is available
+    if (token) {
+      const authToken = localStorage.getItem("authToken");
+
+      axios
+        .get("/api/user-info", {
+          headers: { Authorization: `Bearer ${authToken}` },
+        })
+        .then((response) => {
+          setUserData(response.data.user); // Set the fetched data in context
+        })
+        .catch((err) => {
+          console.error("Failed to load user data:", err);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to load user data. Please try again later.",
+          });
+        });
+    }
+  }, [token, setUserData]);
+
+  // Function to handle saving settings
   const handleSaveChanges = () => {
     Swal.fire({
       icon: 'success',
@@ -25,6 +52,7 @@ const SettingsPage = () => {
     });
   };
 
+  // Function to handle Two Factor Auth
   const handleTwoFactorToggle = () => {
     setTwoFactorAuth(!twoFactorAuth);
     Swal.fire({
@@ -36,17 +64,22 @@ const SettingsPage = () => {
     });
   };
 
+  // Function to handle notifications toggle
   const handleNotificationToggle = async () => {
     try {
+      const authToken = localStorage.getItem("authToken");
       const newStatus = !notifications;
-      setNotifications(newStatus); // Update de lokale state direct voor een snellere UI-respons
+      setNotifications(newStatus);
 
       // Verstuur de update naar de backend
       await axios.put('http://localhost:3000/update-notifications', {
-        notifications: newStatus,
+        notifications: newStatus
       }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+          headers: {
+              Authorization: `Bearer ${authToken}`,  // Send token in Authorization header
+              "Content-Type": "application/json",
+          },
+      })
       
       Swal.fire({
         icon: 'success',
@@ -65,7 +98,7 @@ const SettingsPage = () => {
     }
   };
   
-
+  // Function to handle password reset
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     setLoading(true); // Start loading
@@ -143,7 +176,6 @@ const SettingsPage = () => {
           </div>
         </div>
       </div>
-
 
       {/* Appearance Settings */}
       <div className="settings-box">

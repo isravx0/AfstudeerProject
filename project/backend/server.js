@@ -498,7 +498,7 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
     const userId = req.userId;
 
     // Query to get user details
-    db.query('SELECT id, name, email, phoneNumber, location, bio, gender, dob FROM users WHERE id = ?', [userId], (err, results) => {
+    db.query('SELECT id, name, email, phoneNumber, location, bio, gender, dob, notifications FROM users WHERE id = ?', [userId], (err, results) => {
         if (err || results.length === 0) {
             return res.status(404).send('User not found');
         }
@@ -511,9 +511,10 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
               email: user.email,
               phoneNumber: user.phoneNumber,
               location: user.location,
-              bio: user.bio,   // Ensure this is included
-              gender: user.gender, // Ensure this is included
-              dob: user.dob || ''    // Ensure this is included
+              bio: user.bio,
+              gender: user.gender,
+              dob: user.dob || '',
+              notifications: user.notifications || []
             }
         });
       });
@@ -522,12 +523,12 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
 // Update user profile
 app.put('/update-profile', verifyToken, (req, res) => {
     const userId = req.userId; // Assumed you get the userId from token verification middleware
-    const { name, email, phoneNumber, location, bio, gender, dob } = req.body;
+    const { name, email, phoneNumber, location, bio, gender, dob, notifications } = req.body;
 
     // Update user profile in the database
     db.query(
         'UPDATE users SET name = ?, email = ?, phoneNumber = ?, location = ?, bio = ?, gender = ?, dob = ? WHERE id = ?',
-        [name, email, phoneNumber, location, bio, gender, dob, userId],
+        [name, email, phoneNumber, location, bio, gender, dob, userId], // Remove `notifications` here
         (err, result) => {
             if (err) {
                 console.error('Database error:', err);
@@ -587,7 +588,6 @@ app.put('/update-profile', verifyToken, (req, res) => {
         }
     );
 });
-
 
 // Upload profile picture
 // Set storage engine for multer
@@ -678,9 +678,10 @@ const storage = multer.diskStorage({
 
 // Notification email function
 app.put('/update-notifications', verifyToken, (req, res) => {
-    const userId = req.userId; // Verkrijg userId via token
-    const { notifications } = req.body; // Verwacht een `notifications`-waarde in de body
+    const userId = req.userId;
+    const { notifications } = req.body;
 
+    // Update notification preferences in the database
     db.query(
         'UPDATE users SET notifications = ? WHERE id = ?',
         [notifications, userId],
@@ -690,7 +691,54 @@ app.put('/update-notifications', verifyToken, (req, res) => {
                 return res.status(500).json({ error: 'Failed to update notification preference' });
             }
 
-            res.status(200).json({ message: 'Notification preference updated successfully' });
+            // Prepare email notification if notifications are enabled
+            if (notifications) {
+                db.query(
+                    'SELECT email, name FROM users WHERE id = ?',
+                    [userId],
+                    (err, results) => {
+                        if (err || results.length === 0) {
+                            return res.status(404).send('User not found');
+                        }
+
+                        const user = results[0];
+
+                        // Set up email transporter
+                        const transporter = nodemailer.createTransport({
+                            service: 'Gmail',
+                            auth: {
+                                user: process.env.EMAIL_USER,
+                                pass: process.env.EMAIL_PASS,
+                            },
+                        });
+
+                        const mailOptions = {
+                            to: user.email,
+                            from: 'noreply@yourdomain.com',
+                            subject: 'Notification Preferences Updated',
+                            text: `Hello ${user.name},\n\nYour notification preferences have been successfully updated.\n\nBest regards,\nThe Team`,
+                            html: `<h2>Notification Preferences Updated</h2>
+                                   <p>Hello ${user.name},</p>
+                                   <p>Your notification preferences have been successfully updated.</p>
+                                   <p>Best regards,<br/>The Team</p>`,
+                        };
+
+                        // Send confirmation email
+                        transporter.sendMail(mailOptions, (err) => {
+                            if (err) {
+                                console.error('Error sending update email:', err);
+                                return res.status(500).json({ error: 'Error sending email notification' });
+                            }
+
+                            // Send success response only after email is sent
+                            res.status(200).json({ message: 'Notification preference updated successfully and email sent' });
+                        });
+                    }
+                );
+            } else {
+                // If notifications are disabled, return success without email
+                res.status(200).json({ message: 'Notification preference updated successfully, no email sent' });
+            }
         }
     );
 });
