@@ -36,6 +36,36 @@ const SettingsPage = () => {
     });
   };
 
+  const handleNotificationToggle = async () => {
+    try {
+      const newStatus = !notifications;
+      setNotifications(newStatus); // Update de lokale state direct voor een snellere UI-respons
+
+      // Verstuur de update naar de backend
+      await axios.put('http://localhost:3000/update-notifications', {
+        notifications: newStatus,
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Notification Setting Updated',
+        text: `Notifications have been turned ${newStatus ? "on" : "off"}.`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error('Error updating notifications:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to update notification settings. Please try again.',
+      });
+    }
+  };
+  
+
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     setLoading(true); // Start loading
@@ -106,13 +136,14 @@ const SettingsPage = () => {
           <div className="toggle-switch">
             <button
               className={`toggle-btn ${notifications ? "on" : "off"}`}
-              onClick={() => setNotifications(!notifications)}
+              onClick={handleNotificationToggle}
             >
               {notifications ? "On" : "Off"}
             </button>
           </div>
         </div>
       </div>
+
 
       {/* Appearance Settings */}
       <div className="settings-box">
