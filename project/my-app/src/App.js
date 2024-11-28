@@ -21,6 +21,7 @@ import UserAccountLayout from './components/user_account/UserAccountLayout';
 import FeedbackForm from './components/feedback/FeedbackForm';
 import BatteryDashboard from './components/battery_dashboard/batteryDashboard';
 import SolarDashboard from './components/solar_dashboard/solarDashboard';
+import AboutUs from './components/about_us/AboutUsPage';
 
 import PrivateRoute from './components/PrivateRoute'; 
 import { AuthProvider } from './components/AuthContext';
@@ -49,6 +50,9 @@ function App() {
             <Route path="/feedback" element={<FeedbackForm />} />
             <Route path="/battery_dashboard" element={<BatteryDashboard />} />
             <Route path="/solar_dashboard" element={<SolarDashboard />} />
+            <Route path="/about_us" element={<AboutUs />} />
+
+            
             {/* User Account Section (Nested Routes) */}
             <Route 
               path="/user-account/*" 
@@ -63,6 +67,7 @@ function App() {
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
+
 
             {/* Protect /home route */}
             <Route 
