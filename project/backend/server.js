@@ -520,7 +520,7 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
       });
 });
 
-// Update user profile
+
 // Update user profile
 app.put('/update-profile', verifyToken, (req, res) => {
     const userId = req.userId; // Assumed you get the userId from token verification middleware

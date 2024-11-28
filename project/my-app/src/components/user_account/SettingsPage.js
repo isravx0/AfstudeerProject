@@ -177,37 +177,6 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* Appearance Settings */}
-      <div className="settings-box">
-        <h2>Appearance</h2>
-        <div className="setting-item">
-          <label htmlFor="darkMode">Theme:</label>
-          <select
-            id="darkMode"
-            value={darkMode ? "Dark" : "Light"}
-            onChange={(e) => setDarkMode(e.target.value === "Dark")}
-            className="form-control"
-          >
-            <option value="Light">Light</option>
-            <option value="Dark">Dark</option>
-          </select>
-        </div>
-
-        <div className="setting-item">
-          <label htmlFor="fontSize">Font Size:</label>
-          <select
-            id="fontSize"
-            value={fontSize}
-            onChange={(e) => setFontSize(e.target.value)}
-            className="form-control"
-          >
-            <option value="Small">Small</option>
-            <option value="Medium">Medium</option>
-            <option value="Large">Large</option>
-          </select>
-        </div>
-      </div>
-
       {/* Language Settings */}
       <div className="settings-box">
         <h2>Languages</h2>
