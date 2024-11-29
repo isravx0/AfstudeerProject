@@ -197,7 +197,7 @@ const Homepage = () => {
           </div>
 
           <div className="col-md-4 chart-box">
-            <h4>7-day Weather Forecast</h4>
+            <h4>5-day Weather Forecast</h4>
             <div className="weather-forecast">
               {weatherData.length > 0 ? (
                 weatherData.map((day, index) => {
@@ -219,13 +219,18 @@ const Homepage = () => {
                       <span>{Math.round(day.main.temp)}°C</span> {/* Temperature */}
                       <br />
                       <span>{day.weather[0].description}</span> {/* Weather description */}
+                      
                     </div>
+                    
                   );
+                  
                 })
               ) : (
                 <p>Loading weather data...</p>
+                
               )}
             </div>
+            <a className= "bron_link" href="https://dashboard.openweather.co.uk/">Bron: openweather</a>
           </div>
         </div>
       </div>
