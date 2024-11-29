@@ -248,13 +248,13 @@ const PersonalInfoPage = () => {
             });
             return;
           }
-  
-          const response = await axios.delete("http://localhost:3000/delete-account", {
+
+          const response = await axios.delete("http://localhost:3000/api/delete-account", {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
           });
-  
+          
           Swal.fire({
             icon: "success",
             title: "Account deleted!",
