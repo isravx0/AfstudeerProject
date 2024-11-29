@@ -141,17 +141,40 @@ const PersonalInfoPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Validate form
     if (!validateForm()) return;
-
+  
     setLoading(true);
-
+  
     try {
       const authToken = localStorage.getItem("authToken");
-
+  
+      // Check if the email already exists in the database
+      const emailExistsResponse = await axios.post(
+        "http://localhost:3000/check-email", // Endpoint to check if email exists
+        { email: userData.email },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      // Ensure that the backend responds with a proper 'exists' field
+      if (emailExistsResponse.data.exists) {
+        Swal.fire({
+          icon: "error",
+          title: "Email already in use",
+          text: "This email is already registered. Please use a different one.",
+        });
+        return;
+      }
+  
+      // Proceed with updating the profile if email is unique
       const response = await axios.put(
-        "http://localhost:3000/update-profile", // Ensure this matches your backend URL
+        "http://localhost:3000/update-profile", // Backend API endpoint to update profile
         userData,
         {
           headers: {
@@ -160,6 +183,7 @@ const PersonalInfoPage = () => {
           },
         }
       );
+  
       // Show success message after profile update
       Swal.fire({
         icon: "success",
@@ -170,6 +194,8 @@ const PersonalInfoPage = () => {
       });
     } catch (error) {
       console.error("Error during update:", error);
+  
+      // Handle specific errors based on status or message from backend
       if (error.response?.status === 401) {
         Swal.fire({
           icon: "error",
@@ -180,15 +206,15 @@ const PersonalInfoPage = () => {
           localStorage.removeItem("authToken"); // Clear token
           window.location.href = "/login"; // Redirect to login page
         });
+      } else if (error.response?.status === 400) {
+        Swal.fire({
+          icon: "error",
+          title: "Bad Request",
+          text: "There was an issue with your request. Please check your data and try again.",
+        });
       } else {
         const status = error.response?.status || "Unknown";
         const message = error.response?.data?.message || "An unexpected error occurred.";
-        const details = error.response?.data || {};
-
-        console.error("Error status:", status);
-        console.error("Error message:", message);
-        console.error("Error details:", details);
-
         Swal.fire({
           icon: "error",
           title: `Error ${status}`,
@@ -199,6 +225,7 @@ const PersonalInfoPage = () => {
       setLoading(false);
     }
   };
+  
 
   const handleDeleteAccount = () => {
     Swal.fire({

@@ -591,6 +591,33 @@ app.put('/update-profile', verifyToken, (req, res) => {
 });
 
 
+// Endpoint to check if email exists
+app.post('/check-email', verifyToken, (req, res) => {
+    const { email } = req.body;
+    const userId = req.userId; // Assuming the user ID is retrieved from the token
+  
+    // Query to check if the email already exists in the database
+    db.query(
+      'SELECT id FROM users WHERE email = ? AND id != ?',
+      [email, userId],
+      (err, results) => {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: 'Failed to check email' });
+        }
+  
+        // If email already exists for a different user
+        if (results.length > 0) {
+          return res.status(400).json({ exists: true });
+        }
+  
+        // If email is unique, proceed
+        return res.status(200).json({ exists: false });
+      }
+    );
+  });
+
+  
 // Upload profile picture
 // Set storage engine for multer
 const storage = multer.diskStorage({
