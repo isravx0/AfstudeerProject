@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { useAuth } from "../AuthContext"; // Context for user data and authentication token
+import { useAuth } from "../AuthContext";
 import axios from "axios";
 import "./style/PersonalInfoPage.css";
 
@@ -63,7 +63,7 @@ const PersonalInfoPage = () => {
             .put("http://localhost:3000/upload-profile-picture", formData, {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-                "Content-Type": "multipart/form-data", // Ensure that the Content-Type is set correctly
+                "Content-Type": "multipart/form-data",
               },
             })
             .then((response) => {
@@ -152,7 +152,7 @@ const PersonalInfoPage = () => {
   
       // Check if the email already exists in the database
       const emailExistsResponse = await axios.post(
-        "http://localhost:3000/check-email", // Endpoint to check if email exists
+        "http://localhost:3000/check-email",
         { email: userData.email },
         {
           headers: {
@@ -174,7 +174,7 @@ const PersonalInfoPage = () => {
   
       // Proceed with updating the profile if email is unique
       const response = await axios.put(
-        "http://localhost:3000/update-profile", // Backend API endpoint to update profile
+        "http://localhost:3000/update-profile",
         userData,
         {
           headers: {
@@ -265,8 +265,8 @@ const PersonalInfoPage = () => {
   
           // Remove token and redirect after successful deletion
           localStorage.removeItem("authToken");
-          sessionStorage.removeItem("authToken"); // Make sure to remove session token as well
-          window.location.href = "/login"; // Redirect to login or home page
+          sessionStorage.removeItem("authToken");
+          window.location.href = "/login";
         } catch (error) {
           console.error("Error during account deletion:", error);
           
@@ -279,7 +279,7 @@ const PersonalInfoPage = () => {
               confirmButtonText: "Log In",
             }).then(() => {
               localStorage.removeItem("authToken");
-              window.location.href = "/login"; // Redirect to login page
+              window.location.href = "/login";
             });
           } else {
             Swal.fire({

@@ -6,20 +6,19 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const SettingsPage = () => {
-  const [email, setEmail] = useState(""); // Email state for password reset
-  const [message, setMessage] = useState(""); // Message to show feedback
-  const [loading, setLoading] = useState(false); // Loading state for feedback
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [language, setLanguage] = useState("English");
   const [fontSize, setFontSize] = useState("Medium");
   const [privacy, setPrivacy] = useState("Public");
-  const [twoFactorAuth, setTwoFactorAuth] = useState(false); // New state for 2FA
+  const [twoFactorAuth, setTwoFactorAuth] = useState(false);
   const { userData, setUserData, token } = useAuth();
 
   // Use effect to get user settings from API
   useEffect(() => {
-    // Fetch user profile data when the component mounts if the token is available
     if (token) {
       const authToken = localStorage.getItem("authToken");
 
@@ -28,7 +27,7 @@ const SettingsPage = () => {
           headers: { Authorization: `Bearer ${authToken}` },
         })
         .then((response) => {
-          setUserData(response.data.user); // Set the fetched data in context
+          setUserData(response.data.user);
         })
         .catch((err) => {
           console.error("Failed to load user data:", err);
@@ -71,12 +70,11 @@ const SettingsPage = () => {
       const newStatus = !notifications;
       setNotifications(newStatus);
 
-      // Verstuur de update naar de backend
       await axios.put('http://localhost:3000/update-notifications', {
         notifications: newStatus
       }, {
           headers: {
-              Authorization: `Bearer ${authToken}`,  // Send token in Authorization header
+              Authorization: `Bearer ${authToken}`, 
               "Content-Type": "application/json",
           },
       })
@@ -101,13 +99,13 @@ const SettingsPage = () => {
   // Function to handle password reset
   const handlePasswordReset = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading
+    setLoading(true);
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setMessage("Invalid email format. Please enter a valid email.");
-      setLoading(false); // Stop loading
+      setLoading(false);
       return;
     }
 
@@ -150,7 +148,7 @@ const SettingsPage = () => {
         });
       }
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 

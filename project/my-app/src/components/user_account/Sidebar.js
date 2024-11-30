@@ -1,25 +1,25 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate} from "react-router-dom";
-import { useAuth } from "../AuthContext"; // Importeer de context om gebruikersgegevens op te halen
-import defaultProfilePic from "./images/profile-image.png"; // Zorg ervoor dat het bestand correct wordt geïmporteerd
+import { useAuth } from "../AuthContext";
+import defaultProfilePic from "./images/profile-image.png";
 import "./style/Sidebar.css";
 
 const Sidebar = ({ onToggle }) => {
-  const { userData , logout } = useAuth(); // Verkrijg de gebruikersgegevens uit de context
+  const { userData , logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const navigate = useNavigate();  // Gebruik de navigate functie voor redirects
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     const newCollapsedState = !isCollapsed;
     setIsCollapsed(newCollapsedState);
     if (onToggle) {
-      onToggle(newCollapsedState); // Notify parent about the collapse state
+      onToggle(newCollapsedState);
     }
   };
 
   const handleLogout = () => {
-    logout();  // Roep de logout functie aan
-    navigate('/login');  // Redirect naar de loginpagina
+    logout();
+    navigate('/login');
   };
 
   
@@ -62,13 +62,13 @@ const Sidebar = ({ onToggle }) => {
       <div className="profile-section">
         {userData?.profilePicture ? (
           <img
-            src={`http://localhost:3000${userData.profilePicture}`} // Dynamisch de afbeelding weergeven
+            src={`http://localhost:3000${userData.profilePicture}`} 
             alt="Profile"
           />
         ) : (
-          <img src={defaultProfilePic} alt="Default Profile" /> // Standaard afbeelding als er geen profiel is
+          <img src={defaultProfilePic} alt="Default Profile" />
         )}
-        <span className="name">{userData?.name || "User Name"}</span> {/* Dynamisch de naam van de gebruiker */}
+        <span className="name">{userData?.name || "User Name"}</span>
       </div>
 
       {/* Logout Section */}
