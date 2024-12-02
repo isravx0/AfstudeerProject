@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext';  // Zorg ervoor dat je deze import hebt
+import { useAuth } from '../AuthContext';
 import './style/DropdownMenu.css';
 
 const DropdownMenu = () => {
-  const { logout } = useAuth();  // Haal de logout functie op uit AuthContext
-  const navigate = useNavigate();  // Gebruik de navigate functie voor redirects
+  const { logout } = useAuth(); 
+  const navigate = useNavigate();  
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -13,8 +13,8 @@ const DropdownMenu = () => {
   };
 
   const handleLogout = () => {
-    logout();  // Roep de logout functie aan
-    navigate('/login');  // Redirect naar de loginpagina
+    logout();
+    navigate('/login'); 
   };
 
   return (
@@ -25,13 +25,13 @@ const DropdownMenu = () => {
         <div></div>
       </div>
       <div className={`dropdown-content ${isOpen ? 'open' : ''}`}>
+      <Link to="/home" className="menu-item" onClick={toggleMenu}>Home</Link>
         <Link to="/information" className="menu-item" onClick={toggleMenu}>Information</Link>
-        <Link to="/dashboard-solarpanel" className="menu-item" onClick={toggleMenu}>Solar Panel Dashboard</Link>
-        <Link to="/dashboard-battery" className="menu-item" onClick={toggleMenu}>Battery Dashboard</Link>
-        <Link to="/user-account/personal-info" className="menu-item" onClick={toggleMenu}>User Account</Link>
-        <Link to="/user-account/settings" className="menu-item" onClick={toggleMenu}>Settings</Link>
+        <Link to="/SolarDashboard" className="menu-item" onClick={toggleMenu}>Solar Panel Dashboard</Link>
+        <Link to="/BatteryDashboard" className="menu-item" onClick={toggleMenu}>Battery Dashboard</Link>
+        <Link to="/user-account" className="menu-item" onClick={toggleMenu}>User Account</Link>
         <Link to="/faq" className="menu-item" onClick={toggleMenu}>FAQ</Link>
-
+        <Link to="/contact" className="menu-item" onClick={toggleMenu}>Contact</Link>
         <div className="logout-container">
           <button className="menu-item logout-button" onClick={handleLogout}>Logout</button>
         </div>
