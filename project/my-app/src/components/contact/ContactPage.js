@@ -36,7 +36,7 @@ const ContactPage = () => {
         }
 
         try {
-            await axios.post('http://localhost:3000/api/contact', formData);
+            await axios.post('http://localhost:5000/api/contact', formData);
             setStatus("Your message has been sent successfully!");
             setFormData({ name: '', email: '', phone: '', message: '' });
         } catch (error) {

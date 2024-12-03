@@ -58,7 +58,7 @@ const AddBattery = ({ onBatteryAdded }) => {
       };
 
     try {
-        const response = await axios.post('http://localhost:3000/api/addBattery', formData, {
+        const response = await axios.post('http://localhost:5000/api/addBattery', formData, {
             headers: {
                 'Authorization': `Bearer ${token}`,  // Include the token here
             },

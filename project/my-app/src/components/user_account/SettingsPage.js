@@ -70,7 +70,7 @@ const SettingsPage = () => {
       const newStatus = !notifications;
       setNotifications(newStatus);
 
-      await axios.put('http://localhost:3000/update-notifications', {
+      await axios.put('http://localhost:5000/update-notifications', {
         notifications: newStatus
       }, {
           headers: {
@@ -111,7 +111,7 @@ const SettingsPage = () => {
 
     try {
       // API request to send reset link
-      const response = await axios.post('http://localhost:3000/api/password-reset', { email });
+      const response = await axios.post('http://localhost:5000/api/password-reset', { email });
       Swal.fire({
         icon: 'success',
         title: 'Password Reset Instructions Sent',

@@ -392,7 +392,7 @@ app.post('/api/password-reset', rateLimiter, (req, res) => {
                     text: `Hello ${user.name},\n\n` + 
                           `You are receiving this email because we received a request to reset the password for your account.\n\n` +
                           `To reset your password, please click on the following link or paste it into your browser:\n\n` +
-                          `http://localhost:3001/reset/${token}\n\n` +
+                          `http://localhost:3000/reset/${token}\n\n` +
                           `This link will expire in one hour. If you did not request this, please ignore this email and your password will remain unchanged.\n\n` +
                           `Best regards,\n` +
                           `The Solar Panel Simulation Team\n` +
@@ -401,7 +401,7 @@ app.post('/api/password-reset', rateLimiter, (req, res) => {
                            <p>Hello ${user.name},</p>
                            <p>You are receiving this email because we received a request to reset the password for your account.</p>
                            <p>To reset your password, please click on the following link or paste it into your browser:</p>
-                           <p><a href="http://localhost:3001/reset/${token}">Reset Password</a></p>
+                           <p><a href="http://localhost:3000/reset/${token}">Reset Password</a></p>
                            <p>This link will expire in one hour. If you did not request this, please ignore this email and your password will remain unchanged.</p>
                            <p>Best regards,<br/>The Solar Panel Simulation Team</p>
                            <p>For questions or support, please contact us at <a href="mailto:solarpanelsimulation@gmail.com">solarpanelsimulation@gmail.com</a></p>`,

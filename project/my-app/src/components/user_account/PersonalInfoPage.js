@@ -60,7 +60,7 @@ const PersonalInfoPage = () => {
           setLoading(true);
     
           axios
-            .put("http://localhost:3000/upload-profile-picture", formData, {
+            .put("http://localhost:5000/upload-profile-picture", formData, {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
                 "Content-Type": "multipart/form-data",
@@ -152,7 +152,7 @@ const PersonalInfoPage = () => {
   
       // Check if the email already exists in the database
       const emailExistsResponse = await axios.post(
-        "http://localhost:3000/check-email",
+        "http://localhost:5000/check-email",
         { email: userData.email },
         {
           headers: {
@@ -174,7 +174,7 @@ const PersonalInfoPage = () => {
   
       // Proceed with updating the profile if email is unique
       const response = await axios.put(
-        "http://localhost:3000/update-profile",
+        "http://localhost:5000/update-profile",
         userData,
         {
           headers: {
@@ -249,7 +249,7 @@ const PersonalInfoPage = () => {
             return;
           }
 
-          const response = await axios.delete("http://localhost:3000/api/delete-account", {
+          const response = await axios.delete("http://localhost:5000/api/delete-account", {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
@@ -304,7 +304,7 @@ const PersonalInfoPage = () => {
         {/* Profile Picture */}
         <div className="profile-picture-container">
         {userData?.profilePicture ? (
-          <img src={`http://localhost:3000${userData.profilePicture}`} alt="Profile" />
+          <img src={`http://localhost:5000${userData.profilePicture}`} alt="Profile" />
         ) : (
           <div className="placeholder">No profile picture uploaded</div>
         )}

@@ -13,14 +13,14 @@ const MFA = ({ email, onMFAVerified }) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/check-mfa-enabled", { params: { email } })
+      .get("http://localhost:5000/api/check-mfa-enabled", { params: { email } })
       .then((response) => {
         // Handle the response
       })
       .catch(() => setError("Error while checking MFA status"));
 
     axios
-      .post("http://localhost:3000/api/setup-totp", { email })
+      .post("http://localhost:5000/api/setup-totp", { email })
       .then((response) => {
         setMfaMethod("totp");
         setQrCode(response.data.qrCodeUrl); 
@@ -37,7 +37,7 @@ const MFA = ({ email, onMFAVerified }) => {
       otp: otpValue,  
     };
     console.log('Sending data to the server:', data);
-    const response = await fetch('http://localhost:3000/api/verify-totp', {
+    const response = await fetch('http://localhost:5000/api/verify-totp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

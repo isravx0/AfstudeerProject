@@ -37,7 +37,7 @@ const Homepage = () => {
     const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
 
     try {
-      const response = await axios.get('http://localhost:3000/api/user-info', {
+      const response = await axios.get('http://localhost:5000/api/user-info', {
         headers: {
           Authorization: token, // Send the token in the Authorization header
         },

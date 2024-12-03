@@ -21,7 +21,7 @@ const Sidebar = () => {
     const fetchBatteries = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:3000/api/readBatteries', {
+        const response = await axios.get('http://localhost:5000/api/readBatteries', {
           headers: {
             Authorization: `Bearer ${token}`, // Include the token here
           },

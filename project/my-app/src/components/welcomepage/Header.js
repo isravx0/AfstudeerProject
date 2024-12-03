@@ -10,7 +10,7 @@ const Header = () => {
   const { loggedIn, userData, error } = useAuth();
 
   const profilePic = userData?.profilePicture
-    ? `http://localhost:3000${userData.profilePicture}` // If the user has a profile picture, use it
+    ? `http://localhost:5000${userData.profilePicture}` // If the user has a profile picture, use it
     : defaultProfilePic; // Otherwise, use the default profile ima
   return (
     <div className='navbar'>

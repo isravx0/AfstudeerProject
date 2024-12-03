@@ -18,7 +18,7 @@ const MFALoginPage = ({ email, onMFAVerified }) => {
     setLoading(true);
     
     try {
-      const response = await axios.post('http://localhost:3000/api/verify-mfa', { email, otp });
+      const response = await axios.post('http://localhost:5000/api/verify-mfa', { email, otp });
 
       if (response.data.success) {
         Swal.fire({

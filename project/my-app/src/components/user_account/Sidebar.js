@@ -62,7 +62,7 @@ const Sidebar = ({ onToggle }) => {
       <div className="profile-section">
         {userData?.profilePicture ? (
           <img
-            src={`http://localhost:3000${userData.profilePicture}`} 
+            src={`http://localhost:5000${userData.profilePicture}`} 
             alt="Profile"
           />
         ) : (

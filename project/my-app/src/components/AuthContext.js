@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const fetchUserData = async () => {
     const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     try {
-      const response = await axios.get('http://localhost:3000/api/user-info', {
+      const response = await axios.get('http://localhost:5000/api/user-info', {
         headers: { Authorization: token },
       });
       setUserData(response.data.user);
