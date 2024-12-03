@@ -831,7 +831,6 @@ app.delete('/api/delete-account', verifyToken, (req, res) => {
     });
 });
 
-// Changing password in settings page
 
 
 // Start the server
