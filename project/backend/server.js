@@ -11,6 +11,10 @@ const crypto = require('crypto');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const QRCode = require('qrcode');
+const moment = require('moment-timezone');
+const axios = require('axios');
+const otplib = require('otplib');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -69,6 +73,7 @@ const rateLimiter = (req, res, next) => {
     }
     next();
 };
+
 // JWT verification middleware
 const verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
@@ -110,30 +115,212 @@ app.post('/api/register', (req, res) => {
         }
     );
 });
+function getUserByEmail(email) {
+    return new Promise((resolve, reject) => {
+        db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+            if (err) return reject(err);
+            resolve(results[0]); // Return the first result
+        });
+    });
+}
+// Endpoint to check if MFA is enabled for a user
+app.get('/api/check-mfa-enabled', async (req, res) => {
+    try {
+        const email = req.query.email; // Retrieving the email from query parameters
 
-// Login endpoint
+        if (!email) {
+            return res.status(400).json({ message: 'Email parameter is required' });
+        }
+
+        // Query the database or other logic to check if MFA is enabled for the user
+        const user = await getUserByEmail(email);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const mfaEnabled = user.mfaEnabled; // Assume you have a field for MFA status in your user data
+
+        res.status(200).json({ mfaEnabled });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error while checking MFA status' });
+    }
+});
+app.post('/check-mfa-status', async (req, res) => {
+    try {
+        // Logic to check MFA status
+        const user = await getUserFromSession(req.session.userId);
+        if (!user) throw new Error('User not found');
+        const mfaStatus = await checkMFAStatus(user);
+        res.status(200).json({ mfaStatus });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error while checking MFA status' });
+    }
+})
+// Login endpoint update to check MFA status
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
 
-    // Find the user by email
     db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
         if (err || results.length === 0) {
-            return res.status(401).send('User not found');
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
 
         const user = results[0];
-
-        // Compare the password
         const passwordIsValid = bcrypt.compareSync(password, user.password);
-        if (!passwordIsValid) {
-            return res.status(401).send('Invalid password');
-        }
 
-        // Generate a token
-        const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: 86400 }); // 24 hours
-        res.status(200).send({ auth: true, token: token });
+        if (!passwordIsValid) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+         // Generate and return token
+         const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: '24h' });
+         
+        // Check MFA status
+        if (user.mfa_enabled && user.mfa_secret) {
+            return res.json({
+              requireMFA: true,
+              userId: user.id,
+              auth: true,
+              token // Send user ID for further verification
+            });
+          }
+          res.status(200).json({ auth: true, token });
+       
     });
 });
+
+
+let pendingMfaSecrets = {}; // Temporary storage for pending MFA secrets, ideally use a more persistent storage for production
+
+// Route to generate TOTP secret and QR code
+app.post('/api/setup-totp', async (req, res) => {
+    try {
+      const userEmail = req.body.email;
+      const appName = 'Solar Panel Simulatie'; // Your app's name
+  
+      // Generate TOTP secret
+      const secret = otplib.authenticator.generateSecret(); // Generate the TOTP secret
+      const otpauthUrl = otplib.authenticator.keyuri(userEmail, appName, secret); // Generate the otpauth URL for the QR code
+  
+      // Store the secret temporarily (pending state)
+      pendingMfaSecrets[userEmail] = secret;
+  
+      // Generate QR Code image data URL
+      QRCode.toDataURL(otpauthUrl, (err, data_url) => {
+        if (err) {
+          console.error('Error generating QR code:', err);
+          return res.status(500).json({ message: 'Failed to generate QR code' });
+        }
+        // Send QR code URL and secret to the client
+        res.status(200).json({
+          qrCodeUrl: otpauthUrl,  // Send the QR code image URL
+          secret: secret,       // Send the temporary secret
+        });
+      });
+    } catch (error) {
+      console.error('Error generating TOTP:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+});
+app.post('/api/MFA-Login',(req,res)=>{
+    
+})
+// Route to verify TOTP token using otplib
+app.post('/api/verify-totp', (req, res) => {
+    console.log(req.body);
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: 'Email and OTP are required' });
+    }
+
+    // Retrieve the user's MFA secret from the temporary storage
+    const secret = pendingMfaSecrets[email];
+
+    if (!secret) {
+      return res.status(400).json({ message: 'No pending MFA setup for this email' });
+    }
+
+    // Validate the OTP using otplib
+    const isValid = otplib.authenticator.verify({ token: otp, secret });
+    if (isValid) {
+      // If OTP is valid, save the MFA settings in the database
+      db.query('UPDATE users SET mfa_secret = ?, mfa_enabled = ?, mfa_method = ? WHERE email = ?', 
+        [secret, true, 'totp', email], (err) => {
+            if (err) {
+                console.error('Error updating user MFA settings:', err);
+                return res.status(500).json({ message: 'Failed to save MFA settings' });
+            }
+
+            // Remove the pending secret after saving it to the database
+            delete pendingMfaSecrets[email];
+
+            res.status(200).json({ message: 'MFA setup completed successfully' });
+        }
+      );
+    } else {
+      res.status(400).json({ message: 'Invalid OTP' });
+    }
+});
+
+const getExternalTime = async () => {
+    try {
+      const response = await axios.get('https://timeapi.io/api/Time/current/zone?timeZone=UTC');
+      const externalTime = response.data.dateTime;
+  
+      // Convert the external time (in UTC) to your local time (e.g., 'Europe/Amsterdam')
+      const localTime = moment.utc(externalTime).tz('Europe/Amsterdam').format();
+  
+      console.log('External time in local time:', localTime);
+    } catch (error) {
+      console.error('Error fetching external time:', error);
+    }
+  };
+  
+  getExternalTime();
+  
+  
+// Route to enable MFA for the user (including TOTP or email options)
+app.post('/api/enable-mfa', (req, res) => {
+    const { email, mfaChoice } = req.body;
+
+    if (mfaChoice === 'totp') {
+        res.status(200).send({ message: 'TOTP MFA enabled successfully' });
+    } else if (mfaChoice === 'email') {
+        res.status(200).send({ message: 'Email MFA enabled successfully' });
+    } else {
+        res.status(400).send({ error: 'Invalid MFA choice' });
+    }
+});
+app.post('/api/verify-mfa', async (req, res) => {
+    const { email, otp } = req.body; // Get email and token from the request
+    console.log( "emila: " ,email, " otp " , otp)
+    try {
+        const user = await getUserByEmail(email);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        if (!user.mfa_secret) {
+            return res.status(400).json({ success: false, message: 'MFA not set up for this user' });
+        }
+        // Verify the token using TOTP or any other method you use
+        const isValid = otplib.authenticator.verify({
+        secret: user.mfa_secret, // Assume user has a stored secret for TOTP
+        token: otp, // Token received from the frontend
+        });
+        if (isValid) {
+        return res.json({ success: true, message: 'MFA verified successfully' });
+        } else {
+        return res.status(400).json({ success: false, message: 'Invalid MFA token' });
+        }
+    } catch (error) {
+        console.error('Error verifying MFA:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
+    }
+    });
 
 // Attach db to all routes
 app.use((req, res, next) => {

@@ -1,23 +1,20 @@
-import React, { useEffect } from 'react';
-import Swal from 'sweetalert2';
+import React from 'react';
 import './style/ErrorAlert.css';
 
-const ErrorAlert = ({ title, message }) => {
-  useEffect(() => {
-    Swal.fire({
-      position: "top-end",
-      icon: "error",
-      title: title,
-      text: message,
-      showConfirmButton: false,
-      timer: 1500,
-      customClass: {
-        popup: 'swal-small'
-      }
-    });
-  }, [title, message]);
-
-  return null;
+const ErrorAlert = ({ id, title, message, onClose, className }) => {
+  return (
+    <div className={`error-alert ${className}`} role="alert">
+      <div className="error-alert-content">
+        <div className="error-alert-icon" onClick={() => onClose(id)}>
+          <span className="error-alert-close">✖</span>
+        </div>
+        <div className="error-alert-text">
+          <strong>{title}</strong>
+          <p>{message}</p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ErrorAlert;
