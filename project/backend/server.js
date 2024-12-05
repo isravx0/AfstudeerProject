@@ -322,6 +322,46 @@ app.post('/api/verify-mfa', async (req, res) => {
     }
     });
 
+// Route to toggle MFA (enable/disable) for the user
+app.post('/api/toggle-mfa', async (req, res) => {
+    try {
+        const { email, action } = req.body;
+
+        if (!email || !action) {
+            return res.status(400).json({ message: 'Email and action are required' });
+        }
+
+        const user = await getUserByEmail(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (action === "enable") {
+            // Enable MFA, update the database (you could choose the method here, like 'totp' or 'email')
+            db.query('UPDATE users SET mfa_enabled = ? WHERE email = ?', [true, email], (err) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error enabling MFA' });
+                }
+                res.status(200).json({ message: 'MFA enabled successfully' });
+            });
+        } else if (action === "disable") {
+            // Disable MFA, remove the MFA data (mfa_secret, mfa_enabled) from the user
+            db.query('UPDATE users SET mfa_enabled = ?, mfa_secret = ? WHERE email = ?', [false, null, email], (err) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error disabling MFA' });
+                }
+                res.status(200).json({ message: 'MFA disabled successfully' });
+            });
+        } else {
+            res.status(400).json({ message: 'Invalid action' });
+        }
+    } catch (error) {
+        console.error('Error toggling MFA:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
 // Attach db to all routes
 app.use((req, res, next) => {
     req.db = db;
@@ -685,7 +725,7 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
     const userId = req.userId;
 
     // Query to get user details
-    db.query('SELECT id, name, email, phoneNumber, location, bio, gender, dob, notifications FROM users WHERE id = ?', [userId], (err, results) => {
+    db.query('SELECT id, name, email, phoneNumber, location, bio, gender, dob, notifications, mfa_enabled, mfa_secret FROM users WHERE id = ?', [userId], (err, results) => {
         if (err || results.length === 0) {
             return res.status(404).send('User not found');
         }
@@ -701,7 +741,8 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
               bio: user.bio,
               gender: user.gender,
               dob: user.dob || '',
-              notifications: user.notifications || []
+              notifications: user.notifications || [],
+              mfa_enabled: user.mfa_enabled || false
             }
         });
       });

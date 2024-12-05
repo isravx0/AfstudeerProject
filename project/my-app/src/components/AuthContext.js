@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: token },
       });
       setUserData(response.data.user);
+
     } catch (error) {
       setError('Error fetching user data.');
       console.error('Error fetching user data:', error);
