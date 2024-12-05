@@ -1,8 +1,0 @@
-Plant werkzaamheden en bewaakt de voortgang
-
-Situatie: Geef een voorbeeld van hoe je een planning hebt opgesteld en de voortgang hebt bewaakt. Dit kan een projectplan zijn of een update van een planningstool zoals Trello of Jira.
-
-Bewijsstukken:
-	- Screenshot van een planningstool (Trello, Jira)
-	- Link naar een planningsdocument of tijdlijn
-	- Voorbeeld van voortgangsrapportage of statusupdates

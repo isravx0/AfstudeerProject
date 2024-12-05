@@ -1,8 +1,0 @@
-Ontwerpt Software
-
-Situatie: Beschrijf een situatie waarin je betrokken was bij het ontwerpen van software, inclusief het maken van schema's, flowcharts, of architectuurdiagrammen.
-
-Bewijsstukken:
-	- Screenshot van een ontwerpdiagram of flowchart.
-	- Link naar ontwerpdocumenten of architectuurdiagrammen.
-	- Voorbeeld van een designdocument.

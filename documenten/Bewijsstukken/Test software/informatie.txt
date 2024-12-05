@@ -1,8 +1,0 @@
-Test Software:
-
-Situatie: Beschrijf hoe je software hebt getest. Dit kan het schrijven van testcases, uitvoeren van tests, of het oplossen van bugs omvatten.
-
-Bewijsstukken:
-	- Screenshot van testresultaten of bugrapporten
-	- Link naar testdocumenten of testgevallen
-	- Voorbeeld van een bugfix of testverslag

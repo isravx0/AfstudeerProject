@@ -1,8 +1,0 @@
-Realiseert Software (kerntaak 1)
-
-Situatie: Beschrijf een specifiek project of taak waarbij je software hebt gerealiseerd. Vermeld je bijdrage en de impact op het project.
-
-Bewijsstukken:
-	- Screenshot van een werkend stuk software
-	- Link naar een GitHub-repository met je code
-	- Projectdocumentatie of opleverdocument

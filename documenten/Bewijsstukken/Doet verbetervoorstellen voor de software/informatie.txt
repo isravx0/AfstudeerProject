@@ -1,8 +1,0 @@
-Doet verbetervoorstellen voor de software
-
-Situatie: Geef een voorbeeld van hoe je verbetervoorstellen hebt gedaan voor bestaande software, inclusief de redenen voor de verbeteringen en de impact.
-
-Bewijsstukken:
-	- Screenshot van een document met verbetervoorstellen
-	- Link naar een voorstel of rapport over softwareverbeteringen
-	- Voorbeeld van een presentatie of bespreking van verbeterpunten
