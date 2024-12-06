@@ -1059,7 +1059,36 @@ app.delete('/api/delete-account', verifyToken, (req, res) => {
     });
 });
 
+// --------------------------------------------------------------------SIMULATION SECTION
 
+//Get simulation data from database
+app.post("/api/simulatie", verifyToken, (req, res) => {
+    const { 
+      user_id,
+      energy_usage,
+      house_size,
+      insulation_level,
+      battery_capacity,
+      battery_efficiency,
+      charge_rate,
+      energy_cost,
+      return_rate,
+      use_dynamic_prices,
+    } = req.body;
+  
+    db.query(
+      "INSERT INTO simulatie (user_id, energy_usage, house_size, insulation_level, battery_capacity, battery_efficiency, charge_rate, energy_cost, return_rate, use_dynamic_prices) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [user_id, energy_usage, house_size, insulation_level, battery_capacity, battery_efficiency, charge_rate, energy_cost, return_rate, use_dynamic_prices],
+      (err, result) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Error saving simulatie.");
+        }
+        res.status(201).send("Simulatie saved successfully.");
+      }
+    );
+  });
+  
 
 // Start the server
 app.listen(PORT, () => {
