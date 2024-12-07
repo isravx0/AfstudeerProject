@@ -1124,7 +1124,29 @@ app.post("/api/simulatie", verifyToken, (req, res) => {
     );
   });
   
-  
+  const API_TOKEN = "48d94dd66a2f0e5c2d521f90bda8e091";
+const todayURL = `https://enever.nl/api/stroomprijs_vandaag.php?token=${API_TOKEN}`;
+const monthURL = `https://enever.nl/api/stroomprijs_laatste30dagen.php?token=${API_TOKEN}`;
+
+// Route to fetch today's prices
+app.get('/api/today-prices', async (req, res) => {
+  try {
+    const response = await axios.get(todayURL);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching data' });
+  }
+});
+
+// Route to fetch monthly prices
+app.get('/api/monthly-prices', async (req, res) => {
+  try {
+    const response = await axios.get(monthURL);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching data' });
+  }
+});
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

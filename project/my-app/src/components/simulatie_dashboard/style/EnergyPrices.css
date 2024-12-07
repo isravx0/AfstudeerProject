@@ -1,0 +1,26 @@
+.energy-prices-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  h1, h2 {
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .chart-container {
+    background: #f8f9fa;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  canvas {
+    max-height: 400px !important;
+  }
+  
+  
