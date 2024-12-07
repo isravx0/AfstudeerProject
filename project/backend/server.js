@@ -20,6 +20,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const secretKey = process.env.JWT_SECRET || '77b22a07938ccbb0565abc929d9ee5726affa3c4b197ea58ed28374d8f42161cadf47f74a95a10099d9c9d72541fbea1f579ba123b68cb9021edf8046ce030c6'; // Use environment variable for the secret key
 
+const API_TOKEN = "48d94dd66a2f0e5c2d521f90bda8e091";
+const todayURL = `https://enever.nl/api/stroomprijs_vandaag.php?token=${API_TOKEN}`;
+const monthURL = `https://enever.nl/api/stroomprijs_laatste30dagen.php?token=${API_TOKEN}`;
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -1124,9 +1128,7 @@ app.post("/api/simulatie", verifyToken, (req, res) => {
     );
   });
   
-  const API_TOKEN = "48d94dd66a2f0e5c2d521f90bda8e091";
-const todayURL = `https://enever.nl/api/stroomprijs_vandaag.php?token=${API_TOKEN}`;
-const monthURL = `https://enever.nl/api/stroomprijs_laatste30dagen.php?token=${API_TOKEN}`;
+
 
 // Route to fetch today's prices
 app.get('/api/today-prices', async (req, res) => {
