@@ -23,13 +23,11 @@ import BatteryDashboard from './components/battery_dashboard/batteryDashboard';
 import SolarDashboard from './components/solar_dashboard/solarDashboard';
 import AboutUs from './components/about_us/AboutUsPage';
 import SimulatieForm from './components/simulatie_dashboard/SimulatieForm';
+import SimulatieResults from './components/simulatie_dashboard/SimulatieResults'; // Zorg ervoor dat dit correct is geïmporteerd
 
 import PrivateRoute from './components/PrivateRoute'; 
 import { AuthProvider } from './components/AuthContext';
 import './App.css';
-
-
-
 
 function App() {
   return (
@@ -52,9 +50,9 @@ function App() {
             <Route path="/battery_dashboard" element={<BatteryDashboard />} />
             <Route path="/solar_dashboard" element={<SolarDashboard />} />
             <Route path="/simulatie" element={<SimulatieForm userId={1} />} />
+            <Route path="/simulatie-results/:userId" element={<SimulatieResults />} />
 
             <Route path="/about_us" element={<AboutUs />} />
-
             
             {/* User Account Section (Nested Routes) */}
             <Route 
@@ -71,7 +69,6 @@ function App() {
               <Route path="settings" element={<SettingsPage />} />
             </Route>
 
-
             {/* Protect /home route */}
             <Route 
               path="/home" 
@@ -82,8 +79,6 @@ function App() {
               }     
             />
           </Routes>
-
-          
 
           <FloatingChatButton />
           <Footer />

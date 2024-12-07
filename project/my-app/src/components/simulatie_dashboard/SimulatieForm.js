@@ -1,8 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./style/Simulatie.css";
 
-const SimulatieForm = ({ userId }) => {
+const SimulatieForm = () => {
+  const navigate = useNavigate();
+  const userId = 1; // Gebruik de juiste userId logica indien nodig
+
   const [formData, setFormData] = useState({
     energy_usage: "",
     house_size: "",
@@ -16,7 +20,6 @@ const SimulatieForm = ({ userId }) => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -31,7 +34,7 @@ const SimulatieForm = ({ userId }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/simulatie",
         { ...formData, user_id: userId },
         {
@@ -41,8 +44,7 @@ const SimulatieForm = ({ userId }) => {
           },
         }
       );
-      console.log("Simulatie succesvol opgeslagen:", response.data);
-      setSuccess(true);
+      navigate(`/simulatie-results/${userId}`); // Doorsturen naar de resultatenpagina
     } catch (error) {
       console.error("Fout bij het opslaan van de simulatie:", error);
     } finally {
@@ -53,9 +55,8 @@ const SimulatieForm = ({ userId }) => {
   return (
     <div className="simulatie-form-container">
       <h1>Nieuwe Simulatie</h1>
-      {success && <p className="success-message">Simulatie succesvol opgeslagen!</p>}
       <form onSubmit={handleSubmit}>
-        {/* Dropdown voor energy usage */}
+        {/* Formuliervelden */}
         <div className="form-group">
           <label>Energy Usage (kWh)</label>
           <select
@@ -71,7 +72,6 @@ const SimulatieForm = ({ userId }) => {
           </select>
         </div>
 
-        {/* Dropdown voor house size */}
         <div className="form-group">
           <label>House Size (m²)</label>
           <select
@@ -87,7 +87,6 @@ const SimulatieForm = ({ userId }) => {
           </select>
         </div>
 
-        {/* Dropdown voor insulation level */}
         <div className="form-group">
           <label>Insulation Level</label>
           <select
@@ -103,7 +102,6 @@ const SimulatieForm = ({ userId }) => {
           </select>
         </div>
 
-        {/* Dropdown voor battery capacity */}
         <div className="form-group">
           <label>Battery Capacity (kWh)</label>
           <select
@@ -119,7 +117,6 @@ const SimulatieForm = ({ userId }) => {
           </select>
         </div>
 
-        {/* Dropdown voor battery efficiency */}
         <div className="form-group">
           <label>Battery Efficiency (%)</label>
           <select
@@ -135,7 +132,6 @@ const SimulatieForm = ({ userId }) => {
           </select>
         </div>
 
-        {/* Dropdown voor charge rate */}
         <div className="form-group">
           <label>Charge Rate (kW)</label>
           <select
@@ -151,7 +147,6 @@ const SimulatieForm = ({ userId }) => {
           </select>
         </div>
 
-        {/* Dropdown voor energy cost */}
         <div className="form-group">
           <label>Energy Cost (€/kWh)</label>
           <select
@@ -167,7 +162,6 @@ const SimulatieForm = ({ userId }) => {
           </select>
         </div>
 
-        {/* Dropdown voor return rate */}
         <div className="form-group">
           <label>Return Rate (€/kWh)</label>
           <select
@@ -183,7 +177,6 @@ const SimulatieForm = ({ userId }) => {
           </select>
         </div>
 
-        {/* Checkbox voor dynamic prices */}
         <div className="form-group">
           <label>
             <input
@@ -192,7 +185,7 @@ const SimulatieForm = ({ userId }) => {
               checked={formData.use_dynamic_prices}
               onChange={handleChange}
             />
-            Use Dynamic Prices
+            Gebruik dynamische prijzen
           </label>
         </div>
 
@@ -205,4 +198,3 @@ const SimulatieForm = ({ userId }) => {
 };
 
 export default SimulatieForm;
- 

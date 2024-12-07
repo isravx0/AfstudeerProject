@@ -1090,6 +1090,41 @@ app.post("/api/simulatie", verifyToken, (req, res) => {
   });
   
 
+  // Route om de simulaties van een gebruiker op te halen
+  app.get("/api/simulatie/:userId", verifyToken, (req, res) => {
+    const { userId } = req.params;
+  
+    db.query(
+      "SELECT * FROM simulatie WHERE user_id = ?",
+      [userId],
+      (err, results) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Fout bij het ophalen van gegevens.");
+        }
+        res.status(200).json(results);
+      }
+    );
+  });
+
+  //Get simulation data from database
+  app.get("/api/simulatie/:userId", verifyToken, (req, res) => {
+    const { userId } = req.params;
+  
+    db.query(
+      "SELECT * FROM simulatie WHERE user_id = ?",
+      [userId],
+      (err, results) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Fout bij het ophalen van gegevens.");
+        }
+        res.status(200).json(results);
+      }
+    );
+  });
+  
+  
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
