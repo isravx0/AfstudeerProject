@@ -26,6 +26,7 @@ import SimulatieForm from './components/simulatie_dashboard/SimulatieForm';
 import SimulatieResults from './components/simulatie_dashboard/SimulatieResults'; 
 import EnergyPrices  from './components/simulatie_dashboard/EnergyPrices';
 import SunHours from './components/simulatie_dashboard/SunHours';
+import SimulatieDashboard from './components/simulatie_dashboard/SimulatieDashboard';
 import PrivateRoute from './components/PrivateRoute'; 
 import { AuthProvider } from './components/AuthContext';
 import './App.css';
@@ -54,6 +55,7 @@ function App() {
             <Route path="/simulatie-results/:userId" element={<SimulatieResults />} />
             <Route path="/energy-prices" element={<EnergyPrices />} />
             <Route path="/sun-hours" element={<SunHours />} />
+            <Route path="/simulatie_dashboard" element={<SimulatieDashboard />} />
             <Route path="/about_us" element={<AboutUs />} />
             
             {/* User Account Section (Nested Routes) */}

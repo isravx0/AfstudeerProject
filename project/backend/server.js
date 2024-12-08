@@ -1140,6 +1140,8 @@ app.get('/api/today-prices', async (req, res) => {
   }
 });
 
+// Route to fetch weekly prices
+
 // Route to fetch monthly prices
 app.get('/api/monthly-prices', async (req, res) => {
   try {
