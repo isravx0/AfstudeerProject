@@ -20,7 +20,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const secretKey = process.env.JWT_SECRET || '77b22a07938ccbb0565abc929d9ee5726affa3c4b197ea58ed28374d8f42161cadf47f74a95a10099d9c9d72541fbea1f579ba123b68cb9021edf8046ce030c6'; // Use environment variable for the secret key
 
-const API_TOKEN = "48d94dd66a2f0e5c2d521f90bda8e091";
+const API_TOKEN = "96ee8757b32e311c5f47b170b4781e85";
 const todayURL = `https://enever.nl/api/stroomprijs_vandaag.php?token=${API_TOKEN}`;
 const monthURL = `https://enever.nl/api/stroomprijs_laatste30dagen.php?token=${API_TOKEN}`;
 
@@ -1139,8 +1139,6 @@ app.get('/api/today-prices', async (req, res) => {
     res.status(500).json({ error: 'Error fetching data' });
   }
 });
-
-// Route to fetch weekly prices
 
 // Route to fetch monthly prices
 app.get('/api/monthly-prices', async (req, res) => {
