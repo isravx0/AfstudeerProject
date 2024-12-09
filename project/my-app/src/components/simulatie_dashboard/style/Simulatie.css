@@ -30,7 +30,7 @@
     border-radius: 5px;
   }
   
-  button {
+  .simulatie-form-container button {
     width: 100%;
     padding: 10px;
     background-color: #007bff;
@@ -40,7 +40,7 @@
     cursor: pointer;
   }
   
-  button:disabled {
+  .simulatie-form-container  button:disabled {
     background-color: #aaa;
     cursor: not-allowed;
   }
