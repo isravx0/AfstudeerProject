@@ -20,7 +20,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const secretKey = process.env.JWT_SECRET || '77b22a07938ccbb0565abc929d9ee5726affa3c4b197ea58ed28374d8f42161cadf47f74a95a10099d9c9d72541fbea1f579ba123b68cb9021edf8046ce030c6'; // Use environment variable for the secret key
 
-const API_TOKEN = "96ee8757b32e311c5f47b170b4781e85";
+const API_TOKEN = "48d94dd66a2f0e5c2d521f90bda8e091";
 const todayURL = `https://enever.nl/api/stroomprijs_vandaag.php?token=${API_TOKEN}`;
 const monthURL = `https://enever.nl/api/stroomprijs_laatste30dagen.php?token=${API_TOKEN}`;
 
@@ -127,30 +127,30 @@ function getUserByEmail(email) {
         });
     });
 }
+
+
 // Endpoint to check if MFA is enabled for a user
 app.get('/api/check-mfa-enabled', async (req, res) => {
     try {
         const email = req.query.email; // Retrieving the email from query parameters
-
         if (!email) {
             return res.status(400).json({ message: 'Email parameter is required' });
         }
-
         // Query the database or other logic to check if MFA is enabled for the user
         const user = await getUserByEmail(email);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
-        const mfaEnabled = user.mfaEnabled; // Assume you have a field for MFA status in your user data
-
+        const mfaEnabled = user.mfaEnabled;
         res.status(200).json({ mfaEnabled });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error while checking MFA status' });
     }
 });
+
+//check mfa status
 app.post('/check-mfa-status', async (req, res) => {
     try {
         // Logic to check MFA status
@@ -163,6 +163,7 @@ app.post('/check-mfa-status', async (req, res) => {
         res.status(500).json({ message: 'Error while checking MFA status' });
     }
 })
+
 // Login endpoint update to check MFA status
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
@@ -185,6 +186,7 @@ app.post('/api/login', (req, res) => {
         if (user.mfa_enabled && user.mfa_secret) {
             return res.json({
               requireMFA: true,
+              mfaMethod: user.mfa_method,
               userId: user.id,
               auth: true,
               token // Send user ID for further verification
@@ -196,8 +198,7 @@ app.post('/api/login', (req, res) => {
 });
 
 
-let pendingMfaSecrets = {}; // Temporary storage for pending MFA secrets, ideally use a more persistent storage for production
-
+// Route to generate TOTP secret and QR code
 // Route to generate TOTP secret and QR code
 app.post('/api/setup-totp', async (req, res) => {
     try {
@@ -228,12 +229,27 @@ app.post('/api/setup-totp', async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 app.post('/api/MFA-Login',(req,res)=>{
+
     
 })
+app.post('/api/setup-mfa', (req, res) => {
+    const { email } = req.body;
+    // Genereer een tijdelijke secret
+    const secret = crypto.randomBytes(20).toString('hex'); 
+    // Update de database met de secret en activeer MFA
+    db.query('UPDATE users SET mfa_secret = ?, mfa_enabled = 1 , mfa_method = "email" WHERE email = ?', [secret, email], (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Fout bij het instellen van MFA.');
+        }
+        res.status(200).send('MFA succesvol ingeschakeld.');
+    });
+});
+
 // Route to verify TOTP token using otplib
 app.post('/api/verify-totp', (req, res) => {
-    console.log(req.body);
     const { email, otp } = req.body;
 
     if (!email || !otp) {
@@ -298,9 +314,10 @@ app.post('/api/enable-mfa', (req, res) => {
         res.status(400).send({ error: 'Invalid MFA choice' });
     }
 });
+
+//Route to verify mfa
 app.post('/api/verify-mfa', async (req, res) => {
     const { email, otp } = req.body; // Get email and token from the request
-    console.log( "emila: " ,email, " otp " , otp)
     try {
         const user = await getUserByEmail(email);
         if (!user) {
@@ -365,6 +382,52 @@ app.post('/api/toggle-mfa', async (req, res) => {
     }
 });
 
+app.post('/api/send-mfa-code', (req, res) => {
+    const { email } = req.body;
+
+    // Genereer een 6-cijferige code en stel een vervaltijd in
+    const mfaCode = crypto.randomInt(100000, 999999).toString();
+    const expirationTime = Date.now() + 5 * 60 * 1000; // 5 minuten geldig
+    // Update de database met de gegenereerde code
+    db.query('UPDATE users SET mfa_code = ?, mfa_expiry = ? WHERE email = ?', [mfaCode, expirationTime, email], (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Fout bij het genereren van MFA-code.');
+        }
+
+        // Verstuur de e-mail
+        transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Uw MFA-code',
+            text: `Uw MFA-code is: ${mfaCode}`,
+        }, (mailErr) => {
+            if (mailErr) {
+                console.error(mailErr);
+                return res.status(500).send('Fout bij het verzenden van e-mail.');
+            }
+            res.status(200).send('MFA-code verzonden.');
+        });
+    });
+});
+
+app.post('/api/verify-mfa-email', (req, res) => {
+    const { email, code } = req.body;
+    // Haal de opgeslagen code en vervaltijd op uit de database
+    db.query('SELECT mfa_code, mfa_expiry FROM users WHERE email = ?', [email], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(400).send('Gebruiker niet gevonden.');
+        }
+
+        const { mfa_code, mfa_expiry } = results[0];
+
+        // Controleer of de code geldig is en niet verlopen
+        if (mfa_code === code && Date.now() < mfa_expiry) {
+            return res.status(200).send('MFA succesvol.');
+        }
+        res.status(401).send('MFA-code ongeldig of verlopen.');
+    });
+});
 
 // Attach db to all routes
 app.use((req, res, next) => {
@@ -1062,6 +1125,7 @@ app.delete('/api/delete-account', verifyToken, (req, res) => {
         });
     });
 });
+let pendingMfaSecrets = {}; // Temporary storage for pending MFA secrets, ideally use a more persistent storage for production
 
 // --------------------------------------------------------------------SIMULATION SECTION
 
@@ -1139,6 +1203,7 @@ app.get('/api/today-prices', async (req, res) => {
     res.status(500).json({ error: 'Error fetching data' });
   }
 });
+
 
 // Route to fetch monthly prices
 app.get('/api/monthly-prices', async (req, res) => {

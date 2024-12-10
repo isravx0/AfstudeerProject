@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import "./style/LoginPage.css";
 import MFA from "./MFA"; // Import the MFA component
 import MFALogin from "./MFALoginPage"
+import MFAEmail from "./MFAEmail" 
+import MfaVerificationPage from "./MfaVerificationPage";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -26,6 +28,8 @@ const LoginForm = () => {
   const [showMFALogin, setShowMFALogin] = useState(false); // Control MFA visibility
   const [mfaToken, setMfaToken] = useState(null); 
   const [userEmail, setUserEmail] = useState(""); // Store user email
+  const [showMFAEmail, setShowMFAEmail] = useState(false);
+  const [showMFAVerificationPage, setShowMFAVerificationPage] = useState(false);
   const { login } = useAuth();
   const executeRecaptcha = useRecaptchaV3('6Lc_A2EqAAAAANr-GXLMhgjBdRYWKpZ1y-YwF7Mk', 'login');
   
@@ -59,7 +63,6 @@ const LoginForm = () => {
       setLoading(true);
       const recaptchaToken = await executeRecaptcha('login');
       const data = { ...formData, token: recaptchaToken };
-  
       const response = await axios.post('http://localhost:5000/api/login', data);
       const {token} = response.data
       if (response.data.requireMFA) {
@@ -73,7 +76,12 @@ const LoginForm = () => {
           icon: "info",
           showConfirmButton: true,
         });
-        setShowMFALogin(true); // Show MFA screen
+        if (response.data.mfaMethod === "totp") {
+        setShowMFALogin(true);
+        }
+        else if(response.data.mfaMethod === "email"){
+        setShowMFAVerificationPage(true);
+        }
       } else {
         await login(token);
         setLoginAttempts(0);
@@ -88,7 +96,26 @@ const LoginForm = () => {
           cancelButtonText: "Later",
         }).then((result) => {
           if (result.isConfirmed) {
-            setShowMFA(true);  // Show MFA setup form
+            Swal.fire({
+              title: "Which MFA would you like to use??",
+              text: "You can choose between Authy app (QR code) or email",
+              icon: "info",
+              showDenyButton: true,
+              showCancelButton: true,
+              confirmButtonText: "Authy",
+              denyButtonText: "Email",
+              cancelButtonText: "cancel",
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  setShowMFA(true);
+                }
+                else if (result.isDenied){
+                  setShowMFAEmail(true);
+                }  // Show MFA setup form
+                else{
+                  navigate("/home");  // Redirect to home page
+                }
+           });
           } else {
             navigate("/home");  // Redirect to home page
           }
@@ -133,7 +160,7 @@ const LoginForm = () => {
 
   return (
     <div className="login-container">
-      {!showMFA && !showMFALogin ? (
+      {!showMFA && !showMFALogin && !showMFAEmail && !showMFAVerificationPage ? (
         <div className="login-left-panel">
           <h1>Log in to your account</h1>
           <form onSubmit={handleSubmit} className="login-form">
@@ -189,12 +216,14 @@ const LoginForm = () => {
             {loading && <p>Logging in...</p>}
           </form>
         </div>
-      ) : (
-        // Conditionally render MFA components
+       ) : (
         showMFALogin ? (
-          <MFALogin email={formData.email} onMFAVerified={handleMFASubmit}
-        />
-        ) : (
+          <MFALogin email={formData.email} onMFAVerified={handleMFASubmit} />
+        ) : showMFAEmail ? (
+          <MFAEmail email={formData.email} onMFAVerified={handleMFASubmit} />
+        ) : showMFAVerificationPage ?(
+          <MfaVerificationPage email={formData.email} onMFAVerified={handleMFASubmit} />
+        ) :  (
           <MFA email={formData.email} onMFAVerified={handleMFASubmit} />
         )
       )}

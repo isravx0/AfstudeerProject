@@ -36,7 +36,6 @@ const MFA = ({ email, onMFAVerified }) => {
       email: email,   
       otp: otpValue,  
     };
-    console.log('Sending data to the server:', data);
     const response = await fetch('http://localhost:5000/api/verify-totp', {
       method: 'POST',
       headers: {
@@ -44,7 +43,6 @@ const MFA = ({ email, onMFAVerified }) => {
       },
       body: JSON.stringify(data),
     });
-    console.log('response:', response);
     if (response.ok) {
       Swal.fire({
         title: "MFA Verified",
