@@ -29,10 +29,12 @@ const SunshineHours = () => {
           ],
           timezone: 'auto',
         };
-
-        const url = "https://api.open-meteo.com/v1/forecast";
-        const response = await axios.get(url, { params });
-
+    
+        const response = await axios.get("https://api.open-meteo.com/v1/forecast", {
+          params,
+          timeout: 10000, // 10 seconds
+        });
+    
         if (response.data && response.data.daily) {
           setWeatherData(response.data.daily);
         } else {
@@ -44,7 +46,6 @@ const SunshineHours = () => {
         setLoading(false);
       }
     };
-
     fetchWeatherData();
   }, []);
 

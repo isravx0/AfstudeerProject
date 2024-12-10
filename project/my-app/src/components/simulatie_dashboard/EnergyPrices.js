@@ -23,7 +23,6 @@ const EnergyPrices = () => {
 
       try {
         const res = await axios.get(url);
-        console.log(`${timePeriod.charAt(0).toUpperCase() + timePeriod.slice(1)} data:`, res.data);
 
         if (Array.isArray(res.data?.data)) {
           setPrices(res.data.data);
