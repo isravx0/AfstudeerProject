@@ -22,6 +22,7 @@ import FeedbackForm from './components/feedback/FeedbackForm';
 import BatteryDashboard from './components/battery_dashboard/batteryDashboard';
 import SolarDashboard from './components/solar_dashboard/solarDashboard';
 import AboutUs from './components/about_us/AboutUsPage';
+import AboutUsPage from "./components/aboutus/AboutUs"
 import SimulatieForm from './components/simulatie_dashboard/SimulatieForm';
 import SimulatieResults from './components/simulatie_dashboard/SimulatieResults'; 
 import EnergyPrices  from './components/simulatie_dashboard/EnergyPrices';
@@ -57,7 +58,8 @@ function App() {
             <Route path="/sun-hours" element={<SunHours />} />
             <Route path="/simulatie_dashboard" element={<SimulatieDashboard />} />
             <Route path="/about_us" element={<AboutUs />} />
-            
+            <Route path="/about_us1" element={<AboutUsPage />} />
+
             {/* User Account Section (Nested Routes) */}
             <Route 
               path="/user-account/*" 

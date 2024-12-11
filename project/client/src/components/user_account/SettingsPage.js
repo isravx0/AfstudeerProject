@@ -54,7 +54,7 @@ const SettingsPage = () => {
     Swal.fire({
       icon: 'success',
       title: 'Settings Saved',
-      text: 'Your settings have been successfully saved!',
+      text: 'Your changes have been successfully saved!',
       timer: 1500,
       showConfirmButton: false
     });
@@ -62,42 +62,41 @@ const SettingsPage = () => {
 
   // Function to handle Two Factor Auth
   const handleTwoFactorToggle = async () => {
-  // Check if the user is already logged in
-  if (userData && userData.loggedIn) { // Assuming userData has a `loggedIn` flag or similar logic
-    Swal.fire({
-      icon: 'warning',
-      title: 'Action Required',
-      text: 'To enable two-factor authentication, you need to log out first. Please log out and then try again.',
-      showConfirmButton: true,
-    });
-    return;
-  }
-
-  // Proceed with toggling MFA only if the user is not logged in
-  const action = twoFactorAuth ? "disable" : "enable";
-  try {
-    const response = await axios.post('http://localhost:5000/api/toggle-mfa', {
-      email: userData.email,
-      action: action
-    });
-
-    // Update the UI state based on success
-    setTwoFactorAuth(!twoFactorAuth);
-    Swal.fire({
-      icon: 'success',
-      title: response.data.message,
-      text: `You have ${action === "enable" ? "enabled" : "disabled"} two-factor authentication.`,
-      timer: 1500,
-      showConfirmButton: false
-    });
-  } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'Failed to toggle MFA. Please try again later.',
-    });
-  }
-};
+    if (userData && userData.loggedIn) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Action Required',
+        text: 'Log out first to enable two-factor authentication.',
+        showConfirmButton: true,
+      });
+      return;
+    }
+  
+    const action = twoFactorAuth ? "disable" : "enable";
+    try {
+      const response = await axios.post('http://localhost:5000/api/toggle-mfa', {
+        email: userData.email,
+        action: action
+      });
+  
+      setTwoFactorAuth(!twoFactorAuth);
+  
+      Swal.fire({
+        icon: 'success',
+        title: response.data.message,
+        text: `Two-factor authentication has been ${action === "enable" ? "enabled" : "disabled"}.`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to toggle two-factor authentication. Please try again.',
+      });
+    }
+  };
+  
 
 
   // Function to handle notifications toggle
@@ -105,26 +104,25 @@ const SettingsPage = () => {
     try {
       const newStatus = !notifications;
       setNotifications(newStatus);
-      localStorage.setItem("notifications", JSON.stringify(newStatus)); // Save to localStorage
-
+      localStorage.setItem("notifications", JSON.stringify(newStatus));
+  
       await axios.put('http://localhost:5000/update-notifications', {
         notifications: newStatus
       }, {
-          headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`, 
-              "Content-Type": "application/json",
-          },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          "Content-Type": "application/json",
+        },
       });
-
+  
       Swal.fire({
         icon: 'success',
-        title: 'Notification Setting Updated',
+        title: 'Notifications Updated',
         text: `Notifications have been turned ${newStatus ? "on" : "off"}.`,
         timer: 1500,
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Error updating notifications:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -132,62 +130,71 @@ const SettingsPage = () => {
       });
     }
   };
+  
+  const handleLanguageChange = (e) => {
+    const selectedLanguage = e.target.value;
+    setLanguage(selectedLanguage);
+  
+    Swal.fire({
+      icon: 'success',
+      title: 'Language Changed',
+      text: `Your preferred language has been changed to ${selectedLanguage}.`,
+      timer: 1500,
+      showConfirmButton: false
+    });
+  };
+  
 
   // Function to handle password reset
-  const handlePasswordReset = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  // Functie voor wachtwoord reset met bevestiging
+const handlePasswordReset = async (e) => {
+  e.preventDefault();
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setMessage("Invalid email format. Please enter a valid email.");
-      setLoading(false);
-      return;
-    }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    setMessage("Invalid email format. Please enter a valid email.");
+    return;
+  }
 
-    try {
-      // API request to send reset link
-      const response = await axios.post('http://localhost:5000/api/password-reset', { email });
-      Swal.fire({
-        icon: 'success',
-        title: 'Password Reset Instructions Sent',
-        text: 'Check your email for the password reset instructions.',
-        timer: 1500,
-        showConfirmButton: false
-      });
-    } catch (error) {
-      if (error.response) {
-        if (error.response.status === 404) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Email Not Registered',
-            text: 'This email is not registered.',
-          });
-        } else if (error.response.status === 429) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Too Many Requests',
-            text: 'You have reached the maximum number of password reset requests. Please try again later.',
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error Processing Request',
-            text: 'There was an error processing your request. Please try again.',
-          });
-        }
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Network Error',
-          text: 'Please check your connection and try again.',
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  const confirmResult = await Swal.fire({
+    title: 'Are you sure?',
+    text: `We will send a password reset link to ${email}.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, send it!',
+    cancelButtonText: 'Cancel',
+  });
+
+  if (!confirmResult.isConfirmed) {
+    return; // Annuleer als de gebruiker klikt op "Cancel"
+  }
+
+  setLoading(true);
+
+  try {
+    await axios.post('http://localhost:5000/api/password-reset', { email });
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Password Reset Email Sent',
+      text: 'Check your email for further instructions.',
+      timer: 1500,
+      showConfirmButton: false,
+    });
+  } catch (error) {
+    const errorMsg = error.response?.status === 404 
+      ? 'Email not registered.' 
+      : 'An error occurred. Please try again.';
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: errorMsg,
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="settings-page">
@@ -220,12 +227,13 @@ const SettingsPage = () => {
           <select
             id="language"
             value={language}
-            onChange={(e) => setLanguage(e.target.value)}
+            onChange={handleLanguageChange}
             className="form-control"
           >
             <option value="English">English</option>
             <option value="Dutch">Dutch</option>
           </select>
+
         </div>
       </div>
 
@@ -277,13 +285,7 @@ const SettingsPage = () => {
         <p>Manage access to your profile and shared content.</p>
         <Link to="/user-account/data-sharing" className="btn-save">Manage Sharing Settings</Link>
       </div>
-
-      {/* Save Changes */}
-      <div className="settings-box">
-        <button onClick={handleSaveChanges} className="btn-save">
-          Save Changes
-        </button>
-      </div>
+      
     </div>
   );
 };
