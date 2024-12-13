@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./style/SettingsPage.css";
 import { useAuth } from "../AuthContext"; // Context for user data and authentication token
 import Swal from "sweetalert2";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import axios from 'axios';
 
 const SettingsPage = () => {
@@ -12,56 +12,97 @@ const SettingsPage = () => {
   const [notifications, setNotifications] = useState(true);
   const [language, setLanguage] = useState("English");
   const [twoFactorAuth, setTwoFactorAuth] = useState(false);
+  const [mfaMethod, setMfaMethod] = useState(""); 
   const { userData, setUserData, token } = useAuth();
+  const navigate = useNavigate(); // Initialize navigate
 
   // Use effect to get user settings from API or localStorage
   useEffect(() => {
     if (token) {
-      const authToken = localStorage.getItem("authToken");
-
-      axios
-        .get("/api/user-info", {
-          headers: { Authorization: `Bearer ${authToken}` },
-        })
-        .then((response) => {
-          setUserData(response.data.user);
-          setTwoFactorAuth(response.data.user.mfa_enabled); // Sync MFA status
-        })
-        .catch((err) => {
-          console.error("Failed to load user data:", err);
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to load user data. Please try again later.",
-          });
-        });
+        const authToken = localStorage.getItem("authToken");
+        axios
+            .get("/api/user-info", {
+                headers: { Authorization: `Bearer ${authToken}` },
+            })
+            .then((response) => {
+                setUserData(response.data.user);
+                setTwoFactorAuth(response.data.user.mfa_enabled); // Sync MFA status
+                setMfaMethod(response.data.user.mfa_method); // Sync MFA method (email or TOTP)
+            })
+            .catch((err) => {
+                console.error("Failed to load user data:", err);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to load user data. Please try again later.",
+                });
+            });
     }
-
-    // Set the initial state based on localStorage
-    const savedNotifications = localStorage.getItem("notifications");
-    if (savedNotifications !== null) {
-      setNotifications(JSON.parse(savedNotifications));
-    }
-
     const savedTwoFactor = localStorage.getItem("twoFactorAuth");
     if (savedTwoFactor !== null) {
-      setTwoFactorAuth(JSON.parse(savedTwoFactor));
+        setTwoFactorAuth(JSON.parse(savedTwoFactor));
     }
   }, [token, setUserData]);
 
-  // Function to handle saving settings
-  const handleSaveChanges = () => {
+  // Function to handle MFA method switch
+  const handleMfaSwitch = () => {
+    if (!twoFactorAuth) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Two-Factor Authentication is not enabled',
+        text: 'Please enable two-factor authentication first before switching the MFA method.',
+      });
+      return;
+    }
+
     Swal.fire({
-      icon: 'success',
-      title: 'Settings Saved',
-      text: 'Your changes have been successfully saved!',
-      timer: 1500,
-      showConfirmButton: false
+      title: 'Switch MFA Method',
+      text: `You are currently using ${mfaMethod === "email" ? "Email" : "QR Code (Authy)"} as your MFA method. Do you want to switch to the other method?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, switch',
+      cancelButtonText: 'Cancel',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Call API to switch MFA method on the server
+          const response = await axios.post('http://localhost:5000/api/switch-mfa-method', {
+            email: userData.email,
+            currentMethod: mfaMethod,
+          });
+
+          Swal.fire({
+            icon: 'success',
+            title: 'MFA Method Switched',
+            text: `Your MFA method has been switched to ${mfaMethod === "email" ? "QR Code (Authy)" : "Email"}.`,
+            timer: 1500,
+            showConfirmButton: false,
+          });
+
+          // Redirect to the respective MFA setup page (QR Code or Email)
+          if (mfaMethod === "email") {
+            navigate('/mfa-setup-authy'); // Redirect to the Authy QR setup page
+          } else {
+            navigate('/mfa-setup-email'); // Redirect to the Email MFA setup page
+          }
+
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to switch MFA method. Please try again.',
+          });
+        }
+      }
     });
   };
 
-  // Function to handle Two Factor Auth
+  // Function to handle Two Factor Auth toggle
   const handleTwoFactorToggle = async () => {
+    const newStatus = !twoFactorAuth;
+    setTwoFactorAuth(newStatus);
+    localStorage.setItem("twoFactorAuth", JSON.stringify(newStatus));
+
     if (userData && userData.loggedIn) {
       Swal.fire({
         icon: 'warning',
@@ -96,105 +137,56 @@ const SettingsPage = () => {
       });
     }
   };
-  
 
+  // Function to handle password reset
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
 
-  // Function to handle notifications toggle
-  const handleNotificationToggle = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setMessage("Invalid email format. Please enter a valid email.");
+      return;
+    }
+
+    const confirmResult = await Swal.fire({
+      title: 'Are you sure?',
+      text: `We will send a password reset link to ${email}.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, send it!',
+      cancelButtonText: 'Cancel',
+    });
+
+    if (!confirmResult.isConfirmed) {
+      return; // Cancel if the user clicks "Cancel"
+    }
+
+    setLoading(true);
+
     try {
-      const newStatus = !notifications;
-      setNotifications(newStatus);
-      localStorage.setItem("notifications", JSON.stringify(newStatus));
-  
-      await axios.put('http://localhost:5000/update-notifications', {
-        notifications: newStatus
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          "Content-Type": "application/json",
-        },
-      });
-  
+      await axios.post('http://localhost:5000/api/password-reset', { email });
+
       Swal.fire({
         icon: 'success',
-        title: 'Notifications Updated',
-        text: `Notifications have been turned ${newStatus ? "on" : "off"}.`,
+        title: 'Password Reset Email Sent',
+        text: 'Check your email for further instructions.',
         timer: 1500,
         showConfirmButton: false,
       });
     } catch (error) {
+      const errorMsg = error.response?.status === 404 
+        ? 'Email not registered.' 
+        : 'An error occurred. Please try again.';
+
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Failed to update notification settings. Please try again.',
+        text: errorMsg,
       });
+    } finally {
+      setLoading(false);
     }
   };
-  
-  const handleLanguageChange = (e) => {
-    const selectedLanguage = e.target.value;
-    setLanguage(selectedLanguage);
-  
-    Swal.fire({
-      icon: 'success',
-      title: 'Language Changed',
-      text: `Your preferred language has been changed to ${selectedLanguage}.`,
-      timer: 1500,
-      showConfirmButton: false
-    });
-  };
-  
-
-  // Function to handle password reset
-  // Functie voor wachtwoord reset met bevestiging
-const handlePasswordReset = async (e) => {
-  e.preventDefault();
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    setMessage("Invalid email format. Please enter a valid email.");
-    return;
-  }
-
-  const confirmResult = await Swal.fire({
-    title: 'Are you sure?',
-    text: `We will send a password reset link to ${email}.`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, send it!',
-    cancelButtonText: 'Cancel',
-  });
-
-  if (!confirmResult.isConfirmed) {
-    return; // Annuleer als de gebruiker klikt op "Cancel"
-  }
-
-  setLoading(true);
-
-  try {
-    await axios.post('http://localhost:5000/api/password-reset', { email });
-
-    Swal.fire({
-      icon: 'success',
-      title: 'Password Reset Email Sent',
-      text: 'Check your email for further instructions.',
-      timer: 1500,
-      showConfirmButton: false,
-    });
-  } catch (error) {
-    const errorMsg = error.response?.status === 404 
-      ? 'Email not registered.' 
-      : 'An error occurred. Please try again.';
-
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: errorMsg,
-    });
-  } finally {
-    setLoading(false);
-  }
-};
 
   return (
     <div className="settings-page">
@@ -204,7 +196,7 @@ const handlePasswordReset = async (e) => {
       </div>
 
       {/* Notification Setting */}
-      <div className="settings-box">
+      {/* <div className="settings-box">
         <h2>Notifications</h2>
         <div className="setting-item">
           <label>Enable Notifications:</label>
@@ -217,10 +209,10 @@ const handlePasswordReset = async (e) => {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Language Settings */}
-      <div className="settings-box">
+      {/* <div className="settings-box">
         <h2>Languages</h2>
         <div className="setting-item">
           <label htmlFor="language">Preferred Language:</label>
@@ -233,9 +225,8 @@ const handlePasswordReset = async (e) => {
             <option value="English">English</option>
             <option value="Dutch">Dutch</option>
           </select>
-
         </div>
-      </div>
+      </div> */}
 
       {/* Privacy Settings */}
       <div className="settings-box">
@@ -249,14 +240,25 @@ const handlePasswordReset = async (e) => {
             {twoFactorAuth ? "Enabled" : "Disabled"}
           </button>
         </div>
+        {twoFactorAuth && (
+          <div className="setting-item">
+            <label>MFA Method: {userData?.mfa_method || "Not Set"}</label>
+          </div>
+        )}
+
+        {twoFactorAuth && (
+          <div className="setting-item">
+            <button onClick={handleMfaSwitch} className="btn-save">
+              Switch MFA Method
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Change Password Section */}
       <div className="settings-box">
         <h2>Change Password</h2>
         <p>If you want to change your password, enter your email and request a password reset.</p>
-
-        {/* Email Input for Password Reset */}
         <div className="setting-item">
           <label htmlFor="email">Email Address:</label>
           <input
@@ -268,24 +270,19 @@ const handlePasswordReset = async (e) => {
             placeholder="Enter your email"
           />
         </div>
-
-        {/* Message Display */}
         {message && (
           <p className={message.includes("successfully") ? "success-message" : "error-message"}>{message}</p>
         )}
-
         <button onClick={handlePasswordReset} className="btn-save" disabled={loading}>
           {loading ? "Sending..." : "Send Password Reset Link"}
         </button>
       </div>
 
-      {/* Sharing and Access */}
       <div className="settings-box">
         <h2>Sharing and Access</h2>
         <p>Manage access to your profile and shared content.</p>
         <Link to="/user-account/data-sharing" className="btn-save">Manage Sharing Settings</Link>
       </div>
-      
     </div>
   );
 };

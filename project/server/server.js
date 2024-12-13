@@ -197,8 +197,6 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-
-// Route to generate TOTP secret and QR code
 // Route to generate TOTP secret and QR code
 app.post('/api/setup-totp', async (req, res) => {
     try {
