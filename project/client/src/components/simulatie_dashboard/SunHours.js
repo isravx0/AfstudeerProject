@@ -174,9 +174,7 @@ const SunshineHours = () => {
               <tbody>
                 {weatherData.time && weatherData.time.map((date, index) => {
                     const sunshineDurationSeconds = weatherData.sunshine_duration[index];
-                    const sunshineDurationFormatted = sunshineDurationSeconds > 0
-                    ? convertToHoursAndMinutes(sunshineDurationSeconds)
-                    : "No sunshine data";  // Handle zero or missing sunshine duration
+                    const sunshineDurationFormatted =convertToHoursAndMinutes(sunshineDurationSeconds)
                     const sunriseTime = weatherData.sunrise[index];
                     const sunsetTime = weatherData.sunset[index];
 
