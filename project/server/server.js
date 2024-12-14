@@ -427,6 +427,47 @@ app.post('/api/verify-mfa-email', (req, res) => {
     });
 });
 
+// Endpoint to switch between MFA Method
+app.post('/api/switch-mfa-method', async (req, res) => {
+    try {
+        const { email, currentMethod } = req.body;
+
+        if (!email || !currentMethod) {
+            return res.status(400).json({ message: 'Email and current MFA method are required' });
+        }
+
+        // Check if user exists
+        const user = await getUserByEmail(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Determine the new method
+        const newMfaMethod = currentMethod === "email" ? "totp" : "email";
+
+        // Update the MFA method in the database
+        db.query(
+            'UPDATE users SET mfa_method = ? WHERE email = ?',
+            [newMfaMethod, email],
+            (err) => {
+                if (err) {
+                    console.error('Database update error:', err);
+                    return res.status(500).json({ message: 'Error updating MFA method' });
+                }
+
+                res.status(200).json({
+                    message: `MFA method successfully switched to ${newMfaMethod}`,
+                });
+            }
+        );
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+
 // Attach db to all routes
 app.use((req, res, next) => {
     req.db = db;

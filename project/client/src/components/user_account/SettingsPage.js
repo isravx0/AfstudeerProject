@@ -57,7 +57,7 @@ const SettingsPage = () => {
 
     Swal.fire({
       title: 'Switch MFA Method',
-      text: `You are currently using ${mfaMethod === "email" ? "Email" : "QR Code (Authy)"} as your MFA method. Do you want to switch to the other method?`,
+      text: `You are currently using ${userData.mfa_method === "email" ? "Email" : "QR Code (Authy)"} as your MFA method. Do you want to switch to the other method?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, switch',
@@ -68,7 +68,7 @@ const SettingsPage = () => {
           // Call API to switch MFA method on the server
           const response = await axios.post('http://localhost:5000/api/switch-mfa-method', {
             email: userData.email,
-            currentMethod: mfaMethod,
+            currentMethod: userData.mfa_method,
           });
 
           Swal.fire({
