@@ -428,41 +428,53 @@ app.post('/api/verify-mfa-email', (req, res) => {
 });
 
 // Endpoint to switch between MFA Method
-app.post('/api/switch-mfa-method', async (req, res) => {
+app.post('/switch-mfa-method', async (req, res) => {
+    const { email, newMethod } = req.body;
+
+    // Check if the email is provided
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required.' });
+    }
+
     try {
-        const { email, currentMethod } = req.body;
+        // Find the user in the database
+        const user = await User.findOne({ email });
 
-        if (!email || !currentMethod) {
-            return res.status(400).json({ message: 'Email and current MFA method are required' });
-        }
-
-        // Check if user exists
-        const user = await getUserByEmail(email);
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: 'User not found.' });
         }
 
-        // Determine the new method
-        const newMfaMethod = currentMethod === "email" ? "totp" : "email";
+        // If the user is not already using MFA, enable it first
+        if (!user.mfa_enabled) {
+            return res.status(400).json({
+                message: 'Please enable MFA first before switching methods.'
+            });
+        }
 
-        // Update the MFA method in the database
-        db.query(
-            'UPDATE users SET mfa_method = ? WHERE email = ?',
-            [newMfaMethod, email],
-            (err) => {
-                if (err) {
-                    console.error('Database update error:', err);
-                    return res.status(500).json({ message: 'Error updating MFA method' });
-                }
+        // Handle switching MFA methods
+        if (newMethod === 'QR Code') {
+            user.mfa_method = 'QR Code';
+        } else if (newMethod === 'Email') {
+            user.mfa_method = 'Email';
+        } else {
+            return res.status(400).json({ message: 'Invalid MFA method.' });
+        }
 
-                res.status(200).json({
-                    message: `MFA method successfully switched to ${newMfaMethod}`,
-                });
-            }
-        );
+        // Save the updated user document
+        await user.save();
+
+        // Send a confirmation code for verification via the method specified (email)
+        // Call the existing '/api/send-mfa-code' route to send an MFA code
+        // You may need to adapt this depending on how your existing function is structured
+        await sendMfaCode(user.email);
+
+        res.status(200).json({
+            success: true,
+            message: `MFA method switched successfully to ${newMethod}. Please verify with the confirmation code sent to your email.`
+        });
     } catch (error) {
-        console.error('Server error:', error);
-        res.status(500).json({ message: 'Server error' });
+        console.error('Error switching MFA method:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 

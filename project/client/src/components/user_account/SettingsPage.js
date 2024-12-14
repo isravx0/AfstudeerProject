@@ -19,24 +19,24 @@ const SettingsPage = () => {
   // Use effect to get user settings from API or localStorage
   useEffect(() => {
     if (token) {
-        const authToken = localStorage.getItem("authToken");
-        axios
-            .get("/api/user-info", {
-                headers: { Authorization: `Bearer ${authToken}` },
-            })
-            .then((response) => {
-                setUserData(response.data.user);
-                setTwoFactorAuth(response.data.user.mfa_enabled); // Sync MFA status
-                setMfaMethod(response.data.user.mfa_method); // Sync MFA method (email or TOTP)
-            })
-            .catch((err) => {
-                console.error("Failed to load user data:", err);
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: "Failed to load user data. Please try again later.",
-                });
-            });
+      const authToken = localStorage.getItem("authToken");
+      axios
+        .get("/api/user-info", {
+          headers: { Authorization: `Bearer ${authToken}` },
+        })
+        .then((response) => {
+          setUserData(response.data.user);
+          setTwoFactorAuth(response.data.user.mfa_enabled);
+          setMfaMethod(response.data.user.mfa_method || "email"); // Default to "email"
+        })
+        .catch((err) => {
+          console.error("Failed to load user data:", err);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to load user data. Please try again later.",
+          });
+        });
     }
     const savedTwoFactor = localStorage.getItem("twoFactorAuth");
     if (savedTwoFactor !== null) {
@@ -45,19 +45,19 @@ const SettingsPage = () => {
   }, [token, setUserData]);
 
   // Function to handle MFA method switch
-  const handleMfaSwitch = () => {
+  const handleMfaSwitch = async () => {
     if (!twoFactorAuth) {
       Swal.fire({
         icon: 'warning',
-        title: 'Two-Factor Authentication is not enabled',
-        text: 'Please enable two-factor authentication first before switching the MFA method.',
+        title: 'Enable Two-Factor Authentication First',
+        text: 'Please enable MFA before switching the method.',
       });
       return;
     }
-
+  
     Swal.fire({
       title: 'Switch MFA Method',
-      text: `You are currently using ${userData.mfa_method === "email" ? "Email" : "QR Code (Authy)"} as your MFA method. Do you want to switch to the other method?`,
+      text: `You are currently using ${mfaMethod} MFA. Switch to the other method?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, switch',
@@ -65,38 +65,97 @@ const SettingsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // Call API to switch MFA method on the server
-          const response = await axios.post('http://localhost:5000/api/switch-mfa-method', {
+          // Step 1: Send confirmation code
+          const newMethod = mfaMethod === "email" ? "QR Code" : "Email"; // Toggle between methods
+  
+          const response = await axios.post('http://localhost:5000/api/send-confirmation-code', {
             email: userData.email,
-            currentMethod: userData.mfa_method,
+            mfaMethod: newMethod, // Send the new method
           });
-
-          Swal.fire({
-            icon: 'success',
-            title: 'MFA Method Switched',
-            text: `Your MFA method has been switched to ${mfaMethod === "email" ? "QR Code (Authy)" : "Email"}.`,
-            timer: 1500,
-            showConfirmButton: false,
-          });
-
-          // Redirect to the respective MFA setup page (QR Code or Email)
-          if (mfaMethod === "email") {
-            navigate('/mfa-setup-authy'); // Redirect to the Authy QR setup page
+  
+          if (response.data.success) {
+            // Step 2: Prompt for confirmation code
+            const { value: code } = await Swal.fire({
+              title: 'Enter Confirmation Code',
+              input: 'text',
+              inputLabel: 'Please enter the code sent to your email',
+              inputPlaceholder: 'Confirmation Code',
+              showCancelButton: true,
+              confirmButtonText: 'Confirm',
+            });
+  
+            if (code) {
+              // Step 3: Verify the code
+              const verifyResponse = await axios.post('http://localhost:5000/api/verify-confirmation-code', {
+                email: userData.email,
+                code,
+              });
+  
+              if (verifyResponse.data.success) {
+                // Step 4: Switch MFA method
+                const switchResponse = await axios.post('http://localhost:5000/api/switch-mfa-method', {
+                  email: userData.email,
+                  newMethod, // Toggle between methods
+                });
+  
+                if (switchResponse.data.success) {
+                  setMfaMethod(newMethod); // Update state with new method
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'MFA Method Switched',
+                    text: `Your MFA method has been switched to ${newMethod}.`,
+                  });
+  
+                  // Redirect based on new method
+                  if (newMethod === "email") {
+                    navigate('/mfa-verification-page', { state: { email: userData.email } });
+                  } else {
+                    navigate('/mfa-login-page', { state: { email: userData.email } });
+                  }
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to switch MFA method. Please try again.',
+                  });
+                }
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Invalid Code',
+                  text: 'The confirmation code is incorrect. Please try again.',
+                });
+              }
+            } else {
+              // Handle case where user cancels the code input
+              Swal.fire({
+                icon: 'info',
+                title: 'Action Cancelled',
+                text: 'You have cancelled the action.',
+              });
+            }
           } else {
-            navigate('/mfa-setup-email'); // Redirect to the Email MFA setup page
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to send confirmation code. Please try again.',
+            });
           }
-
         } catch (error) {
+          console.error("Error:", error.response?.data || error.message);
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Failed to switch MFA method. Please try again.',
+            text: 'Failed to initiate MFA switch. Please try again.',
           });
         }
       }
     });
   };
+  
+  
 
+  
   // Function to handle Two Factor Auth toggle
   const handleTwoFactorToggle = async () => {
     const newStatus = !twoFactorAuth;
@@ -137,6 +196,54 @@ const SettingsPage = () => {
       });
     }
   };
+
+  // Function to handle notifications toggle
+  const handleNotificationToggle = async () => {
+    try {
+      const newStatus = !notifications;
+      setNotifications(newStatus);
+      localStorage.setItem("notifications", JSON.stringify(newStatus));
+  
+      await axios.put('http://localhost:5000/update-notifications', {
+        notifications: newStatus
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Notifications Updated',
+        text: `Notifications have been turned ${newStatus ? "on" : "off"}.`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to update notification settings. Please try again.',
+      });
+    }
+  };
+
+  // Function to handle language toggle
+  const handleLanguageChange = (e) => {
+    const selectedLanguage = e.target.value;
+    setLanguage(selectedLanguage);
+  
+    Swal.fire({
+      icon: 'success',
+      title: 'Language Changed',
+      text: `Your preferred language has been changed to ${selectedLanguage}.`,
+      timer: 1500,
+      showConfirmButton: false
+    });
+  };
+
+
 
   // Function to handle password reset
   const handlePasswordReset = async (e) => {
@@ -196,7 +303,7 @@ const SettingsPage = () => {
       </div>
 
       {/* Notification Setting */}
-      {/* <div className="settings-box">
+      <div className="settings-box">
         <h2>Notifications</h2>
         <div className="setting-item">
           <label>Enable Notifications:</label>
@@ -209,10 +316,10 @@ const SettingsPage = () => {
             </button>
           </div>
         </div>
-      </div> */}
+      </div>
 
       {/* Language Settings */}
-      {/* <div className="settings-box">
+      <div className="settings-box">
         <h2>Languages</h2>
         <div className="setting-item">
           <label htmlFor="language">Preferred Language:</label>
@@ -226,7 +333,7 @@ const SettingsPage = () => {
             <option value="Dutch">Dutch</option>
           </select>
         </div>
-      </div> */}
+      </div>
 
       {/* Privacy Settings */}
       <div className="settings-box">
