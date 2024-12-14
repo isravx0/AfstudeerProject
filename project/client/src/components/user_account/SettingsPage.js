@@ -55,6 +55,7 @@ const SettingsPage = () => {
       return;
     }
   
+    // Vraag de gebruiker om een keuze te maken om de MFA-methode te wijzigen
     Swal.fire({
       title: 'Switch MFA Method',
       text: `You are currently using ${mfaMethod} MFA. Switch to the other method?`,
@@ -65,16 +66,17 @@ const SettingsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // Step 1: Send confirmation code
-          const newMethod = mfaMethod === "email" ? "QR Code" : "Email"; // Toggle between methods
+          // Kies de nieuwe methode (e-mail of QR-code)
+          const newMethod = mfaMethod === "email" ? "QR Code" : "Email"; // Toggle tussen methodes
   
+          // Stap 1: Stuur de bevestigingscode naar de nieuwe methode
           const response = await axios.post('http://localhost:5000/api/send-confirmation-code', {
             email: userData.email,
-            mfaMethod: newMethod, // Send the new method
+            mfaMethod: newMethod, // Stuur de nieuwe methode
           });
   
           if (response.data.success) {
-            // Step 2: Prompt for confirmation code
+            // Stap 2: Vraag de gebruiker om de bevestigingscode in te voeren
             const { value: code } = await Swal.fire({
               title: 'Enter Confirmation Code',
               input: 'text',
@@ -85,28 +87,28 @@ const SettingsPage = () => {
             });
   
             if (code) {
-              // Step 3: Verify the code
+              // Stap 3: Verifieer de code
               const verifyResponse = await axios.post('http://localhost:5000/api/verify-confirmation-code', {
                 email: userData.email,
                 code,
               });
   
               if (verifyResponse.data.success) {
-                // Step 4: Switch MFA method
+                // Stap 4: Wijzig de MFA-methode
                 const switchResponse = await axios.post('http://localhost:5000/api/switch-mfa-method', {
                   email: userData.email,
-                  newMethod, // Toggle between methods
+                  newMethod, // Stuur de nieuwe methode door
                 });
   
                 if (switchResponse.data.success) {
-                  setMfaMethod(newMethod); // Update state with new method
+                  setMfaMethod(newMethod); // Werk de staat bij met de nieuwe methode
                   Swal.fire({
                     icon: 'success',
                     title: 'MFA Method Switched',
                     text: `Your MFA method has been switched to ${newMethod}.`,
                   });
   
-                  // Redirect based on new method
+                  // Redirect op basis van de nieuwe methode
                   if (newMethod === "email") {
                     navigate('/mfa-verification-page', { state: { email: userData.email } });
                   } else {
@@ -152,10 +154,7 @@ const SettingsPage = () => {
       }
     });
   };
-  
-  
 
-  
   // Function to handle Two Factor Auth toggle
   const handleTwoFactorToggle = async () => {
     const newStatus = !twoFactorAuth;
