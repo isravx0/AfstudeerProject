@@ -58,7 +58,7 @@ const SettingsPage = () => {
     // Vraag de gebruiker om een keuze te maken om de MFA-methode te wijzigen
     Swal.fire({
       title: 'Switch MFA Method',
-      text: `You are currently using ${mfaMethod} MFA. Switch to the other method?`,
+      text: `You are currently using ${userData.mfa_method} MFA. Switch to the other method?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, switch',
@@ -66,13 +66,13 @@ const SettingsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // Kies de nieuwe methode (e-mail of QR-code)
-          const newMethod = mfaMethod === "email" ? "QR Code" : "Email"; // Toggle tussen methodes
+          const mfaMethod = userData.mfa_method
+          const newMethod = mfaMethod === "email" ? "totp" : "Email"; // Toggle tussen methodes
   
           // Stap 1: Stuur de bevestigingscode naar de nieuwe methode
-          const response = await axios.post('http://localhost:5000/api/send-confirmation-code', {
+          const response = await axios.post('http://localhost:5000/api/send-mfa-code', {
             email: userData.email,
-            mfaMethod: newMethod, // Stuur de nieuwe methode
+            mfaMethod: newMethod,
           });
   
           if (response.data.success) {
@@ -97,11 +97,11 @@ const SettingsPage = () => {
                 // Stap 4: Wijzig de MFA-methode
                 const switchResponse = await axios.post('http://localhost:5000/api/switch-mfa-method', {
                   email: userData.email,
-                  newMethod, // Stuur de nieuwe methode door
+                  newMethod,
                 });
   
                 if (switchResponse.data.success) {
-                  setMfaMethod(newMethod); // Werk de staat bij met de nieuwe methode
+                  setMfaMethod(newMethod);
                   Swal.fire({
                     icon: 'success',
                     title: 'MFA Method Switched',

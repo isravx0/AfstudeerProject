@@ -444,18 +444,20 @@ app.post('/switch-mfa-method', async (req, res) => {
             return res.status(404).json({ message: 'User not found.' });
         }
 
-        // If the user is not already using MFA, enable it first
+        // If MFA is not enabled, return an error
         if (!user.mfa_enabled) {
-            return res.status(400).json({
-                message: 'Please enable MFA first before switching methods.'
-            });
+            return res.status(400).json({ message: 'Please enable MFA first before switching methods.' });
         }
 
         // Handle switching MFA methods
-        if (newMethod === 'QR Code') {
-            user.mfa_method = 'QR Code';
+        if (newMethod === 'totp') {
+            // Generate a TOTP secret for the user
+            const totpSecret = generateTotpSecret();  // You would implement this function to generate a secret
+            user.mfa_method = 'totp';
+            user.totp_secret = totpSecret;  // Store the TOTP secret in the user document
         } else if (newMethod === 'Email') {
             user.mfa_method = 'Email';
+            user.totp_secret = null;  // Clear TOTP secret when switching back to email
         } else {
             return res.status(400).json({ message: 'Invalid MFA method.' });
         }
@@ -464,8 +466,6 @@ app.post('/switch-mfa-method', async (req, res) => {
         await user.save();
 
         // Send a confirmation code for verification via the method specified (email)
-        // Call the existing '/api/send-mfa-code' route to send an MFA code
-        // You may need to adapt this depending on how your existing function is structured
         await sendMfaCode(user.email);
 
         res.status(200).json({
@@ -477,6 +477,7 @@ app.post('/switch-mfa-method', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 
 
