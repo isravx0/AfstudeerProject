@@ -4,6 +4,9 @@ import { useAuth } from "../AuthContext"; // Context for user data and authentic
 import Swal from "sweetalert2";
 import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import axios from 'axios';
+import MFASettings from "./MFASettings";  // Import for MFA settings page
+import EmailMFA from "./EmailMFA";  // Import for Email MFA
+import MfaVerificationPage from "../login/MfaVerificationPage"; // Import for MFA Verification
 
 const SettingsPage = () => {
   const [email, setEmail] = useState("");
@@ -11,10 +14,13 @@ const SettingsPage = () => {
   const [loading, setLoading] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [language, setLanguage] = useState("English");
-  const [twoFactorAuth, setTwoFactorAuth] = useState(false);
-  const [mfaMethod, setMfaMethod] = useState(""); 
+  const [mfaEnabled, setMfaEnabled] = useState(false);  // Keep local state for MFA
+  const [mfaMethod, setMfaMethod] = useState("");
+  const [showMFASettings, setShowMFASettings] = useState(false);
+  const [showMFAVerificationPage, setShowMFAVerificationPage] = useState(false);
+  const [showMFAEmail, setShowMFAEmail] = useState(false);
   const { userData, setUserData, token } = useAuth();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   // Use effect to get user settings from API or localStorage
   useEffect(() => {
@@ -26,8 +32,6 @@ const SettingsPage = () => {
         })
         .then((response) => {
           setUserData(response.data.user);
-          setTwoFactorAuth(response.data.user.mfa_enabled);
-          setMfaMethod(response.data.user.mfa_method || "email"); // Default to "email"
         })
         .catch((err) => {
           console.error("Failed to load user data:", err);
@@ -38,172 +42,102 @@ const SettingsPage = () => {
           });
         });
     }
-    const savedTwoFactor = localStorage.getItem("twoFactorAuth");
-    if (savedTwoFactor !== null) {
-        setTwoFactorAuth(JSON.parse(savedTwoFactor));
+
+    const savedNotifications = localStorage.getItem("notifications");
+    if (savedNotifications !== null) {
+      setNotifications(JSON.parse(savedNotifications));
     }
+
+    const saveMFA = localStorage.getItem("mfaEnabled");
+    if (saveMFA !== null) {
+      setNotifications(JSON.parse(saveMFA));
+    }
+    fetchMFAStatus();
+
   }, [token, setUserData]);
 
-  // Function to handle MFA method switch
-  const handleMfaSwitch = async () => {
-    if (!twoFactorAuth) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Enable Two-Factor Authentication First',
-        text: 'Please enable MFA before switching the method.',
-      });
-      return;
+  useEffect(() => {
+    if (userData?.mfa_enabled !== undefined) {
+      setMfaEnabled(userData.mfa_enabled);
+      setMfaMethod(userData.mfa_method || "");
     }
-  
-    // Vraag de gebruiker om een keuze te maken om de MFA-methode te wijzigen
-    Swal.fire({
-      title: 'Switch MFA Method',
-      text: `You are currently using ${userData.mfa_method} MFA. Switch to the other method?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, switch',
-      cancelButtonText: 'Cancel',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const mfaMethod = userData.mfa_method
-          const newMethod = mfaMethod === "email" ? "totp" : "Email"; // Toggle tussen methodes
-  
-          // Stap 1: Stuur de bevestigingscode naar de nieuwe methode
-          const response = await axios.post('http://localhost:5000/api/send-mfa-code', {
-            email: userData.email,
-            mfaMethod: newMethod,
-          });
-  
-          if (response.data.success) {
-            // Stap 2: Vraag de gebruiker om de bevestigingscode in te voeren
-            const { value: code } = await Swal.fire({
-              title: 'Enter Confirmation Code',
-              input: 'text',
-              inputLabel: 'Please enter the code sent to your email',
-              inputPlaceholder: 'Confirmation Code',
-              showCancelButton: true,
-              confirmButtonText: 'Confirm',
-            });
-  
-            if (code) {
-              // Stap 3: Verifieer de code
-              const verifyResponse = await axios.post('http://localhost:5000/api/verify-confirmation-code', {
-                email: userData.email,
-                code,
-              });
-  
-              if (verifyResponse.data.success) {
-                // Stap 4: Wijzig de MFA-methode
-                const switchResponse = await axios.post('http://localhost:5000/api/switch-mfa-method', {
-                  email: userData.email,
-                  newMethod,
-                });
-  
-                if (switchResponse.data.success) {
-                  setMfaMethod(newMethod);
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'MFA Method Switched',
-                    text: `Your MFA method has been switched to ${newMethod}.`,
-                  });
-  
-                  // Redirect op basis van de nieuwe methode
-                  if (newMethod === "email") {
-                    navigate('/mfa-verification-page', { state: { email: userData.email } });
-                  } else {
-                    navigate('/mfa-login-page', { state: { email: userData.email } });
-                  }
-                } else {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to switch MFA method. Please try again.',
-                  });
-                }
-              } else {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Invalid Code',
-                  text: 'The confirmation code is incorrect. Please try again.',
-                });
-              }
-            } else {
-              // Handle case where user cancels the code input
-              Swal.fire({
-                icon: 'info',
-                title: 'Action Cancelled',
-                text: 'You have cancelled the action.',
-              });
-            }
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Failed to send confirmation code. Please try again.',
-            });
-          }
-        } catch (error) {
-          console.error("Error:", error.response?.data || error.message);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to initiate MFA switch. Please try again.',
-          });
-        }
-      }
-    });
-  };
+  }, [userData]);
 
-  // Function to handle Two Factor Auth toggle
-  const handleTwoFactorToggle = async () => {
-    const newStatus = !twoFactorAuth;
-    setTwoFactorAuth(newStatus);
-    localStorage.setItem("twoFactorAuth", JSON.stringify(newStatus));
-
-    if (userData && userData.loggedIn) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Action Required',
-        text: 'Log out first to enable two-factor authentication.',
-        showConfirmButton: true,
-      });
-      return;
-    }
+  // Fetch MFA status from backend
+  const fetchMFAStatus = () => {
+    if (token && userData?.email) {
+      axios
+        .get("http://localhost:5000/api/check-mfa-enabled", {
+          params: { email: userData.email },
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          console.log('MFA Status Response:', response.data);
   
-    const action = twoFactorAuth ? "disable" : "enable";
-    try {
-      const response = await axios.post('http://localhost:5000/api/toggle-mfa', {
-        email: userData.email,
-        action: action
-      });
-  
-      setTwoFactorAuth(!twoFactorAuth);
-  
-      Swal.fire({
-        icon: 'success',
-        title: response.data.message,
-        text: `Two-factor authentication has been ${action === "enable" ? "enabled" : "disabled"}.`,
-        timer: 1500,
-        showConfirmButton: false
-      });
-    } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Failed to toggle two-factor authentication. Please try again.',
-      });
+          // Ensure the response data has the correct structure
+          setMfaEnabled(response.data.mfaStatus.enabled);
+          setMfaMethod(response.data.mfaStatus.method);
+        })
+        .catch(() =>
+          Swal.fire("Error", "Failed to retrieve MFA status.", "error")
+        );
     }
   };
 
-  // Function to handle notifications toggle
+// Handle MFA method selection
+const handleSelectMfaMethod = () => {
+  Swal.fire({
+    title: "Enable MFA",
+    text: "Choose an MFA method:",
+    icon: "info",
+    showCancelButton: true,
+    showDenyButton: true,
+    confirmButtonText: "Authy (QR Code)",
+    denyButtonText: "Email",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      setShowMFASettings(true);
+    } else if (result.isDenied) {
+      setShowMFAEmail(true);
+    } else if (result.isDismissed) {
+      console.log('MFA setup was canceled');
+    }
+  });
+};
+
+// Switch between MFA methods if enabled
+const handleSwitchMfaMethod = () => {
+  Swal.fire({
+    title: "Switch MFA Method",
+    text: "Choose a new MFA method to switch to:",
+    icon: "info",
+    showCancelButton: true,
+    showDenyButton: true,
+    confirmButtonText: "Authy (QR Code)",
+    denyButtonText: "Email",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      setShowMFASettings(true);
+    } else if (result.isDenied) {
+      setShowMFAEmail(true);
+    } else if (result.isDismissed) {
+      console.log('MFA method switch was canceled');
+      setShowMFAEmail(false);
+      setShowMFASettings(false);
+    }
+  });
+};
+
+  // Handle Notification Toggle
   const handleNotificationToggle = async () => {
     try {
       const newStatus = !notifications;
       setNotifications(newStatus);
       localStorage.setItem("notifications", JSON.stringify(newStatus));
-  
-      await axios.put('http://localhost:5000/update-notifications', {
+
+      const response = await axios.put('http://localhost:5000/update-notifications', {
         notifications: newStatus
       }, {
         headers: {
@@ -211,14 +145,16 @@ const SettingsPage = () => {
           "Content-Type": "application/json",
         },
       });
-  
-      Swal.fire({
-        icon: 'success',
-        title: 'Notifications Updated',
-        text: `Notifications have been turned ${newStatus ? "on" : "off"}.`,
-        timer: 1500,
-        showConfirmButton: false,
-      });
+
+      if (response.status === 200) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Notifications Updated',
+          text: `Notifications have been turned ${newStatus ? "on" : "off"}.`,
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -228,11 +164,11 @@ const SettingsPage = () => {
     }
   };
 
-  // Function to handle language toggle
+  // Handle Language Change
   const handleLanguageChange = (e) => {
     const selectedLanguage = e.target.value;
     setLanguage(selectedLanguage);
-  
+
     Swal.fire({
       icon: 'success',
       title: 'Language Changed',
@@ -242,16 +178,17 @@ const SettingsPage = () => {
     });
   };
 
-
-
-  // Function to handle password reset
+  // Handle Password Reset
   const handlePasswordReset = async (e) => {
     e.preventDefault();
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setMessage("Invalid email format. Please enter a valid email.");
+      document.getElementById("email").style.borderColor = "red";
       return;
+    } else {
+      document.getElementById("email").style.borderColor = "initial";
     }
 
     const confirmResult = await Swal.fire({
@@ -264,7 +201,7 @@ const SettingsPage = () => {
     });
 
     if (!confirmResult.isConfirmed) {
-      return; // Cancel if the user clicks "Cancel"
+      return;
     }
 
     setLoading(true);
@@ -280,8 +217,8 @@ const SettingsPage = () => {
         showConfirmButton: false,
       });
     } catch (error) {
-      const errorMsg = error.response?.status === 404 
-        ? 'Email not registered.' 
+      const errorMsg = error.response?.status === 404
+        ? 'Email not registered.'
         : 'An error occurred. Please try again.';
 
       Swal.fire({
@@ -292,6 +229,60 @@ const SettingsPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleToggleMFA = async () => {
+    if (mfaEnabled) {
+      // Disable MFA by calling the backend API
+      try {
+        const response = await axios.post("http://localhost:5000/api/disable-mfa", { email: userData.email }, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        if (response.status === 200) {
+          setMfaEnabled(false);
+          setMfaMethod("");
+          Swal.fire("Disabled", "MFA has been disabled.", "success");
+        }
+      } catch (error) {
+        Swal.fire("Error", "Failed to disable MFA. Please try again.", "error");
+      }
+    } else {
+      // Enable MFA by calling the method selection handler
+      handleSelectMfaMethod();
+    }
+  };
+
+  const handleMFAConfirmed = () => {
+    if (userData?.mfa_enabled) {
+      setShowMFAVerificationPage(false);
+      axios
+        .post("http://localhost:5000/api/disable-mfa", { email: userData.email }, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then(() => {
+          setMfaEnabled(false);
+          setMfaMethod("");
+          Swal.fire("Disabled", "MFA has been disabled.", "success");
+        })
+        .catch(() => Swal.fire("Error", "Failed to disable MFA.", "error"));
+    }
+  };
+
+  // Save MFA settings to the backend after the user selects a method
+  const handleSaveMFASettings = (method) => {
+    axios
+      .post("http://localhost:5000/api/enable-mfa", { email: userData.email, method }, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setMfaEnabled(true);
+        setMfaMethod(method);
+        Swal.fire("Success", `MFA with ${method} has been enabled.`, "success");
+      })
+      .catch((error) => {
+        Swal.fire("Error", "Failed to enable MFA. Please try again.", "error");
+      });
   };
 
   return (
@@ -334,31 +325,27 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* Privacy Settings */}
+      {/* MFA Settings */}
       <div className="settings-box">
-        <h2>Privacy</h2>
-        <div className="setting-item">
-          <label>Two-Factor Authentication:</label>
-          <button
-            className={`toggle-btn ${twoFactorAuth ? "on" : "off"}`}
-            onClick={handleTwoFactorToggle}
-          >
-            {twoFactorAuth ? "Enabled" : "Disabled"}
-          </button>
-        </div>
-        {twoFactorAuth && (
-          <div className="setting-item">
-            <label>MFA Method: {userData?.mfa_method || "Not Set"}</label>
-          </div>
-        )}
+        <h2>Two-Factor Authentication</h2>
+        <button onClick={handleToggleMFA} className="btn-save">
+          {mfaEnabled ? "Disable MFA" : "Enable MFA"}
+        </button>
 
-        {twoFactorAuth && (
-          <div className="setting-item">
-            <button onClick={handleMfaSwitch} className="btn-save">
+        {/* If MFA is enabled, show mfa method */}
+        {mfaEnabled && (
+          <div>
+            <p>Method: {mfaMethod}</p>
+            <button onClick={handleSwitchMfaMethod} className="btn-switch-mfa">
               Switch MFA Method
             </button>
           </div>
         )}
+
+        {/* Conditional rendering for MFA settings */}
+        {showMFASettings && <MFASettings email={userData.email} />}
+        {showMFAEmail && <EmailMFA email={userData.email} />}
+        {showMFAVerificationPage && <MfaVerificationPage email={userData.email} onMFAConfirmed={handleMFAConfirmed} />}
       </div>
 
       {/* Change Password Section */}
@@ -384,6 +371,7 @@ const SettingsPage = () => {
         </button>
       </div>
 
+      {/* Sharing and Access */}
       <div className="settings-box">
         <h2>Sharing and Access</h2>
         <p>Manage access to your profile and shared content.</p>

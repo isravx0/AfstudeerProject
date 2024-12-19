@@ -30,6 +30,7 @@ import SunHours from './components/simulatie_dashboard/SunHours';
 import SimulatieDashboard from './components/simulatie_dashboard/SimulatieDashboard';
 import PrivateRoute from './components/PrivateRoute'; 
 import { AuthProvider } from './components/AuthContext';
+
 import './App.css';
 
 function App() {
@@ -59,7 +60,6 @@ function App() {
             <Route path="/simulatie_dashboard" element={<SimulatieDashboard />} />
             <Route path="/about_us" element={<AboutUs />} />
             <Route path="/about_us1" element={<AboutUsPage />} />
-
             {/* User Account Section (Nested Routes) */}
             <Route 
               path="/user-account/*" 
