@@ -51,8 +51,8 @@ function App() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/information" element={<InformationPage />} />
             <Route path="/feedback" element={<FeedbackForm />} />
-            <Route path="/battery_dashboard" element={<BatteryDashboard />} />
-            <Route path="/solar_dashboard" element={<SolarDashboard />} />
+            <Route path="/BatteryDashboard" element={<BatteryDashboard />} />
+            <Route path="/SolarDashboard" element={<SolarDashboard />} />
             <Route path="/simulatie" element={<SimulatieForm userId={1} />} />
             <Route path="/simulatie-results/:userId" element={<SimulatieResults />} />
             <Route path="/energy-prices" element={<EnergyPrices />} />

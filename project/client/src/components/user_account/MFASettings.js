@@ -8,8 +8,16 @@ const MFASettings = ({ email, onMFAVerified }) => {
   const [qrCode, setQrCode] = useState("");  
   const [totpToken, setTotpToken] = useState("");  
   const [error, setError] = useState("");  
+  const [isMFAEnabled, setIsMFAEnabled] = useState(false); 
 
   useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/check-mfa-enabled", { params: { email } })
+      .then((response) => {
+        // Handle the response
+      })
+      .catch(() => setError("Error while checking MFA status"));
+
     axios
       .post("http://localhost:5000/api/setup-totp", { email })
       .then((response) => {
@@ -17,9 +25,10 @@ const MFASettings = ({ email, onMFAVerified }) => {
         setQrCode(response.data.qrCodeUrl); 
       })
       .catch(() => setError("Error while fetching MFA setup"));
-  }, [email]);
+            
+      },[email]);
 
-  const handleSubmit = async (otpValue, event) => {
+  const handleSubmit = async (otpValue, event, email) => {
     event.preventDefault(); 
 
     const data = {
@@ -40,8 +49,7 @@ const MFASettings = ({ email, onMFAVerified }) => {
         icon: "success",
         confirmButtonText: "Proceed",
       }).then(() => {
-        // Trigger the parent callback and refresh the page
-        window.location.reload();  // This will reload the page
+        window.location.reload();  // Refresh the page to reflect MFA status
       });
     } else {
       Swal.fire({
@@ -64,23 +72,29 @@ const MFASettings = ({ email, onMFAVerified }) => {
                 Scan this QR code with your authenticator app
               </h3>
               <div>
-                <QRCodeSVG value={qrCode} />
+              <QRCodeSVG value={qrCode} />
               </div>
               <div>
-                <input
-                  type="text"
-                  className="login-input"
-                  value={totpToken}
-                  onChange={(e) => setTotpToken(e.target.value)}
-                  placeholder="Enter TOTP"
-                />
-                <button
-                  className="login"
-                  onClick={(e) => handleSubmit(totpToken, e)}
-                >
-                  Verify
-                </button>
+              <input
+                type="text"
+                className="login-input"
+                value={totpToken}
+                onChange={(e) => setTotpToken(e.target.value)}
+                placeholder="Enter TOTP"
+              />
+              <button
+                className="login"
+                onClick={(e) => handleSubmit(totpToken, e,email)}
+              >
+                Verify
+              </button>
               </div>
+              <div/>
+            </div>
+          )}
+          {isMFAEnabled && (
+            <div className="login-mfa-enabled">
+              <h3>MFA is already enabled on your account.</h3>
             </div>
           )}
           {error && <div className="error">{error}</div>}

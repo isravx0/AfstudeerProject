@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useAuth } from "../AuthContext";
@@ -9,7 +9,27 @@ const EmailMFA = ({ email, onMFAVerified }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { setMfaVerified } = useAuth();
+  
+  // useEffect to fetch and set MFA method and verify MFA status
+  useEffect(() => {
+    // Fetch MFA setup for the given email
+    axios
+      .post("http://localhost:5000/api/setup-mfa", { email })
+      .then((response) => {
+        // Optionally handle success logic here
+      })
+      .catch(() => setError("Error while fetching MFA setup"));
 
+    // Fetch MFA enabled status for the user
+    axios
+      .get("http://localhost:5000/api/check-mfa-enabled", { params: { email } })
+      .then((response) => {
+        // Handle MFA enabled response logic here if needed
+      })
+      .catch(() => setError("Error while checking MFA status"));
+  }, [email]);
+
+  // Function to verify the MFA code
   const handleVerify = async () => {
     if (!/^\d+$/.test(code)) {
       Swal.fire({
@@ -23,24 +43,26 @@ const EmailMFA = ({ email, onMFAVerified }) => {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/verify-mfa-email", { email, code });
+      // Send the MFA code and email to the backend for verification
+      const response = await axios.post("http://localhost:5000/api/verify-mfa-email", { email, code });
 
-      // Success message
-      Swal.fire({
-        title: "Success!",
-        text: "Verification successful. The page will refresh.",
-        icon: "success",
-        confirmButtonText: "OK",
-      }).then(() => {
-        setMfaVerified(true);
-        
-        // Refresh the page instead of redirecting
-        window.location.reload();  // Refreshes the current page to reflect MFA status
-      });
+      if (response.status === 200) {
+        // If verification is successful
+        Swal.fire({
+          title: "Success!",
+          text: "Verification successful. The page will refresh.",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => {
+          setMfaVerified(true); // Mark MFA as verified
+          window.location.reload();  // Refresh the page to reflect MFA status
+        });
+      }
     } catch (err) {
+      // Error handling for failed verification
       Swal.fire({
         title: "Error",
-        text: "Invalid or expired code. Please try again.",
+        text: err.response?.data?.message || "Invalid or expired code. Please try again.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -50,6 +72,7 @@ const EmailMFA = ({ email, onMFAVerified }) => {
     }
   };
 
+  // Function to resend the MFA code
   const handleResendCode = async () => {
     setLoading(true);
     try {
@@ -63,7 +86,7 @@ const EmailMFA = ({ email, onMFAVerified }) => {
     } catch (err) {
       Swal.fire({
         title: "Error",
-        text: "Error when resending the code.",
+        text: err.response?.data?.message || "Error when resending the code.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -89,7 +112,11 @@ const EmailMFA = ({ email, onMFAVerified }) => {
           className="login-input"
         />
         <div className="login-form">
-          <button onClick={handleVerify} disabled={loading} className="login">
+          <button 
+            onClick={handleVerify} 
+            disabled={loading || !code}  // Disable if no code or loading
+            className="login"
+          >
             {loading ? "Verifying..." : "Verify"}
           </button>
           <button
@@ -97,9 +124,10 @@ const EmailMFA = ({ email, onMFAVerified }) => {
             disabled={loading}
             className="cancel-button"
           >
-            {loading ? "Sending..." : "Click to resend code."}
+            {loading ? "Sending..." : "Click to resend code"}
           </button>
         </div>
+        {error && <div className="error-message">{error}</div>}  {/* Display error if any */}
       </div>
     </div>
   );

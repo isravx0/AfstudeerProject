@@ -312,15 +312,34 @@ const getExternalTime = async () => {
   
   
 // Route to enable MFA for the user (including TOTP or email options)
-app.post('/api/enable-mfa', (req, res) => {
-    const { email, mfaChoice } = req.body;
+app.post('/api/enable-mfa', async (req, res) => {
+    try {
+        const { email, method } = req.body;  // 'method' is the MFA method (e.g., Authy or Email)
+        if (!email || !method) {
+            return res.status(400).json({ message: 'Email and method are required' });
+        }
 
-    if (mfaChoice === 'totp') {
-        res.status(200).send({ message: 'TOTP MFA enabled successfully' });
-    } else if (mfaChoice === 'email') {
-        res.status(200).send({ message: 'Email MFA enabled successfully' });
-    } else {
-        res.status(400).send({ error: 'Invalid MFA choice' });
+        // Check if the user exists
+        const user = await getUserByEmail(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update the database to enable MFA and store the selected method
+        db.query(
+            'UPDATE users SET mfa_enabled = ?, mfa_method = ? WHERE email = ?',
+            [true, method, email],
+            (err) => {
+                if (err) {
+                    console.error('Error enabling MFA:', err);
+                    return res.status(500).json({ message: 'Server error enabling MFA' });
+                }
+                res.status(200).json({ message: 'MFA enabled successfully' });
+            }
+        );
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -438,7 +457,6 @@ app.post('/api/verify-mfa-email', (req, res) => {
     });
 });
 
-
 //-----------------------
 // Route to toggle MFA (enable/disable) for the user
 app.post('/api/disable-mfa', async (req, res) => {
@@ -473,60 +491,25 @@ app.post('/api/disable-mfa', async (req, res) => {
     }
 });
 
-app.post('/api/enable-mfa', async (req, res) => {
-    try {
-        const { email, method } = req.body;  // 'method' is the MFA method (e.g., Authy or Email)
-        if (!email || !method) {
-            return res.status(400).json({ message: 'Email and method are required' });
-        }
-
-        // Check if the user exists
-        const user = await getUserByEmail(email);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Update the database to enable MFA and store the selected method
-        db.query(
-            'UPDATE users SET mfa_enabled = ?, mfa_method = ? WHERE email = ?',
-            [true, method, email],
-            (err) => {
-                if (err) {
-                    console.error('Error enabling MFA:', err);
-                    return res.status(500).json({ message: 'Server error enabling MFA' });
-                }
-                res.status(200).json({ message: 'MFA enabled successfully' });
-            }
-        );
-    } catch (error) {
-        console.error('Server error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+// Express.js voorbeeld
+app.put('/api/update-mfa-method', (req, res) => {
+    const { email, mfaMethod } = req.body;
+    
+    // Controleer of het e-mailadres en de MFA-methode geldig zijn
+    if (!email || !mfaMethod) {
+      return res.status(400).send('Email en MFA-methode zijn verplicht');
     }
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
+    // Werk de MFA-methode bij in de database
+    User.update({ email: email }, { mfa_method: mfaMethod })
+      .then(() => {
+        res.status(200).send({ message: 'MFA-methode bijgewerkt' });
+      })
+      .catch((err) => {
+        res.status(500).send({ error: 'Er is een fout opgetreden bij het bijwerken van de MFA-methode' });
+      });
+  });
+  
 // Attach db to all routes
 app.use((req, res, next) => {
     req.db = db;
