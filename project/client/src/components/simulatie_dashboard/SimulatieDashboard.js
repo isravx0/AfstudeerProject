@@ -68,15 +68,20 @@ const SimulatieDashboard = () => {
     <div className="dashboard-container">
       <h1>Simulatie Dashboard</h1>
 
-      {/* Energy Prices and Sunshine Hours */}
+      {/* Energy Prices */}
       <div className="energy-section">
         <div className="energy-prices">
           <EnergyPrices />
         </div>
+      </div>
+
+      {/* Sunshine Hours */}
+      <div className="energy-section">
         <div className="sunshine-hours">
           <SunshineHours />
         </div>
       </div>
+      
 
       {/* Simulatie Form and Results */}
       <div className="forms-and-results">
