@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useMemo } from 'react';
 import SunshineHours from './SunHours';
 import EnergyPrices from './EnergyPrices';
 import './style/SimulatieDashboard.css';
@@ -9,83 +8,82 @@ const SimulatieDashboard = () => {
   const [solarPanelOutput, setSolarPanelOutput] = useState(0);
   const [batteryChargeTime, setBatteryChargeTime] = useState(0);
 
-  // User input states for calculations
   const [formData, setFormData] = useState({
     residents: 1,
     houseSize: 50,
     insulationLevel: 'low',
-    appliancesUsage: 5, // average appliance usage in kWh per day
+    appliancesUsage: 5, // kWh per day
     daysAtHome: 30,
     panels: 10,
-    panelArea: 20,
+    panelArea: 20, // m²
     panelPower: 200, // watts per m²
     location: 'city',
-    batteryCapacity: 10,
+    batteryCapacity: 10, // kWh
     chargeRate: 5, // kW
-    batteryEfficiency: 90,
+    batteryEfficiency: 90, // percentage
   });
 
-  // Handle form changes
+  // Handle form changes with validation
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const parsedValue = Math.max(0, Number(value)); // Ensure no negative values
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: parsedValue,
     }));
   };
 
-  // Calculate Energy Usage
+  // Energy Usage Calculation
   const calculateEnergyUsage = () => {
     const { residents, appliancesUsage, daysAtHome } = formData;
     const energyUsage = residents * appliancesUsage * daysAtHome;
     setEnergyUsage(energyUsage);
   };
 
-  // Calculate Solar Panel Output
+  // Solar Panel Output Calculation
   const calculateSolarPanelOutput = () => {
     const { panelArea, panelPower, location } = formData;
-    const sunHours = location === 'city' ? 4 : 5; // Example sun hours
-    const output = (panelArea * panelPower * sunHours) / 1000; // kWh
+    const sunHours = location === 'city' ? 4 : 5; // Example: 4 hours in cities, 5 in rural
+    const output = (panelArea * panelPower * sunHours) / 1000; // Convert to kWh
     setSolarPanelOutput(output);
   };
 
-  // Calculate Battery Charge Time
+  // Battery Charge Time Calculation
   const calculateBatteryChargeTime = () => {
     const { batteryCapacity, chargeRate, batteryEfficiency } = formData;
     const chargeTime = (batteryCapacity / chargeRate) * (100 / batteryEfficiency);
     setBatteryChargeTime(chargeTime);
   };
 
-  useEffect(() => {
-    // Call calculation functions when the form data changes
-    calculateEnergyUsage();
-    calculateSolarPanelOutput();
-    calculateBatteryChargeTime();
+  // Memoized Calculations for Performance
+  const calculations = useMemo(() => {
+    return {
+      energyUsage: calculateEnergyUsage(),
+      solarPanelOutput: calculateSolarPanelOutput(),
+      batteryChargeTime: calculateBatteryChargeTime(),
+    };
   }, [formData]);
 
   return (
     <div className="dashboard-container">
-      <h1>Dashboard</h1>
+      <h1>Simulatie Dashboard</h1>
 
-      {/* Energy Prices and Sunshine Hours Section */}
+      {/* Energy Prices and Sunshine Hours */}
       <div className="energy-section">
         <div className="energy-prices">
           <EnergyPrices />
         </div>
-      </div>
-
-      <div className="energy-section">
         <div className="sunshine-hours">
-            <SunshineHours />
+          <SunshineHours />
         </div>
       </div>
-      
-      {/* Simulatie Form and Results Section */}
+
+      {/* Simulatie Form and Results */}
       <div className="forms-and-results">
         <div className="forms-container">
-          {/* Household Energy Usage Form */}
+          {/* Household Energy Usage */}
           <div className="section">
-            <h2>Calculate Household Energy Usage</h2>
+            <h2>Bereken Energieverbruik</h2>
             <form>
               <label>Aantal bewoners</label>
               <input
@@ -93,7 +91,6 @@ const SimulatieDashboard = () => {
                 name="residents"
                 value={formData.residents}
                 onChange={handleChange}
-                required
               />
               <label>Grootte woning (m²)</label>
               <input
@@ -101,56 +98,48 @@ const SimulatieDashboard = () => {
                 name="houseSize"
                 value={formData.houseSize}
                 onChange={handleChange}
-                required
               />
               <label>Isolatieniveau</label>
               <select
                 name="insulationLevel"
                 value={formData.insulationLevel}
                 onChange={handleChange}
-                required
               >
                 <option value="low">Laag</option>
                 <option value="medium">Middel</option>
                 <option value="high">Hoog</option>
               </select>
-              <label>Veelgebruikte apparaten (kWh/dag)</label>
+              <label>Apparaatverbruik (kWh/dag)</label>
               <input
                 type="number"
                 name="appliancesUsage"
                 value={formData.appliancesUsage}
                 onChange={handleChange}
-                required
               />
-              <label>Tijd thuis per dag (dagen)</label>
+              <label>Aantal dagen thuis</label>
               <input
                 type="number"
                 name="daysAtHome"
                 value={formData.daysAtHome}
                 onChange={handleChange}
-                required
               />
             </form>
+            <button onClick={calculateEnergyUsage}>Bereken Energieverbruik</button>
             <div className="result-block">
-              <h3>Calculated Energy Usage: {energyUsage} kWh</h3>
-              <p>
-                This calculation estimates your household's total energy consumption based on the number of
-                residents, daily appliance usage, and the number of days spent at home.
-              </p>
+              <h3>Totaal Energieverbruik: {energyUsage} kWh</h3>
             </div>
           </div>
 
-          {/* Solar Panel Configuration Form */}
+          {/* Solar Panel Output */}
           <div className="section">
-            <h2>Calculate Solar Panel Output</h2>
+            <h2>Bereken Zonnepanelen Output</h2>
             <form>
-              <label>Aantal zonnepanelen</label>
+              <label>Aantal panelen</label>
               <input
                 type="number"
                 name="panels"
                 value={formData.panels}
                 onChange={handleChange}
-                required
               />
               <label>Oppervlakte (m²)</label>
               <input
@@ -158,7 +147,6 @@ const SimulatieDashboard = () => {
                 name="panelArea"
                 value={formData.panelArea}
                 onChange={handleChange}
-                required
               />
               <label>Vermogen per m² (W)</label>
               <input
@@ -166,31 +154,26 @@ const SimulatieDashboard = () => {
                 name="panelPower"
                 value={formData.panelPower}
                 onChange={handleChange}
-                required
               />
               <label>Locatie</label>
               <select
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                required
               >
-                <option value="city">City</option>
-                <option value="rural">Rural</option>
+                <option value="city">Stad</option>
+                <option value="rural">Landelijk</option>
               </select>
             </form>
+            <button onClick={calculateSolarPanelOutput}>Bereken Panelen Output</button>
             <div className="result-block">
-              <h3>Calculated Solar Panel Output: {solarPanelOutput} kWh</h3>
-              <p>
-                This calculation estimates how much energy your solar panels will generate based on the
-                panel area, panel efficiency, and location.
-              </p>
+              <h3>Zonnepanelen Output: {solarPanelOutput} kWh</h3>
             </div>
           </div>
 
-          {/* Battery Configuration Form */}
+          {/* Battery Charging */}
           <div className="section">
-            <h2>Calculate Battery Charging Time</h2>
+            <h2>Bereken Batterij Laadtijd</h2>
             <form>
               <label>Batterijcapaciteit (kWh)</label>
               <input
@@ -198,7 +181,6 @@ const SimulatieDashboard = () => {
                 name="batteryCapacity"
                 value={formData.batteryCapacity}
                 onChange={handleChange}
-                required
               />
               <label>Oplaadsnelheid (kW)</label>
               <input
@@ -206,22 +188,18 @@ const SimulatieDashboard = () => {
                 name="chargeRate"
                 value={formData.chargeRate}
                 onChange={handleChange}
-                required
               />
-              <label>Efficiëntie van de batterij (%)</label>
+              <label>Efficiëntie (%)</label>
               <input
                 type="number"
                 name="batteryEfficiency"
                 value={formData.batteryEfficiency}
                 onChange={handleChange}
-                required
               />
             </form>
+            <button onClick={calculateBatteryChargeTime}>Bereken Laadtijd</button>
             <div className="result-block">
-              <h3>Calculated Battery Charge Time: {batteryChargeTime} hours</h3>
-              <p>
-                This calculation estimates how long it will take to fully charge your battery.
-              </p>
+              <h3>Batterij Laadtijd: {batteryChargeTime} uur</h3>
             </div>
           </div>
         </div>
