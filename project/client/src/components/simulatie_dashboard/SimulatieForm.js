@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../AuthContext";
 import "./style/Simulatie.css";
 
 const SimulatieForm = () => {
   const navigate = useNavigate();
-  const userId = 1; // Gebruik de juiste userId logica indien nodig
+  const { userData } = useAuth(); // Get user data from AuthContext
+  const userId = userData?.id; // Replace with the actual key for user ID in your API response
 
   const [formData, setFormData] = useState({
     energy_usage: "",
@@ -33,6 +35,11 @@ const SimulatieForm = () => {
     e.preventDefault();
     setLoading(true);
 
+    if (!userId) {
+      console.error("User ID is not available.");
+      return;
+    }
+
     try {
       await axios.post(
         "http://localhost:5000/api/simulatie",
@@ -44,9 +51,9 @@ const SimulatieForm = () => {
           },
         }
       );
-      navigate(`/simulatie-results/${userId}`); // Doorsturen naar de resultatenpagina
+      navigate(`/simulatie-results/${userId}`); // Redirect to results page
     } catch (error) {
-      console.error("Fout bij het opslaan van de simulatie:", error);
+      console.error("Error saving simulation:", error);
     } finally {
       setLoading(false);
     }

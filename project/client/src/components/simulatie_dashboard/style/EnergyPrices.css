@@ -4,16 +4,16 @@
   margin: 0 auto;
 }
 
-h1, h2 {
+.energy-prices-container h1, h2 {
   text-align: center;
 }
 
-.time-period-selector {
+.energy-prices-container .time-period-selector {
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
 }
-.time-period-selector button {
+.energy-prices-container .time-period-selector button {
   padding: 10px 20px;
   font-size: 16px;
   margin: 0 10px;
@@ -24,11 +24,11 @@ h1, h2 {
   transition: background-color 0.3s ease;
 }
 
-.time-period-selector button.active {
+.energy-prices-container .time-period-selector button.active {
   background-color: #007bff;
   color: white;
 }
 
-.chart-container {
+.energy-prices-container .chart-container {
   margin-top: 30px;
 }

@@ -896,7 +896,6 @@ app.get('/api/user-profile', verifyToken, (req, res) => {
       });
 });
 
-
 // Update user profile
 app.put('/update-profile', verifyToken, (req, res) => {
     const userId = req.userId; // Assumed you get the userId from token verification middleware
@@ -965,7 +964,6 @@ app.put('/update-profile', verifyToken, (req, res) => {
         }
     );
 });
-
 
 // Endpoint to check if email exists
 app.post('/check-email', verifyToken, (req, res) => {
@@ -1148,7 +1146,6 @@ app.put('/update-notifications', verifyToken, (req, res) => {
     );
 });
 
-
 // Deleting user account API endpoint
 app.delete('/api/delete-account', verifyToken, (req, res) => {
     const userId = req.userId;  // Extract user ID from the JWT token
@@ -1237,8 +1234,9 @@ app.post("/api/simulatie", verifyToken, (req, res) => {
       }
     );
   });
-  //Get simulation data from database
-  app.get("/api/simulatie/:userId", verifyToken, (req, res) => {
+
+//Get simulation data from database
+app.get("/api/simulatie/:userId", verifyToken, (req, res) => {
     const { userId } = req.params;
   
     db.query(
@@ -1253,8 +1251,6 @@ app.post("/api/simulatie", verifyToken, (req, res) => {
       }
     );
   });
-  
-
 
 // Route to fetch today's prices
 app.get('/api/today-prices', async (req, res) => {
@@ -1266,7 +1262,6 @@ app.get('/api/today-prices', async (req, res) => {
   }
 });
 
-
 // Route to fetch monthly prices
 app.get('/api/monthly-prices', async (req, res) => {
   try {
@@ -1276,6 +1271,8 @@ app.get('/api/monthly-prices', async (req, res) => {
     res.status(500).json({ error: 'Error fetching data' });
   }
 });
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

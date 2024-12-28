@@ -65,7 +65,7 @@ const SimulatieDashboard = () => {
   }, [formData]);
 
   return (
-    <div className="dashboard-container">
+    <div className="simulatie-dashboard dashboard-container">
       <h1>Simulatie Dashboard</h1>
 
       {/* Energy Prices */}

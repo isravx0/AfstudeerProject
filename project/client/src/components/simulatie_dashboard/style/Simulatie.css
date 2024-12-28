@@ -12,17 +12,17 @@
     margin-bottom: 20px;
   }
   
-  .form-group {
+  .simulatie-form-container .form-group {
     margin-bottom: 15px;
   }
   
-  .form-group label {
+  .simulatie-form-container .form-group label {
     display: block;
     font-weight: bold;
   }
   
-  .form-group input,
-  .form-group select {
+  .simulatie-form-container .form-group input,
+  .simulatie-form-container .form-group select {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
@@ -45,7 +45,7 @@
     cursor: not-allowed;
   }
   
-  .success-message {
+  .simulatie-form-container .success-message {
     color: green;
     text-align: center;
     font-weight: bold;
