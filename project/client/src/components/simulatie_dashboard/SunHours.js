@@ -4,7 +4,6 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import "./style/SunHours.css";
 
-// Register chart components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const SunshineHours = () => {
@@ -22,26 +21,20 @@ const SunshineHours = () => {
             'temperature_2m_min',
             'sunrise',
             'sunset',
-            'daylight_duration',
             'sunshine_duration', 
             'uv_index_max',
-            'uv_index_clear_sky_max',
           ],
           timezone: 'auto',
         };
-    
-        const response = await axios.get("https://api.open-meteo.com/v1/forecast", {
-          params,
-          timeout: 10000, // 10 seconds
-        });
-    
+
+        const response = await axios.get("https://api.open-meteo.com/v1/forecast", { params });
         if (response.data && response.data.daily) {
           setWeatherData(response.data.daily);
         } else {
-          console.error('No daily data found in the API response.');
+          console.error("API response bevat geen dagelijkse gegevens.");
         }
       } catch (error) {
-        console.error('Error fetching weather data:', error);
+        console.error("Fout bij het ophalen van weerdata:", error);
       } finally {
         setLoading(false);
       }
@@ -49,154 +42,97 @@ const SunshineHours = () => {
     fetchWeatherData();
   }, []);
 
-  // Helper function to convert seconds to hours and minutes
   const convertToHoursAndMinutes = (seconds) => {
-    const hours = Math.floor(seconds / 3600); // Convert seconds to hours
-    const minutes = Math.floor((seconds % 3600) / 60); // Convert remaining seconds to minutes
-    return `${hours} hours ${minutes} minutes`;
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours} uur ${minutes} minuten`;
   };
 
-  // Helper function to format data for the charts
   const formatChartData = () => {
     const dates = weatherData.time || [];
     const temperatureMax = weatherData.temperature_2m_max || [];
     const temperatureMin = weatherData.temperature_2m_min || [];
     const uvIndexMax = weatherData.uv_index_max || [];
+    const sunshineDuration = weatherData.sunshine_duration || [];
 
-    // Max/Min Temperature chart
     const temperatureChartData = {
       labels: dates.map(date => new Date(date).toLocaleDateString()),
       datasets: [
         {
-          label: 'Max Temperature (°C)',
+          label: 'Max Temp (°C)',
           data: temperatureMax,
-          fill: false,
-          backgroundColor: '#ff6347',
-          borderColor: '#ff6347',
-          tension: 0.4,
+          borderColor: 'rgba(255, 99, 132, 1)',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
         },
         {
-          label: 'Min Temperature (°C)',
+          label: 'Min Temp (°C)',
           data: temperatureMin,
-          fill: false,
-          backgroundColor: '#1e90ff',
-          borderColor: '#1e90ff',
-          tension: 0.4,
+          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
         },
       ],
     };
 
-    // UV Index chart
-    const uvIndexChartData = {
+    const sunshineChartData = {
       labels: dates.map(date => new Date(date).toLocaleDateString()),
       datasets: [
         {
-          label: 'UV Index Max',
-          data: uvIndexMax,
-          fill: false,
-          backgroundColor: '#ffcc00',
-          borderColor: '#ffcc00',
-          tension: 0.4,
+          label: 'Zonuren (uren)',
+          data: sunshineDuration.map(seconds => (seconds / 3600).toFixed(2)),
+          borderColor: 'rgba(255, 206, 86, 1)',
+          backgroundColor: 'rgba(255, 206, 86, 0.2)',
         },
       ],
     };
 
-    return { temperatureChartData, uvIndexChartData };
+    return { temperatureChartData, sunshineChartData };
   };
 
   return (
     <div className="sunshine-hours-container">
-      <h1>Sunshine Hours and Weather Data</h1>
+      <h1>Weersdata & Zonuren</h1>
       {loading ? (
-        <p>Loading weather data...</p>
+        <p>Gegevens laden...</p>
       ) : (
         <div>
-          {/* Side-by-side charts */}
           <div className="charts-container">
             <div className="chart-item">
-              <h2>Max and Min Temperatures (°C)</h2>
-              {weatherData.time ? (
-                <Line
-                  data={formatChartData().temperatureChartData}
-                  options={{
-                    responsive: true,
-                    plugins: {
-                      legend: {
-                        display: true,
-                      },
-                    },
-                    scales: {
-                      x: {
-                        title: { display: true, text: 'Date' },
-                        ticks: { autoSkip: true, maxRotation: 45, minRotation: 45 },
-                      },
-                      y: { title: { display: true, text: 'Temperature (°C)' }, beginAtZero: false },
-                    },
-                  }}
-                />
-              ) : (
-                <p>No data available for temperature.</p>
-              )}
+              <h2>Max & Min Temperaturen</h2>
+              <Line data={formatChartData().temperatureChartData} />
             </div>
-
             <div className="chart-item">
-              <h2>UV Index Max</h2>
-              {weatherData.time ? (
-                <Line
-                  data={formatChartData().uvIndexChartData}
-                  options={{
-                    responsive: true,
-                    plugins: { legend: { display: true } },
-                    scales: {
-                      x: { title: { display: true, text: 'Date' }, ticks: { autoSkip: true, maxRotation: 45, minRotation: 45 } },
-                      y: { title: { display: true, text: 'UV Index' }, beginAtZero: false },
-                    },
-                  }}
-                />
-              ) : (
-                <p>No data available for UV Index.</p>
-              )}
+              <h2>Zonuren (uren)</h2>
+              <Line data={formatChartData().sunshineChartData} />
             </div>
           </div>
-
-          {/* Table for Sunshine Duration */}
           <div className="sunshine-duration-table">
-            <h2>Sunshine Duration for the Next 7 Days</h2>
+            <h2>Zonuren Tabel</h2>
             <table>
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Sunshine Duration</th>
-                  <th>Sunrise</th>
-                  <th>Sunset</th>
+                  <th>Datum</th>
+                  <th>Zonuren</th>
+                  <th>Zonsopgang</th>
+                  <th>Zonsondergang</th>
                 </tr>
               </thead>
               <tbody>
-                {weatherData.time && weatherData.time.map((date, index) => {
-                    const sunshineDurationSeconds = weatherData.sunshine_duration[index];
-                    const sunshineDurationFormatted =convertToHoursAndMinutes(sunshineDurationSeconds)
-                    const sunriseTime = weatherData.sunrise[index];
-                    const sunsetTime = weatherData.sunset[index];
+                {weatherData.time.map((date, index) => {
+                  const sunshineDuration = weatherData.sunshine_duration[index];
+                  const sunrise = weatherData.sunrise[index];
+                  const sunset = weatherData.sunset[index];
 
-                    const sunriseFormatted = new Date(sunriseTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const sunsetFormatted = new Date(sunsetTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                    return (
+                  return (
                     <tr key={index}>
-                        <td>{new Date(date).toLocaleDateString()}</td>
-                        <td>{sunshineDurationFormatted}</td>
-                        <td>{sunriseFormatted}</td>
-                        <td>{sunsetFormatted}</td>
+                      <td>{new Date(date).toLocaleDateString()}</td>
+                      <td>{convertToHoursAndMinutes(sunshineDuration)}</td>
+                      <td>{new Date(sunrise).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                      <td>{new Date(sunset).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                     </tr>
-                    );
+                  );
                 })}
-                </tbody>
+              </tbody>
             </table>
-          </div>
-
-          {/* Data source attribution */}
-          <div className="attribution">
-            <p>Data provided by Open Meteo</p>
           </div>
         </div>
       )}
