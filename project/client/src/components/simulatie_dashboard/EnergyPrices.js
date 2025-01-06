@@ -6,7 +6,7 @@ import "./style/EnergyPrices.css";
 const todayURL = `http://localhost:5000/api/today-prices`;
 const monthURL = `http://localhost:5000/api/monthly-prices`;
 
-const EnergyPrices = () => {
+const EnergyPrices = ({ onTodayPriceUpdate }) => {
   const [prices, setPrices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [timePeriod, setTimePeriod] = useState('monthly'); // Default to monthly data
@@ -39,20 +39,64 @@ const EnergyPrices = () => {
     fetchData();
   }, [timePeriod]);
 
+  // Calculate the average price for the day
+  const calculateAveragePrice = (prices) => {
+    const totalPrice = prices.reduce((acc, item) => acc + parseFloat(item.prijs), 0);
+    return (totalPrice / prices.length).toFixed(6); // Return the average price, rounded to 6 decimal places
+  };
+
+  useEffect(() => {
+    if (timePeriod === 'today' && prices.length > 0) {
+      const avgPrice = calculateAveragePrice(prices);
+      onTodayPriceUpdate(parseFloat(avgPrice)); // Ensure the price is a number
+    }
+  }, [prices, timePeriod, onTodayPriceUpdate]);
+
+  // Group by date and calculate the average price per day for monthly data
+  const groupByDate = (prices) => {
+    const groupedPrices = prices.reduce((acc, item) => {
+      const date = item.datum.split(" ")[0]; // Get the date part (YYYY-MM-DD)
+      const price = parseFloat(item.prijs);
+
+      if (!acc[date]) {
+        acc[date] = { total: price, count: 1 };
+      } else {
+        acc[date].total += price;
+        acc[date].count += 1;
+      }
+      return acc;
+    }, {});
+
+    // Calculate average price for each date
+    return Object.keys(groupedPrices).map((date) => ({
+      datum: date,
+      prijs: (groupedPrices[date].total / groupedPrices[date].count).toFixed(6),
+    }));
+  };
+
   // Format chart data
-  const formatChartData = (prices) => ({
-    labels: prices.map((item) => item.datum.split(" ")[0]), // Use `datum` for date and split to remove time
-    datasets: [
-      {
-        label: "Energieprijs (€ / kWh)",
-        data: prices.map((item) => parseFloat(item.prijs)), // Use `prijs` for price
-        fill: false,
-        backgroundColor: "#007bff",
-        borderColor: "#007bff",
-        tension: 0.4,
-      },
-    ],
-  });
+  const formatChartData = (prices) => {
+    const groupedPrices = timePeriod === 'monthly' ? groupByDate(prices) : prices;
+
+    return {
+      labels: groupedPrices.map((item) => {
+        if (timePeriod === 'today') {
+          return item.datum.split(" ")[1]; // Only show time (hour:minute)
+        }
+        return item.datum; // For monthly, show the full date
+      }),
+      datasets: [
+        {
+          label: "Energieprijs (€ / kWh)",
+          data: groupedPrices.map((item) => parseFloat(item.prijs)), // Use `prijs` for price
+          fill: false,
+          backgroundColor: "#007bff",
+          borderColor: "#007bff",
+          tension: 0.4,
+        },
+      ],
+    };
+  };
 
   return (
     <div className="energy-prices-container">
@@ -82,7 +126,7 @@ const EnergyPrices = () => {
                   plugins: { legend: { display: true } },
                   scales: {
                     x: {
-                      title: { display: true, text: "Date" },
+                      title: { display: true, text: timePeriod === 'today' ? "Time (HH:mm)" : "Date" },
                       ticks: {
                         autoSkip: true,
                         maxRotation: 45,

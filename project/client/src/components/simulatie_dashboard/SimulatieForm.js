@@ -1,206 +1,266 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useAuth } from "../AuthContext";
-import "./style/Simulatie.css";
+import { useNavigate } from "react-router-dom";  // Om te navigeren naar de resultatenpagina
+import { useAuth } from "../AuthContext";  // Om toegang te krijgen tot de gebruiker van de context
+
+import "./style/SimulatieForm.css";
 
 const SimulatieForm = () => {
-  const navigate = useNavigate();
-  const { userData } = useAuth(); // Get user data from AuthContext
-  const userId = userData?.id; // Replace with the actual key for user ID in your API response
+  const { userData } = useAuth(); // Haal gebruikersgegevens op uit de context
+  const userId = userData?.id;  // Haal de user ID op uit de context
+  const navigate = useNavigate();  // Voor het navigeren naar de resultatenpagina
 
   const [formData, setFormData] = useState({
-    energy_usage: "",
-    house_size: "",
-    insulation_level: "",
-    battery_capacity: "",
-    battery_efficiency: "",
-    charge_rate: "",
-    energy_cost: "",
-    return_rate: "",
-    use_dynamic_prices: false,
+    residents: 1,
+    appliancesUsage: 150,
+    daysAtHome: 30,
+    panels: 10,
+    panelArea: 20,
+    panelPower: 200,
+    location: "city",
+    batteryCapacity: 5,
+    chargeRate: 2,
+    batteryEfficiency: 90,
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);  // Voor het weergeven van laadstatus
 
+  // Verwerkt formulierinvoer
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value ? parseFloat(value) : value, // Parseer cijfers naar getallen
     }));
   };
 
+  // Verwerkt formulierverzending
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setLoading(true);  // Zet loadingstatus op true
 
     if (!userId) {
-      console.error("User ID is not available.");
+      console.error("User ID is niet beschikbaar.");
       return;
     }
 
     try {
+      // Stuur formulierdata naar de server
       await axios.post(
         "http://localhost:5000/api/simulatie",
         { ...formData, user_id: userId },
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Haal token op uit localStorage
           },
         }
       );
-      navigate(`/simulatie-results/${userId}`); // Redirect to results page
+
+      // Navigeren naar de resultatenpagina
+      navigate(`/simulatie-results/${userId}`);
     } catch (error) {
-      console.error("Error saving simulation:", error);
+      console.error("Fout bij het opslaan van simulatie:", error);
     } finally {
-      setLoading(false);
+      setLoading(false);  // Zet loadingstatus terug naar false
     }
   };
 
   return (
-    <div className="simulatie-form-container">
-      <h1>Nieuwe Simulatie</h1>
-      <form onSubmit={handleSubmit}>
-        {/* Formuliervelden */}
-        <div className="form-group">
-          <label>Energy Usage (kWh)</label>
-          <select
-            name="energy_usage"
-            value={formData.energy_usage}
+    <form className="simulatie-form" onSubmit={handleSubmit}>
+      <h2>Simulatie Formulier</h2>
+      <p className="form-description">
+        Vul de onderstaande velden in om een simulatie te maken van je maandelijkse energieverbruik en productie.
+      </p>
+
+      {/* Energieverbruik */}
+      <div className="form-section">
+        <h3>Energieverbruik</h3>
+        <label>
+          <span className="label-text">
+            Aantal bewoners
+            <span className="tooltip">?
+              <span className="tooltip-text">
+                Het aantal mensen in je huishouden bepaalt het gemiddelde energieverbruik.
+              </span>
+            </span>
+          </span>
+          <input
+            type="number"
+            name="residents"
+            min="1"
+            value={formData.residents}
             onChange={handleChange}
-            required
-          >
-            <option value="">Kies...</option>
-            <option value="1000">1000 kWh</option>
-            <option value="2000">2000 kWh</option>
-            <option value="3000">3000 kWh</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>House Size (m²)</label>
-          <select
-            name="house_size"
-            value={formData.house_size}
+          />
+        </label>
+        <label>
+          <span className="label-text">
+            Apparaatverbruik (kWh/maand)
+            <span className="tooltip">?
+              <span className="tooltip-text">
+                Gemiddeld maandelijkse energieverbruik door huishoudelijke apparaten.
+              </span>
+            </span>
+          </span>
+          <input
+            type="number"
+            name="appliancesUsage"
+            min="0"
+            value={formData.appliancesUsage}
             onChange={handleChange}
-            required
-          >
-            <option value="">Kies...</option>
-            <option value="50">50 m²</option>
-            <option value="100">100 m²</option>
-            <option value="150">150 m²</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>Insulation Level</label>
-          <select
-            name="insulation_level"
-            value={formData.insulation_level}
+          />
+        </label>
+        <label>
+          <span className="label-text">
+            Aantal dagen thuis per maand
+            <span className="tooltip">?
+              <span className="tooltip-text">
+                Hoe vaak je thuis bent beïnvloedt je energieverbruik aanzienlijk.
+              </span>
+            </span>
+          </span>
+          <input
+            type="number"
+            name="daysAtHome"
+            min="0"
+            max="31"
+            value={formData.daysAtHome}
             onChange={handleChange}
-            required
-          >
-            <option value="">Kies...</option>
-            <option value="low">Laag</option>
-            <option value="medium">Middel</option>
-            <option value="high">Hoog</option>
-          </select>
-        </div>
+          />
+        </label>
+      </div>
 
-        <div className="form-group">
-          <label>Battery Capacity (kWh)</label>
-          <select
-            name="battery_capacity"
-            value={formData.battery_capacity}
+      {/* Zonnepanelen */}
+      <div className="form-section">
+        <h3>Zonnepanelen</h3>
+        <label>
+          <span className="label-text">
+            Aantal panelen
+            <span className="tooltip">?
+              <span className="tooltip-text">
+                Het aantal zonnepanelen bepaalt hoeveel energie je kunt produceren.
+              </span>
+            </span>
+          </span>
+          <input
+            type="number"
+            name="panels"
+            min="1"
+            value={formData.panels}
             onChange={handleChange}
-            required
-          >
-            <option value="">Kies...</option>
-            <option value="5">5 kWh</option>
-            <option value="10">10 kWh</option>
-            <option value="20">20 kWh</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>Battery Efficiency (%)</label>
-          <select
-            name="battery_efficiency"
-            value={formData.battery_efficiency}
+          />
+        </label>
+        <label>
+          <span className="label-text">
+            Oppervlakte van panelen (m²)
+            <span className="tooltip">?
+              <span className="tooltip-text">
+                De totale oppervlakte van je zonnepanelen beïnvloedt de energieproductie.
+              </span>
+            </span>
+          </span>
+          <input
+            type="number"
+            name="panelArea"
+            min="0"
+            value={formData.panelArea}
             onChange={handleChange}
-            required
-          >
-            <option value="">Kies...</option>
-            <option value="80">80%</option>
-            <option value="90">90%</option>
-            <option value="95">95%</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>Charge Rate (kW)</label>
-          <select
-            name="charge_rate"
-            value={formData.charge_rate}
+          />
+        </label>
+        <label>
+          <span className="label-text">
+            Vermogen per m² (W)
+            <span className="tooltip">?
+              <span className="tooltip-text">
+                Het vermogen van zonnepanelen bepaalt hoeveel energie ze produceren per uur.
+              </span>
+            </span>
+          </span>
+          <input
+            type="number"
+            name="panelPower"
+            min="0"
+            value={formData.panelPower}
             onChange={handleChange}
-            required
-          >
-            <option value="">Kies...</option>
-            <option value="2">2 kW</option>
-            <option value="5">5 kW</option>
-            <option value="10">10 kW</option>
+          />
+        </label>
+        <label>
+          <span className="label-text">
+            Locatie
+            <span className="tooltip">?
+              <span className="tooltip-text">
+                In stedelijke gebieden is het aantal zonuren gemiddeld lager dan op het platteland.
+              </span>
+            </span>
+          </span>
+          <select name="location" value={formData.location} onChange={handleChange}>
+            <option value="city">Stad</option>
+            <option value="rural">Landelijk</option>
           </select>
-        </div>
+        </label>
+      </div>
 
-        <div className="form-group">
-          <label>Energy Cost (€/kWh)</label>
-          <select
-            name="energy_cost"
-            value={formData.energy_cost}
+      {/* Batterij */}
+      <div className="form-section">
+        <h3>Batterij</h3>
+        <label>
+          <span className="label-text">
+            Batterijcapaciteit (kWh)
+            <span className="tooltip">?
+              <span className="tooltip-text">
+                De totale opslagcapaciteit van je batterij voor energie.
+              </span>
+            </span>
+          </span>
+          <input
+            type="number"
+            name="batteryCapacity"
+            min="0"
+            value={formData.batteryCapacity}
             onChange={handleChange}
-            required
-          >
-            <option value="">Kies...</option>
-            <option value="0.2">€0.20</option>
-            <option value="0.3">€0.30</option>
-            <option value="0.4">€0.40</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>Return Rate (€/kWh)</label>
-          <select
-            name="return_rate"
-            value={formData.return_rate}
+          />
+        </label>
+        <label>
+          <span className="label-text">
+            Oplaadsnelheid (kW)
+            <span className="tooltip">?
+              <span className="tooltip-text">
+                Hoe snel je batterij kan opladen met overtollige energie.
+              </span>
+            </span>
+          </span>
+          <input
+            type="number"
+            name="chargeRate"
+            min="0"
+            value={formData.chargeRate}
             onChange={handleChange}
-            required
-          >
-            <option value="">Kies...</option>
-            <option value="0.1">€0.10</option>
-            <option value="0.15">€0.15</option>
-            <option value="0.2">€0.20</option>
-          </select>
-        </div>
+          />
+        </label>
+        <label>
+          <span className="label-text">
+            Efficiëntie (%)
+            <span className="tooltip">?
+              <span className="tooltip-text">
+                Hoeveel van de opgeslagen energie daadwerkelijk bruikbaar is.
+              </span>
+            </span>
+          </span>
+          <input
+            type="number"
+            name="batteryEfficiency"
+            min="0"
+            max="100"
+            value={formData.batteryEfficiency}
+            onChange={handleChange}
+          />
+        </label>
+      </div>
 
-        <div className="form-group">
-          <label>
-            <input
-              type="checkbox"
-              name="use_dynamic_prices"
-              checked={formData.use_dynamic_prices}
-              onChange={handleChange}
-            />
-            Gebruik dynamische prijzen
-          </label>
-        </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Opslaan..." : "Opslaan"}
-        </button>
-      </form>
-    </div>
+      <button type="submit" className="submit-btn" disabled={loading}>
+        {loading ? "Opslaan..." : "Bereken Simulatie"}
+      </button>
+    </form>
   );
 };
 

@@ -1,0 +1,65 @@
+SQL Code for Simulatie Table:
+
+CREATE TABLE simulatie (
+    id INT AUTO_INCREMENT PRIMARY KEY,          
+    user_id INT NULL,                           
+    energy_usage FLOAT NOT NULL,               
+    house_size VARCHAR(50) NOT NULL,            
+    insulation_level VARCHAR(20) NOT NULL,
+    battery_capacity FLOAT NOT NULL
+    battery_efficiency FLOAT DEFAULT 90,
+    charge_rate FLOAT NOT NULL,                 
+    energy_cost FLOAT NOT NULL,
+    return_rate FLOAT NOT NULL,
+    use_dynamic_prices BOOLEAN DEFAULT FALSE,
+    simulation_result JSON NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+---------NEW COLUMN-------------
+ALTER TABLE simulatie
+ADD COLUMN residents INT NOT NULL,
+ADD COLUMN appliances_usage FLOAT NOT NULL,
+ADD COLUMN days_at_home INT NOT NULL,
+ADD COLUMN panels INT NOT NULL,
+ADD COLUMN panel_area FLOAT NOT NULL,
+ADD COLUMN panel_power FLOAT NOT NULL;
+
+
+-----------
+Add the foreign key constraint for users table, to link simulations to specific users:
+ALTER TABLE simulatie
+ADD CONSTRAINT fk_user
+FOREIGN KEY (user_id) REFERENCES users(id)
+ON DELETE CASCADE;
+---
+Create the indexes for better performance, especially if you will frequently query user_id or created_at:
+CREATE INDEX idx_user_id ON simulatie(user_id);
+CREATE INDEX idx_created_at ON simulatie(created_at);
+
+
+NOTE: 
+Foreign Key Constraint: Ensures referential integrity between the users table and simulatie. If a user is deleted, their associated simulations will also be deleted automatically due to the ON DELETE CASCADE.
+Indexes: Improve query performance. For example, if you are searching for all simulations by a specific user or sorting simulations by creation date, these indexes will make those queries faster.
+
+----------------------
+ENERGY PRICES:
+https://enever.nl/
+
+
+
+--------------------
+SUN HOURS:
+https://open-meteo.com/en/docs/knmi-api
+npm install openmeteo
+
+
+
+
+------------------
+Bronnenlijst= 
+- Website om energieverbruik:
+https://alphaventilatie.nl/duurzaam-huis/stroomverbruik-berekenen-apparaten/#:~:text=De%20formule%20voor%20het%20energieverbruik,energieprijs%20per%20uur%20(%E2%82%AC).
+
+- 

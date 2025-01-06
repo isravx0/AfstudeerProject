@@ -1210,47 +1210,47 @@ let pendingMfaSecrets = {}; // Temporary storage for pending MFA secrets, ideall
 //Get simulation data from database
 app.post("/api/simulatie", verifyToken, (req, res) => {
     const { 
-      user_id,
-      energy_usage,
-      house_size,
-      insulation_level,
-      battery_capacity,
-      battery_efficiency,
-      charge_rate,
-      energy_cost,
-      return_rate,
-      use_dynamic_prices,
-    } = req.body;
+      user_id, residents, appliancesUsage, daysAtHome, panels, panelArea, panelPower, batteryCapacity, chargeRate, batteryEfficiency } = req.body;
   
-    db.query(
-      "INSERT INTO simulatie (user_id, energy_usage, house_size, insulation_level, battery_capacity, battery_efficiency, charge_rate, energy_cost, return_rate, use_dynamic_prices) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      [user_id, energy_usage, house_size, insulation_level, battery_capacity, battery_efficiency, charge_rate, energy_cost, return_rate, use_dynamic_prices],
-      (err, result) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).send("Error saving simulatie.");
-        }
-        res.status(201).send("Simulatie saved successfully.");
+    const query = `
+      INSERT INTO simulatie (
+         user_id, residents, appliancesUsage, daysAtHome, panels, panelArea, panelPower, batteryCapacity, chargeRate, batteryEfficiency )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+  
+    const values = [ user_id, residents, appliancesUsage, daysAtHome, panels, panelArea, panelPower, batteryCapacity, chargeRate, batteryEfficiency ];
+  
+    db.query(query, values, (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error saving simulatie.");
       }
-    );
+      res.status(201).send("Simulatie saved successfully.");
+    });
   });
-
+  
 //Get simulation data from database
 app.get("/api/simulatie/:userId", verifyToken, (req, res) => {
     const { userId } = req.params;
   
-    db.query(
-      "SELECT * FROM simulatie WHERE user_id = ?",
-      [userId],
-      (err, results) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).send("Fout bij het ophalen van gegevens.");
-        }
-        res.status(200).json(results);
+    const query = `
+      SELECT 
+        simulatie.*, 
+        users.location 
+      FROM simulatie
+      JOIN users ON simulatie.user_id = users.id
+      WHERE simulatie.user_id = ?
+    `;
+  
+    db.query(query, [userId], (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error fetching simulation data.");
       }
-    );
+      res.status(200).json(results);
+    });
   });
+  
 
 // Route to fetch today's prices
 app.get('/api/today-prices', async (req, res) => {
