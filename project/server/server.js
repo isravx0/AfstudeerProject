@@ -1209,16 +1209,22 @@ let pendingMfaSecrets = {}; // Temporary storage for pending MFA secrets, ideall
 
 //Get simulation data from database
 app.post("/api/simulatie", verifyToken, (req, res) => {
-    const { 
-      user_id, residents, appliancesUsage, daysAtHome, panels, panelArea, panelPower, batteryCapacity, chargeRate, batteryEfficiency } = req.body;
+    const { user_id, residents, appliancesUsage, daysAtHome, panels, panelArea, panelPower, batteryCapacity, chargeRate, batteryEfficiency } = req.body;
+  
+    // Calculate total energy usage, panel output, usable battery storage, and energy balance
+    const totalEnergyUsage = residents * appliancesUsage * (daysAtHome / 30); // Assuming monthly usage
+    const totalPanelOutput = (panels * panelArea * panelPower * 30) / 1000; // Assuming daily output in kWh
+    const usableBatteryStorage = (batteryCapacity * batteryEfficiency) / 100; // Usable battery storage in kWh
+    const energyBalance = totalPanelOutput - totalEnergyUsage; // Energy balance in kWh
   
     const query = `
       INSERT INTO simulatie (
-         user_id, residents, appliancesUsage, daysAtHome, panels, panelArea, panelPower, batteryCapacity, chargeRate, batteryEfficiency )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        user_id, residents, appliancesUsage, daysAtHome, panels, panelArea, panelPower, batteryCapacity, chargeRate, batteryEfficiency, totalEnergyUsage, totalPanelOutput, usableBatteryStorage, energyBalance )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
   
-    const values = [ user_id, residents, appliancesUsage, daysAtHome, panels, panelArea, panelPower, batteryCapacity, chargeRate, batteryEfficiency ];
+    const values = [
+      user_id, residents, appliancesUsage, daysAtHome, panels, panelArea, panelPower, batteryCapacity, chargeRate, batteryEfficiency, totalEnergyUsage, totalPanelOutput, usableBatteryStorage, energyBalance ];
   
     db.query(query, values, (err, result) => {
       if (err) {
@@ -1228,7 +1234,7 @@ app.post("/api/simulatie", verifyToken, (req, res) => {
       res.status(201).send("Simulatie saved successfully.");
     });
   });
-  
+
 //Get simulation data from database
 app.get("/api/simulatie/:userId", verifyToken, (req, res) => {
     const { userId } = req.params;
@@ -1250,7 +1256,6 @@ app.get("/api/simulatie/:userId", verifyToken, (req, res) => {
       res.status(200).json(results);
     });
   });
-  
 
 // Route to fetch today's prices
 app.get('/api/today-prices', async (req, res) => {

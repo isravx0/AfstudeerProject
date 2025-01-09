@@ -1,61 +1,60 @@
-.simulatie-results-container {
-  padding: 2rem;
-  background-color: #f7f7f7;
-}
-
-.simulatie-results-container h1 {
-  text-align: center;
-  color: #333;
-}
-
-.simulatie-results-container .loading-message,
-.simulatie-results-container .no-results-message {
-  text-align: center;
-  color: #777;
-  font-size: 1.2rem;
-}
-
-.simulatie-results-container .results-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.simulatie-results-container .result-card {
-  background: #fff;
-  padding: 1.5rem;
+.simulatie-results {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease-in-out;
 }
 
-.simulatie-results-container .result-card:hover {
-  transform: translateY(-5px);
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.simulatie-results-container .result-card h2 {
-  margin-bottom: 1rem;
-  color: #444;
+.result-item {
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.loading,
+.no-data {
+  text-align: center;
+  font-size: 18px;
+  color: #777;
 }
 
-.simulatie-results-container .result-details {
-  list-style: none;
-  padding: 0;
+.tooltip {
+  display: inline-block;
+  margin-left: 8px;
+  margin-right: 2%;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #007bff;
+  position: relative;
 }
 
-.simulatie-results-container .result-details li {
-  margin: 0.5rem 0;
-  font-size: 1rem;
-  color: #555;
+.tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 8px;
+  border-radius: 4px;
+  position: absolute;
+  bottom: 125%; /* Position above */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 1;
 }
 
-.simulatie-results-container .result-details li strong {
-  color: #333;
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }
-
-.simulatie-results-container .result-details li svg {
-  margin-right: 0.5rem;
-  color: #0056b3;
-}
-

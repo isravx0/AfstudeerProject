@@ -27,6 +27,7 @@ const Header = () => {
                 <a href='/information'><li>Information</li></a>
                 <a href='/SolarDashboard'><li>Solar Panels Dashboard</li></a>
                 <a href='/BatteryDashboard'><li>Battery Dashboard</li></a>
+                <a href='/SimulationDashboard'><li>Simulation Dashboard</li></a>
               </ul>
               <img src={profilePic} alt='profile' className='profile' />
               <span>{userData?.name}</span>

@@ -50,7 +50,6 @@ CREATE TABLE feedback (
 );
 
 
-
 //-------------------------------------------------------
 BATTERY DASHBOARD TABEL:
 CREATE TABLE Battery (
@@ -63,26 +62,19 @@ CREATE TABLE Battery (
 
 //-------------------------------------------------------
 CREATE TABLE simulatie (
-    id INT AUTO_INCREMENT PRIMARY KEY,          
-    user_id INT NULL,                           
-    energy_usage FLOAT NOT NULL,               
-    house_size VARCHAR(50) NOT NULL,            
-    insulation_level VARCHAR(20) NOT NULL,
-    battery_capacity FLOAT NOT NULL,
-    battery_efficiency FLOAT DEFAULT 90,
-    charge_rate FLOAT NOT NULL,                 
-    energy_cost FLOAT NOT NULL,
-    return_rate FLOAT NOT NULL,
-    use_dynamic_prices BOOLEAN DEFAULT FALSE,
-    simulation_result JSON NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    residents INT NOT NULL,
+    appliancesUsage FLOAT NOT NULL,
+    daysAtHome INT NOT NULL,
+    panels INT NOT NULL,
+    panelArea FLOAT NOT NULL,
+    panelPower FLOAT NOT NULL,
+    location VARCHAR(50) NOT NULL,
+    batteryCapacity FLOAT NOT NULL,
+    chargeRate FLOAT NOT NULL,
+    batteryEfficiency FLOAT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-ALTER TABLE simulatie
-ADD COLUMN residents INT NOT NULL,
-ADD COLUMN appliances_usage FLOAT NOT NULL,
-ADD COLUMN days_at_home INT NOT NULL,
-ADD COLUMN panels INT NOT NULL,
-ADD COLUMN panel_area FLOAT NOT NULL,
-ADD COLUMN panel_power FLOAT NOT NULL;

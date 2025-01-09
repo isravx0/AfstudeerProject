@@ -57,7 +57,7 @@ function App() {
             <Route path="/simulatie-results/:userId" element={<SimulatieResults />} />
             <Route path="/energy-prices" element={<EnergyPrices />} />
             <Route path="/sun-hours" element={<SunHours />} />
-            <Route path="/simulatie_dashboard" element={<SimulatieDashboard />} />
+            <Route path="/SimulationDashboard" element={<SimulatieDashboard />} />
             <Route path="/about_us" element={<AboutUs />} />
             <Route path="/about_us1" element={<AboutUsPage />} />
             {/* User Account Section (Nested Routes) */}

@@ -1,68 +1,93 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";  // Om te navigeren naar de resultatenpagina
-import { useAuth } from "../AuthContext";  // Om toegang te krijgen tot de gebruiker van de context
+import { useNavigate } from "react-router-dom"; 
+import { useAuth } from "../AuthContext"; 
+import Swal from "sweetalert2";
 
 import "./style/SimulatieForm.css";
 
 const SimulatieForm = () => {
-  const { userData } = useAuth(); // Haal gebruikersgegevens op uit de context
-  const userId = userData?.id;  // Haal de user ID op uit de context
-  const navigate = useNavigate();  // Voor het navigeren naar de resultatenpagina
+  const { userData } = useAuth();
+  const userId = userData?.id;
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     residents: 1,
-    appliancesUsage: 150,
+    appliancesUsage: 5,
     daysAtHome: 30,
-    panels: 10,
+    panels: 1,
     panelArea: 20,
     panelPower: 200,
     location: "city",
-    batteryCapacity: 5,
-    chargeRate: 2,
+    batteryCapacity: 10,
+    chargeRate: 5,
     batteryEfficiency: 90,
   });
 
-  const [loading, setLoading] = useState(false);  // Voor het weergeven van laadstatus
+  const [loading, setLoading] = useState(false);
 
-  // Verwerkt formulierinvoer
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value ? parseFloat(value) : value, // Parseer cijfers naar getallen
+      [name]: value ? parseFloat(value) : value,
     }));
   };
 
-  // Verwerkt formulierverzending
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);  // Zet loadingstatus op true
+    setLoading(true);
 
     if (!userId) {
-      console.error("User ID is niet beschikbaar.");
+      Swal.fire({
+        icon: "error",
+        title: "Gebruikersfout",
+        text: "Gebruikers-ID is niet beschikbaar. Log opnieuw in en probeer het opnieuw.",
+      });
+      setLoading(false);
       return;
     }
 
     try {
-      // Stuur formulierdata naar de server
-      await axios.post(
+      const totalEnergyUsage = formData.residents * formData.appliancesUsage * (formData.daysAtHome / 30);
+      const totalPanelOutput = (formData.panels * formData.panelArea * formData.panelPower * 30) / 1000;
+      const usableBatteryStorage = (formData.batteryCapacity * formData.batteryEfficiency) / 100;
+      const energyBalance = totalPanelOutput - totalEnergyUsage;
+
+      const simulationResults = {
+        ...formData,
+        totalEnergyUsage,
+        totalPanelOutput,
+        usableBatteryStorage,
+        energyBalance,
+      };
+
+      const response = await axios.post(
         "http://localhost:5000/api/simulatie",
-        { ...formData, user_id: userId },
+        { ...simulationResults, user_id: userId },
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Haal token op uit localStorage
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         }
       );
 
-      // Navigeren naar de resultatenpagina
+      Swal.fire({
+        icon: "success",
+        title: "Simulatie opgeslagen",
+        text: "Je simulatiegegevens zijn succesvol opgeslagen!",
+      });
       navigate(`/simulatie-results/${userId}`);
     } catch (error) {
       console.error("Fout bij het opslaan van simulatie:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Serverfout",
+        text: "Er is een probleem opgetreden bij het opslaan van je simulatie. Probeer het later opnieuw.",
+      });
     } finally {
-      setLoading(false);  // Zet loadingstatus terug naar false
+      setLoading(false);
     }
   };
 
@@ -183,20 +208,6 @@ const SimulatieForm = () => {
             value={formData.panelPower}
             onChange={handleChange}
           />
-        </label>
-        <label>
-          <span className="label-text">
-            Locatie
-            <span className="tooltip">?
-              <span className="tooltip-text">
-                In stedelijke gebieden is het aantal zonuren gemiddeld lager dan op het platteland.
-              </span>
-            </span>
-          </span>
-          <select name="location" value={formData.location} onChange={handleChange}>
-            <option value="city">Stad</option>
-            <option value="rural">Landelijk</option>
-          </select>
         </label>
       </div>
 

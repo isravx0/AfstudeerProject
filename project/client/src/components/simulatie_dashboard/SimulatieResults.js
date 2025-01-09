@@ -1,99 +1,118 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./style/Simulatie.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBolt,
-  faHome,
-  faThermometerHalf,
-  faBatteryFull,
-  faTachometerAlt,
-  faEuroSign,
-  faExchangeAlt,
-  faSyncAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
+
+import "./style/SimulatieResults.css";
 
 const SimulatieResults = () => {
   const { userId } = useParams();
-  const [simulaties, setSimulaties] = useState([]);
+  const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSimulationData = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/api/simulatie/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
-        setSimulaties(response.data);
+        const response = await axios.get(`http://localhost:5000/api/simulatie/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+        if (response.data && response.data.length > 0) {
+          setResults(response.data[0]); // Neem het eerste resultaat
+        } else {
+          setResults(null);
+        }
       } catch (error) {
-        console.error("Fout bij het ophalen van simulatiegegevens:", error);
+        console.error("Fout bij ophalen van simulatiegegevens:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Fout bij ophalen",
+          text: "Kan simulatiegegevens niet ophalen. Probeer het opnieuw.",
+        });
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+
+    fetchSimulationData();
   }, [userId]);
 
+  if (loading) {
+    return <div className="loading">Gegevens laden...</div>;
+  }
+
+  if (!results) {
+    return <div className="no-data">Geen simulatiegegevens gevonden.</div>;
+  }
+
   return (
-    <div className="simulatie-results-container">
-      <h1>Mijn Simulaties</h1>
-      {loading ? (
-        <p className="loading-message">Gegevens laden...</p>
-      ) : simulaties.length > 0 ? (
-        <div className="results-grid">
-          {simulaties.map((simulatie) => (
-            <div key={simulatie.id} className="result-card">
-              <h2>Simulatie ID: {simulatie.id}</h2>
-              <ul className="result-details">
-                <li>
-                  <FontAwesomeIcon icon={faBolt} /> Energieverbruik:{" "}
-                  <strong>{simulatie.energy_usage} kWh</strong>
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faHome} /> Huisgrootte:{" "}
-                  <strong>{simulatie.house_size} m²</strong>
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faThermometerHalf} /> Isolatieniveau:{" "}
-                  <strong>{simulatie.insulation_level}</strong>
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faBatteryFull} /> Batterijcapaciteit:{" "}
-                  <strong>{simulatie.battery_capacity} kWh</strong>
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faTachometerAlt} /> Batterijrendement:{" "}
-                  <strong>{simulatie.battery_efficiency}%</strong>
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faSyncAlt} /> Laadsnelheid:{" "}
-                  <strong>{simulatie.charge_rate} kW</strong>
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faEuroSign} /> Energieprijs:{" "}
-                  <strong>€{simulatie.energy_cost}/kWh</strong>
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faExchangeAlt} /> Terugleverprijs:{" "}
-                  <strong>€{simulatie.return_rate}/kWh</strong>
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faSyncAlt} /> Dynamische prijzen:{" "}
-                  <strong>{simulatie.use_dynamic_prices ? "Ja" : "Nee"}</strong>
-                </li>
-              </ul>
+    <div className="simulatie-results">
+      <h2>Simulatieresultaten</h2>
+      <div className="results-container">
+        {results ? (
+          <>
+            <div className="result-item">
+              <strong>
+                Totaal Energieverbruik (kWh):
+              </strong>
+              {results.totalEnergyUsage ? results.totalEnergyUsage.toFixed(2) : 'N/A'}
+              <span className="tooltip">
+                  ?
+                  <span className="tooltip-text">
+                    Dit is het totaal verbruik van je huishoudelijke apparaten in een maand, berekend op basis van het aantal bewoners en hun gebruik.
+                  </span>
+                </span>
             </div>
-          ))}
-        </div>
-      ) : (
-        <p className="no-results-message">Geen simulaties gevonden.</p>
-      )}
+
+            <div className="result-item">
+              <strong>
+                Energieproductie Zonnepanelen (kWh):
+              </strong>
+              {results.totalPanelOutput ? results.totalPanelOutput.toFixed(2) : 'N/A'}
+              <span className="tooltip">
+                  ?
+                  <span className="tooltip-text">
+                    Dit is de energie die je zonnepanelen gedurende de maand produceren, berekend op basis van het aantal panelen, de oppervlakte en het vermogen per m².
+                  </span>
+                </span>
+            </div>
+
+            <div className="result-item">
+              <strong>
+                Bruikbare Batterijcapaciteit (kWh):
+              </strong>
+              {results.usableBatteryStorage ? results.usableBatteryStorage.toFixed(2) : 'N/A'}
+              <span className="tooltip">
+                  ?
+                  <span className="tooltip-text">
+                    Dit is de capaciteit van de batterij die daadwerkelijk bruikbaar is, rekening houdend met de efficiëntie van de batterij.
+                  </span>
+                </span>
+            </div>
+
+            <div className="result-item">
+              <strong>
+                Energiebalans (kWh):
+
+              </strong>
+              {results.energyBalance !== undefined ? 
+                (results.energyBalance > 0 ? 
+                  `Overschot (${results.energyBalance.toFixed(2)})` 
+                  : `Tekort (${Math.abs(results.energyBalance).toFixed(2)})`) 
+                : 'N/A'}
+                <span className="tooltip">
+                  ?
+                  <span className="tooltip-text">
+                    Dit geeft aan of je zonnepanelen voldoende energie produceren voor je verbruik. Een positieve waarde geeft een overschot aan energie, terwijl een negatieve waarde een tekort aangeeft.
+                  </span>
+                </span>
+            </div>
+          </>
+        ) : (
+          <div>Geen simulatiegegevens gevonden.</div>
+        )}
+      </div>
     </div>
   );
 };
