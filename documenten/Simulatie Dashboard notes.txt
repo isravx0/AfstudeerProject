@@ -62,4 +62,7 @@ Bronnenlijst=
 - Website om energieverbruik:
 https://alphaventilatie.nl/duurzaam-huis/stroomverbruik-berekenen-apparaten/#:~:text=De%20formule%20voor%20het%20energieverbruik,energieprijs%20per%20uur%20(%E2%82%AC).
 
+- gemiddelde energieverbruik: 
+https://www.engie.nl/product-advies/gemiddeld-energieverbruik/gemiddeld-stroomverbruik
+
 - 

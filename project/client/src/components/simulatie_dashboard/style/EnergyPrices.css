@@ -19,13 +19,13 @@
   margin: 0 10px;
   cursor: pointer;
   border: 1px solid #007bff;
-  background-color: #fff;
-  color: #007bff;
+  background-color: #007bff;
+  color: #ffffff;
   transition: background-color 0.3s ease;
 }
 
 .energy-prices-container .time-period-selector button.active {
-  background-color: #007bff;
+  background-color: #060f62;
   color: white;
 }
 

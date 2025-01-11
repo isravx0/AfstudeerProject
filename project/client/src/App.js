@@ -53,13 +53,12 @@ function App() {
             <Route path="/feedback" element={<FeedbackForm />} />
             <Route path="/BatteryDashboard" element={<BatteryDashboard />} />
             <Route path="/SolarDashboard" element={<SolarDashboard />} />
-            <Route path="/simulatie" element={<SimulatieForm userId={1} />} />
-            <Route path="/simulatie-results/:userId" element={<SimulatieResults />} />
+            <Route path="/simulation" element={<SimulatieForm userId={1} />} />
+            <Route path="/simulationResults/:userId" element={<SimulatieResults />} />
             <Route path="/energy-prices" element={<EnergyPrices />} />
             <Route path="/sun-hours" element={<SunHours />} />
             <Route path="/SimulationDashboard" element={<SimulatieDashboard />} />
             <Route path="/about_us" element={<AboutUs />} />
-            <Route path="/about_us1" element={<AboutUsPage />} />
             {/* User Account Section (Nested Routes) */}
             <Route 
               path="/user-account/*" 

@@ -31,10 +31,10 @@ const SunshineHours = () => {
         if (response.data && response.data.daily) {
           setWeatherData(response.data.daily);
         } else {
-          console.error("API response bevat geen dagelijkse gegevens.");
+          console.error("API response does not contain daily data.");
         }
       } catch (error) {
-        console.error("Fout bij het ophalen van weerdata:", error);
+        console.error("Error fetching weather data:", error);
       } finally {
         setLoading(false);
       }
@@ -42,18 +42,22 @@ const SunshineHours = () => {
     fetchWeatherData();
   }, []);
 
+  // Convert seconds to hours and minutes
   const convertToHoursAndMinutes = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours} uur ${minutes} minuten`;
+    return `${hours} hours ${minutes} minutes`;
   };
 
+  // Format the data for charting
   const formatChartData = () => {
     const dates = weatherData.time || [];
     const temperatureMax = weatherData.temperature_2m_max || [];
     const temperatureMin = weatherData.temperature_2m_min || [];
     const uvIndexMax = weatherData.uv_index_max || [];
     const sunshineDuration = weatherData.sunshine_duration || [];
+
+    const totalSunshineHours = sunshineDuration.reduce((total, duration) => total + duration, 0) / 3600; // Sum all sunshine durations and convert to hours
 
     const temperatureChartData = {
       labels: dates.map(date => new Date(date).toLocaleDateString()),
@@ -77,7 +81,7 @@ const SunshineHours = () => {
       labels: dates.map(date => new Date(date).toLocaleDateString()),
       datasets: [
         {
-          label: 'Zonuren (uren)',
+          label: 'Sunshine Hours (hours)',
           data: sunshineDuration.map(seconds => (seconds / 3600).toFixed(2)),
           borderColor: 'rgba(255, 206, 86, 1)',
           backgroundColor: 'rgba(255, 206, 86, 0.2)',
@@ -85,55 +89,30 @@ const SunshineHours = () => {
       ],
     };
 
-    return { temperatureChartData, sunshineChartData };
+    return { temperatureChartData, sunshineChartData, totalSunshineHours };
   };
 
   return (
     <div className="sunshine-hours-container">
-      <h1>Weersdata & Zonuren</h1>
       {loading ? (
-        <p>Gegevens laden...</p>
+        <p>Loading data...</p>
       ) : (
         <div>
           <div className="charts-container">
             <div className="chart-item">
-              <h2>Max & Min Temperaturen</h2>
+              <h2>Max & Min Temperatures</h2>
               <Line data={formatChartData().temperatureChartData} />
             </div>
             <div className="chart-item">
-              <h2>Zonuren (uren)</h2>
+              <h2>Sunshine Hours (hours)</h2>
               <Line data={formatChartData().sunshineChartData} />
             </div>
           </div>
-          <div className="sunshine-duration-table">
-            <h2>Zonuren Tabel</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Datum</th>
-                  <th>Zonuren</th>
-                  <th>Zonsopgang</th>
-                  <th>Zonsondergang</th>
-                </tr>
-              </thead>
-              <tbody>
-                {weatherData.time.map((date, index) => {
-                  const sunshineDuration = weatherData.sunshine_duration[index];
-                  const sunrise = weatherData.sunrise[index];
-                  const sunset = weatherData.sunset[index];
 
-                  return (
-                    <tr key={index}>
-                      <td>{new Date(date).toLocaleDateString()}</td>
-                      <td>{convertToHoursAndMinutes(sunshineDuration)}</td>
-                      <td>{new Date(sunrise).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-                      <td>{new Date(sunset).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          {/* Display Monthly Sunshine Hours */}
+          {/* <div className="monthly-sunshine">
+            <h3>Total Sunshine Hours for the Month: {formatChartData().totalSunshineHours.toFixed(2)} hours</h3>
+          </div> */}
         </div>
       )}
     </div>

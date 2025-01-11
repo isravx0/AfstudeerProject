@@ -151,3 +151,5 @@ const EnergyPrices = ({ onTodayPriceUpdate }) => {
 };
 
 export default EnergyPrices;
+
+

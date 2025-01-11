@@ -1,191 +1,34 @@
-/* General Layout */
-.simulatie-dashboard .dashboard-container {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 30px;
-  background: linear-gradient(135deg, #f8f9fa, #ffffff);
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  font-family: 'Roboto', sans-serif;
-}
-
-.simulatie-dashboard h1 {
-  text-align: center;
-  font-size: 3rem;
-  margin-bottom: 30px;
-  color: #2c3e50;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.simulatie-dashboard h2 {
-  font-size: 2rem;
-  color: #34495e;
-  margin-bottom: 20px;
-  border-left: 4px solid #007bff;
-  padding-left: 15px;
-}
-
-/* Section Styling */
-.simulatie-dashboard .section {
-  margin-bottom: 40px;
+.simulatie-dashboard {
   padding: 20px;
+  background-color: #f9f9f9;
+  font-family: Arial, sans-serif;
 }
 
-.simulatie-dashboard .section h3 {
-  font-size: 1.6rem;
-  text-align: center;
-  color: #27ae60;
-  margin-top: 15px;
-  font-weight: bold;
-}
-
-.simulatie-dashboard .section p {
-  font-size: 1rem;
-  color: #7f8c8d;
-  text-align: center;
-  margin-top: 10px;
-}
-
-/* Form Inputs */
-.simulatie-dashboard form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.simulatie-dashboard form label {
-  font-size: 1rem;
-  color: #34495e;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.simulatie-dashboard form input,
-form select {
-  padding: 12px;
-  font-size: 1rem;
-  border: 1px solid #dcdcdc;
-  border-radius: 8px;
-  background: #fdfdfd;
-  width: 100%;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.simulatie-dashboard form input:focus,
-.simulatie-dashboard form select:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-/* Buttons */
-.simulatie-dashboard button {
-  padding: 12px 24px;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: #ffffff;
-  transition: all 0.3s ease;
-  font-weight: bold;
-}
-
-.simulatie-dashboard button:hover {
-  background: linear-gradient(135deg, #0056b3, #003f7f);
-  transform: translateY(-2px);
-}
-
-.simulatie-dashboard button:active {
-  transform: translateY(1px);
-}
-
-/* Results Block */
-.simulatie-dashboard .result-block {
-  background: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
-}
-
-.simulatie-dashboard .result-block h3 {
-  font-size: 1.8rem;
-  color: #27ae60;
-  font-weight: bold;
-  text-align: center;
-}
-
-.simulatie-dashboard .result-block p {
-  font-size: 1.1rem;
-  color: #7f8c8d;
-  text-align: center;
-  margin-top: 10px;
-}
-
-/* Energy and Sunshine Section */
-.simulatie-dashboard .energy-section {
+.card-container {
   display: flex;
   justify-content: space-between;
-  gap: 30px;
+  margin-bottom: 20px;
 }
 
-.simulatie-dashboard .energy-prices,
-.simulatie-dashboard .sunshine-hours {
-  flex: 1;
-  padding: 20px;
-  background: #ffffff;
+.card {
+  background: white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  margin-bottom: 40px;
   padding: 20px;
+  flex: 1;
+  margin: 0 10px;
 }
 
-.simulatie-dashboard .energy-prices h2,
-.simulatie-dashboard .sunshine-hours h2 {
-  font-size: 1.6rem;
-  color: #2c3e50;
-  margin-bottom: 15px;
-}
-
-/* Forms and Results Layout */
-.simulatie-dashboard .forms-and-results {
+.second-row {
   display: flex;
   justify-content: space-between;
-  gap: 40px;
-  margin-top: 40px;
 }
 
-.simulatie-dashboard .forms-container {
+.performance-monitoring {
   flex: 1;
-  background: #ffffff;
+  background: white;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .simulatie-dashboard .forms-and-results,
-  .simulatie-dashboard .energy-section {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .simulatie-dashboard form {
-    grid-template-columns: 1fr;
-  }
-
-  .simulatie-dashboard button {
-    width: 100%;
-  }
-
-  .simulatie-dashboard .section h3 {
-    font-size: 1.4rem;
-  }
-
-  .simulatie-dashboard .result-block h3 {
-    font-size: 1.5rem;
-  }
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-left: 10px;
 }
